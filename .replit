@@ -1,5 +1,55 @@
+modules = ["python-3.11", "nodejs-20"]
 [agent]
 expertMode = true
 
 [nix]
 channel = "stable-25_05"
+packages = ["libyaml"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "LabDabbler Frontend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "LabDabbler Backend"
+
+[[workflows.workflow]]
+name = "LabDabbler Frontend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd web/frontend && npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow]]
+name = "LabDabbler Backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd web/backend && python app.py"
+waitForPort = 8000
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 8000
+externalPort = 8000

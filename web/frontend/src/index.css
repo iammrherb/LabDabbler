@@ -1,0 +1,124 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: #1a1a1a;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+.App-header {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin-bottom: 2rem;
+}
+
+.App-header h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.labs-section, .containers-section, .lab-builder {
+  margin-bottom: 3rem;
+}
+
+.labs-section h2, .containers-section h2, .lab-builder h2 {
+  color: #667eea;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.lab-category, .container-category {
+  margin-bottom: 2rem;
+}
+
+.lab-category h3, .container-category h3 {
+  color: #764ba2;
+  margin-bottom: 1rem;
+  text-transform: capitalize;
+}
+
+.lab-grid, .container-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.lab-card, .container-card {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.lab-card:hover, .container-card:hover {
+  transform: translateY(-2px);
+  border-color: #667eea;
+}
+
+.lab-card h4, .container-card h4 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.image-name {
+  font-family: 'Courier New', monospace;
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5a67d8;
+}
+
+.btn-secondary {
+  background: #764ba2;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #6b46c1;
+}
+
+.builder-placeholder {
+  text-align: center;
+  padding: 3rem;
+  background: #2a2a2a;
+  border: 2px dashed #444;
+  border-radius: 8px;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.5rem;
+}
