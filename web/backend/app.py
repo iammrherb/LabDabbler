@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -9,6 +9,7 @@ from pathlib import Path
 from services.container_discovery import ContainerDiscoveryService
 from services.github_lab_scanner import GitHubLabScanner
 from services.lab_launcher import LabLauncherService
+from services.vrnetlab_service import VRNetLabService
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 container_service = ContainerDiscoveryService(DATA_DIR)
 lab_scanner = GitHubLabScanner(DATA_DIR)
 lab_launcher = LabLauncherService(DATA_DIR)
+vrnetlab_service = VRNetLabService(DATA_DIR)
 
 @app.get("/")
 async def root():
@@ -121,11 +123,163 @@ async def get_containers(refresh: bool = False):
     
     return containers
 
+@app.get("/api/containers/search")
+async def search_containers(
+    q: str = "",
+    category: str = "", 
+    vendor: str = "",
+    architecture: str = "",
+    limit: int = 50,
+    offset: int = 0
+):
+    """Search containers with filters and pagination"""
+    results = container_service.search_containers(
+        query=q, 
+        category=category, 
+        vendor=vendor, 
+        architecture=architecture
+    )
+    
+    # Apply pagination
+    total = results["total"]
+    paginated_results = results["results"][offset:offset + limit]
+    
+    return {
+        "total": total,
+        "results": paginated_results,
+        "categories": results["categories"],
+        "query": results["query"],
+        "filters": results["filters"],
+        "pagination": {
+            "limit": limit,
+            "offset": offset,
+            "has_more": (offset + limit) < total
+        }
+    }
+
+@app.get("/api/containers/categories")
+async def get_container_categories():
+    """Get all container categories with metadata and counts"""
+    categories = container_service.get_container_categories()
+    return {"categories": categories}
+
+@app.get("/api/containers/vendors")
+async def get_container_vendors():
+    """Get list of all container vendors"""
+    vendors = container_service.get_vendors()
+    return {"vendors": vendors}
+
+@app.get("/api/containers/architectures")
+async def get_container_architectures():
+    """Get list of all supported architectures"""
+    architectures = container_service.get_architectures()
+    return {"architectures": architectures}
+
+@app.get("/api/containers/stats")
+async def get_container_stats():
+    """Get statistics about the container catalog"""
+    containers = container_service.load_containers()
+    if not containers:
+        return {"total_containers": 0, "total_categories": 0, "vendors": [], "last_updated": None}
+    
+    total_containers = 0
+    categories = []
+    
+    for category_name, container_list in containers.items():
+        if category_name == "last_updated":
+            continue
+        if isinstance(container_list, list):
+            total_containers += len(container_list)
+            categories.append(category_name)
+    
+    return {
+        "total_containers": total_containers,
+        "total_categories": len(categories),
+        "categories": categories,
+        "vendors": container_service.get_vendors(),
+        "architectures": container_service.get_architectures(),
+        "last_updated": containers.get("last_updated")
+    }
+
 @app.post("/api/containers/refresh")
 async def refresh_containers():
     """Refresh container discovery from all sources"""
     containers = await container_service.refresh_containers()
-    return {"message": "Container discovery completed", "containers": containers}
+    stats = {
+        "total_containers": sum(len(v) if isinstance(v, list) else 0 for v in containers.values()),
+        "total_categories": len([k for k in containers.keys() if k != "last_updated"]),
+        "last_updated": containers.get("last_updated")
+    }
+    return {"message": "Container discovery completed", "stats": stats}
+
+@app.post("/api/containers/validate-compatibility")
+async def validate_container_compatibility(
+    request: dict
+):
+    """Validate container compatibility with a specific lab type"""
+    container_data = request.get("container")
+    lab_type = request.get("lab_type")
+    protocols = request.get("protocols", [])
+    
+    if not container_data or not lab_type:
+        raise HTTPException(status_code=400, detail="container and lab_type are required")
+    
+    compatibility = await container_service.validate_container_compatibility(
+        container_data, lab_type, protocols
+    )
+    return compatibility
+
+@app.get("/api/containers/recommendations/{lab_type}")
+async def get_recommended_containers(
+    lab_type: str,
+    lab_description: str = None,
+    protocols: str = None,  # Comma-separated list
+    limit: int = 10
+):
+    """Get recommended containers for a specific lab type"""
+    protocol_list = protocols.split(",") if protocols else None
+    recommendations = await container_service.get_recommended_containers_for_lab(
+        lab_type, lab_description, protocol_list, limit
+    )
+    return recommendations
+
+@app.post("/api/labs/{lab_id}/analyze-requirements")
+async def analyze_lab_container_requirements(lab_id: str):
+    """Analyze a lab configuration and suggest required containers"""
+    # First try to load the lab from GitHub data
+    github_labs = lab_scanner.load_labs()
+    lab_config = None
+    
+    if github_labs and "repositories" in github_labs:
+        for repo, repo_labs in github_labs["repositories"].items():
+            for lab in repo_labs:
+                if lab.get("name") == lab_id or lab.get("file_path", "").endswith(f"/{lab_id}.clab.yml"):
+                    # Load the actual lab config if we have the URL
+                    if "raw_url" in lab:
+                        try:
+                            import requests
+                            response = requests.get(lab["raw_url"])
+                            if response.status_code == 200:
+                                lab_config = yaml.safe_load(response.text)
+                                break
+                        except Exception as e:
+                            logger.error(f"Error loading lab config from {lab.get('raw_url')}: {e}")
+    
+    # If not found in GitHub, try local labs
+    if not lab_config and LABS_DIR.exists():
+        for lab_file in LABS_DIR.rglob(f"*{lab_id}*.clab.yml"):
+            try:
+                with open(lab_file, 'r') as f:
+                    lab_config = yaml.safe_load(f)
+                break
+            except Exception as e:
+                logger.error(f"Error loading local lab file {lab_file}: {e}")
+    
+    if not lab_config:
+        raise HTTPException(status_code=404, detail=f"Lab configuration not found for ID: {lab_id}")
+    
+    suggestions = await container_service.analyze_lab_container_requirements(lab_config)
+    return suggestions
 
 @app.post("/api/labs/launch")
 async def launch_lab(request: dict):
@@ -173,6 +327,121 @@ async def create_lab(lab_config: dict):
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "message": "LabDabbler API is running"}
+
+# VRNetlab endpoints
+@app.post("/api/vrnetlab/init")
+async def initialize_vrnetlab_repo():
+    """Initialize or update the vrnetlab repository"""
+    result = await vrnetlab_service.initialize_vrnetlab_repo()
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
+
+@app.post("/api/vrnetlab/upload")
+async def upload_vm_image(
+    file: UploadFile = File(...),
+    vendor: str = Form(...),
+    platform: str = Form(...),
+    version: str = Form("latest")
+):
+    """Upload a VM image for vrnetlab conversion"""
+    try:
+        # Read file content
+        file_data = await file.read()
+        
+        # Validate file has a filename
+        if not file.filename:
+            raise HTTPException(status_code=400, detail={"message": "File must have a filename"})
+        
+        # Upload the image
+        result = await vrnetlab_service.upload_vm_image(
+            file_data, file.filename, vendor, platform, version
+        )
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result)
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"error": str(e), "message": "Failed to upload VM image"})
+
+@app.post("/api/vrnetlab/build")
+async def build_vrnetlab_container(request: dict):
+    """Build a vrnetlab container from uploaded VM image"""
+    image_id = request.get("image_id")
+    container_name = request.get("container_name")
+    container_tag = request.get("container_tag", "latest")
+    
+    if not image_id:
+        raise HTTPException(status_code=400, detail={"message": "image_id is required"})
+    
+    # Container name is optional - will be auto-generated if not provided
+    result = await vrnetlab_service.build_vrnetlab_container(image_id, container_name, container_tag)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.get("/api/vrnetlab/builds/{build_id}/status")
+async def get_build_status(build_id: str):
+    """Get the status of a vrnetlab build"""
+    result = await vrnetlab_service.get_build_status(build_id)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail=result)
+
+@app.get("/api/vrnetlab/images")
+async def list_vm_images():
+    """List all uploaded VM images"""
+    result = await vrnetlab_service.list_vm_images()
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
+
+@app.get("/api/vrnetlab/builds")
+async def list_builds():
+    """List all vrnetlab builds"""
+    result = await vrnetlab_service.list_builds()
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
+
+@app.get("/api/vrnetlab/containers")
+async def list_built_containers():
+    """List all built vrnetlab containers"""
+    result = await vrnetlab_service.list_built_containers()
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
+
+@app.delete("/api/vrnetlab/images/{image_id}")
+async def delete_vm_image(image_id: str):
+    """Delete a VM image"""
+    result = await vrnetlab_service.delete_vm_image(image_id)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.get("/api/vrnetlab/vendors")
+async def get_supported_vendors():
+    """Get list of supported vendors and platforms"""
+    return {
+        "success": True,
+        "vendors": vrnetlab_service.supported_vendors
+    }
 
 if __name__ == "__main__":
     import uvicorn

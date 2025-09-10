@@ -1,0 +1,145 @@
+{
+	"name": "LabDabbler - Containerlab Network Lab Environment",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+	
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "20",
+			"nodeGypDependencies": true,
+			"installYarnUsingApt": true
+		},
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.11",
+			"installTools": true,
+			"installJupyterlab": false
+		},
+		"ghcr.io/devcontainers/features/git:1": {
+			"version": "latest",
+			"ppa": true
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"version": "latest"
+		}
+	},
+
+	"runArgs": [
+		"--privileged",
+		"--init"
+	],
+
+	"mounts": [
+		"source=dind-var-lib-docker,target=/var/lib/docker,type=volume"
+	],
+
+	"containerEnv": {
+		"DOCKER_BUILDKIT": "1",
+		"PYTHONPATH": "/workspaces/labdabbler",
+		"CONTAINERLAB_VERSION": "0.56.0"
+	},
+
+	"remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/usr/local/go/bin:/home/vscode/.local/bin"
+	},
+
+	"postCreateCommand": "bash .devcontainer/setup.sh",
+
+	"forwardPorts": [
+		8000,
+		5000,
+		3000,
+		80,
+		443,
+		830,
+		8080,
+		9090
+	],
+
+	"portsAttributes": {
+		"8000": {
+			"label": "FastAPI Backend",
+			"onAutoForward": "notify"
+		},
+		"5000": {
+			"label": "React Frontend",
+			"onAutoForward": "openPreview"
+		},
+		"3000": {
+			"label": "Dev Server Alt",
+			"onAutoForward": "silent"
+		},
+		"80": {
+			"label": "HTTP (Lab devices)",
+			"onAutoForward": "silent"
+		},
+		"443": {
+			"label": "HTTPS (Lab devices)",
+			"onAutoForward": "silent"
+		},
+		"830": {
+			"label": "NETCONF",
+			"onAutoForward": "silent"
+		},
+		"8080": {
+			"label": "Web UI (Alt)",
+			"onAutoForward": "silent"
+		},
+		"9090": {
+			"label": "Monitoring",
+			"onAutoForward": "silent"
+		}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.pylint",
+				"ms-python.black-formatter",
+				"ms-vscode.vscode-typescript-next",
+				"esbenp.prettier-vscode",
+				"ms-vscode.vscode-json",
+				"redhat.vscode-yaml",
+				"ms-vscode.makefile-tools",
+				"ms-azuretools.vscode-docker",
+				"bradlc.vscode-tailwindcss",
+				"formulahendry.auto-rename-tag",
+				"ms-vscode.hexeditor"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/usr/local/python/current/bin/python",
+				"python.linting.enabled": true,
+				"python.linting.pylintEnabled": true,
+				"python.formatting.provider": "black",
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": true
+				},
+				"files.associations": {
+					"*.clab.yml": "yaml",
+					"*.yml": "yaml",
+					"*.yaml": "yaml"
+				},
+				"yaml.schemas": {
+					"https://raw.githubusercontent.com/srl-labs/containerlab/main/schemas/clab.schema.json": "*.clab.yml"
+				},
+				"terminal.integrated.defaultProfile.linux": "bash"
+			}
+		}
+	},
+
+	"remoteUser": "vscode",
+
+	"workspaceFolder": "/workspaces/labdabbler",
+
+	"updateContentCommand": "bash .devcontainer/setup.sh --update",
+
+	"postStartCommand": {
+		"docker-service": "sudo service docker start",
+		"permissions": "sudo chown -R vscode:vscode /workspaces/labdabbler"
+	}
+}

@@ -1,0 +1,47 @@
+name: Codespaces Prebuilds
+
+on:
+  push:
+    branches: [ main, dev ]
+    paths:
+      - '.devcontainer/**'
+      - 'pyproject.toml'
+      - 'web/frontend/package.json'
+      - '.github/workflows/codespaces-prebuilds.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.devcontainer/**'
+
+jobs:
+  prebuild:
+    name: Trigger Codespaces Prebuild
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trigger prebuild via API
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "Codespaces prebuilds are triggered automatically by GitHub"
+          echo "This workflow serves as a placeholder for future prebuild automation"
+          
+      - name: Validate devcontainer.json
+        run: |
+          # Basic JSON validation
+          cat .devcontainer/devcontainer.json | jq . > /dev/null
+          echo "✅ devcontainer.json is valid JSON"
+          
+          # Check for required properties
+          if ! cat .devcontainer/devcontainer.json | jq -e '.name' > /dev/null; then
+            echo "❌ Missing required 'name' property"
+            exit 1
+          fi
+          
+          if ! cat .devcontainer/devcontainer.json | jq -e '.image' > /dev/null; then
+            echo "❌ Missing required 'image' property"
+            exit 1
+          fi
+          
+          echo "✅ devcontainer.json has required properties"

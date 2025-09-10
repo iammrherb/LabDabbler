@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  labdabbler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    network_mode: "host"
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    environment:
+      - DOCKER_BUILDKIT=1
+      - PYTHONPATH=/workspaces/labdabbler
+      - CONTAINERLAB_VERSION=0.56.0

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import VRNetLabManager from './components/VRNetLabManager'
+import ContainerCatalog from './components/ContainerCatalog'
 
 function App() {
   const [labs, setLabs] = useState([])
   const [containers, setContainers] = useState({})
   const [activeLabs, setActiveLabs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentView, setCurrentView] = useState('dashboard')
 
   useEffect(() => {
     fetchData()
@@ -145,9 +148,36 @@ function App() {
       <header className="App-header">
         <h1>🧪 LabDabbler</h1>
         <p>Master Lab Repository - Launch any lab, anywhere</p>
+        
+        <nav className="main-navigation">
+          <button 
+            className={`nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setCurrentView('dashboard')}
+          >
+            📊 Dashboard
+          </button>
+          <button 
+            className={`nav-btn ${currentView === 'catalog' ? 'active' : ''}`}
+            onClick={() => setCurrentView('catalog')}
+          >
+            📦 Container Catalog
+          </button>
+          <button 
+            className={`nav-btn ${currentView === 'vrnetlab' ? 'active' : ''}`}
+            onClick={() => setCurrentView('vrnetlab')}
+          >
+            🏗️ VRNetlab
+          </button>
+        </nav>
       </header>
 
       <main className="container">
+        {currentView === 'catalog' ? (
+          <ContainerCatalog />
+        ) : currentView === 'vrnetlab' ? (
+          <VRNetLabManager />
+        ) : (
+          <>
         <section className="labs-section">
           <div className="section-header">
             <h2>Available Labs</h2>
@@ -267,6 +297,8 @@ function App() {
             <button className="btn-primary">Create Custom Lab</button>
           </div>
         </section>
+          </>
+        )}
       </main>
     </div>
   )
