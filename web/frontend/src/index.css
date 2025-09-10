@@ -122,3 +122,60 @@ body {
   padding: 4rem;
   font-size: 1.5rem;
 }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  margin-bottom: 0;
+}
+
+.source-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.source-badge.local {
+  background: #10b981;
+  color: white;
+}
+
+.source-badge.github {
+  background: #6366f1;
+  color: white;
+}
+
+.repo-info {
+  color: #888;
+  font-size: 0.9rem;
+  font-weight: normal;
+  margin-left: 0.5rem;
+}
+
+.lab-meta, .container-meta {
+  color: #888;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+.btn-primary:disabled, .btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary:disabled:hover, .btn-secondary:disabled:hover {
+  background: #667eea;
+}
+
+.btn-secondary:disabled:hover {
+  background: #764ba2;
+}

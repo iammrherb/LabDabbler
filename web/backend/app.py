@@ -5,6 +5,8 @@ import os
 import yaml
 import json
 from pathlib import Path
+from services.container_discovery import ContainerDiscoveryService
+from services.github_lab_scanner import GitHubLabScanner
 
 app = FastAPI(title="LabDabbler - Master Lab Repository", version="1.0.0")
 
@@ -17,24 +19,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data storage
-LABS_DIR = Path("./labs")
-CONFIGS_DIR = Path("./configs")
-DATA_DIR = Path("./data")
+# Data storage - paths relative to project root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+LABS_DIR = PROJECT_ROOT / "labs"
+CONFIGS_DIR = PROJECT_ROOT / "configs"
+DATA_DIR = PROJECT_ROOT / "data"
+
+# Initialize services
+container_service = ContainerDiscoveryService(DATA_DIR)
+lab_scanner = GitHubLabScanner(DATA_DIR)
 
 @app.get("/")
 async def root():
     return {"message": "LabDabbler Master Lab Repository API", "version": "1.0.0"}
 
 @app.get("/api/labs")
-async def get_labs():
+async def get_labs(include_github: bool = True):
     """Get all available labs"""
     labs = []
+    
+    # Local labs from filesystem
     if LABS_DIR.exists():
         for category in LABS_DIR.iterdir():
             if category.is_dir():
                 category_labs = {
                     "category": category.name,
+                    "source": "local",
                     "labs": []
                 }
                 for lab in category.iterdir():
@@ -42,34 +52,52 @@ async def get_labs():
                         lab_info = {
                             "name": lab.name,
                             "path": str(lab.relative_to(Path.cwd())),
-                            "description": f"{category.name.title()} lab: {lab.name}"
+                            "description": f"{category.name.title()} lab: {lab.name}",
+                            "source": "local"
                         }
                         category_labs["labs"].append(lab_info)
                 labs.append(category_labs)
+    
+    # GitHub labs
+    if include_github:
+        github_labs = lab_scanner.load_labs()
+        if github_labs and "repositories" in github_labs:
+            for repo, repo_labs in github_labs["repositories"].items():
+                if repo_labs:
+                    github_category = {
+                        "category": f"github-{repo.replace('/', '-')}",
+                        "source": "github",
+                        "repository": repo,
+                        "labs": repo_labs
+                    }
+                    labs.append(github_category)
+    
     return labs
 
+@app.post("/api/labs/scan")
+async def scan_github_labs():
+    """Scan GitHub repositories for lab definitions"""
+    labs = await lab_scanner.refresh_labs()
+    return {"message": "GitHub lab scan completed", "results": labs}
+
 @app.get("/api/containers")
-async def get_containers():
+async def get_containers(refresh: bool = False):
     """Get all available containers"""
-    # This will be populated with Docker Hub scanning
-    containers = {
-        "portnox": [
-            {"name": "local-radius", "image": "portnox/local-radius:latest", "description": "Portnox Local RADIUS Server"},
-            {"name": "tacacs", "image": "portnox/tacacs:latest", "description": "Portnox TACACS+ Server"},
-            {"name": "dhcp", "image": "portnox/dhcp:latest", "description": "Portnox DHCP Server"},
-            {"name": "ztna-gateway", "image": "portnox/ztna-gateway:latest", "description": "Portnox ZTNA Gateway"}
-        ],
-        "network_os": [
-            {"name": "nokia-srlinux", "image": "ghcr.io/nokia/srlinux:latest", "kind": "nokia_srlinux"},
-            {"name": "arista-ceos", "image": "ceos:latest", "kind": "arista_ceos"},
-            {"name": "frr", "image": "frrouting/frr:latest", "kind": "linux"}
-        ],
-        "security": [
-            {"name": "kali", "image": "kalilinux/kali-rolling:latest", "description": "Kali Linux"},
-            {"name": "metasploit", "image": "metasploitframework/metasploit-framework:latest", "description": "Metasploit"}
-        ]
-    }
+    if refresh:
+        containers = await container_service.discover_all_containers()
+    else:
+        containers = container_service.load_containers()
+        if not containers:
+            # First time - discover containers
+            containers = await container_service.discover_all_containers()
+    
     return containers
+
+@app.post("/api/containers/refresh")
+async def refresh_containers():
+    """Refresh container discovery from all sources"""
+    containers = await container_service.refresh_containers()
+    return {"message": "Container discovery completed", "containers": containers}
 
 @app.post("/api/labs/create")
 async def create_lab(lab_config: dict):
