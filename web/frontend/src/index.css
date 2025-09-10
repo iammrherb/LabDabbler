@@ -179,3 +179,75 @@ body {
 .btn-secondary:disabled:hover {
   background: #764ba2;
 }
+
+.active-labs-section {
+  margin-bottom: 3rem;
+}
+
+.active-labs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.active-lab-card {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.active-lab-card:hover {
+  transform: translateY(-2px);
+  border-color: #10b981;
+}
+
+.lab-id {
+  font-family: 'Courier New', monospace;
+  color: #888;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.status.running {
+  color: #10b981;
+}
+
+.status.stopped {
+  color: #ef4444;
+}
+
+.status.unknown {
+  color: #f59e0b;
+}
+
+.btn-danger {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  margin-top: 1rem;
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-danger:disabled:hover {
+  background: #ef4444;
+}

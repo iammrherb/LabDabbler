@@ -4,6 +4,7 @@ import './App.css'
 function App() {
   const [labs, setLabs] = useState([])
   const [containers, setContainers] = useState({})
+  const [activeLabs, setActiveLabs] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -13,16 +14,19 @@ function App() {
   const fetchData = async () => {
     try {
       // Note: Using localhost for backend API calls in development
-      const [labsRes, containersRes] = await Promise.all([
+      const [labsRes, containersRes, activeLabsRes] = await Promise.all([
         fetch('http://localhost:8000/api/labs?include_github=true'),
-        fetch('http://localhost:8000/api/containers')
+        fetch('http://localhost:8000/api/containers'),
+        fetch('http://localhost:8000/api/labs/active')
       ])
       
       const labsData = await labsRes.json()
       const containersData = await containersRes.json()
+      const activeLabsData = await activeLabsRes.json()
       
       setLabs(labsData)
       setContainers(containersData)
+      setActiveLabs(activeLabsData.active_labs || [])
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -58,6 +62,70 @@ function App() {
       setLabs(labsData)
     } catch (error) {
       console.error('Error scanning GitHub labs:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const launchLab = async (lab) => {
+    setLoading(true)
+    try {
+      // Use the file_path from the lab object
+      const labFilePath = lab.file_path || lab.path // fallback to path for backward compatibility
+      
+      if (!labFilePath) {
+        alert('No lab file path provided')
+        return
+      }
+      
+      const response = await fetch('http://localhost:8000/api/labs/launch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ lab_file_path: labFilePath })
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        alert(`Lab "${data.lab_name}" launched successfully!`)
+        // Refresh active labs
+        const activeLabsRes = await fetch('http://localhost:8000/api/labs/active')
+        const activeLabsData = await activeLabsRes.json()
+        setActiveLabs(activeLabsData.active_labs || [])
+      } else {
+        const error = await response.json()
+        alert(`Failed to launch lab: ${error.detail?.message || error.message || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error launching lab:', error)
+      alert('Error launching lab. Please check if containerlab is installed.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const stopLab = async (labId) => {
+    setLoading(true)
+    try {
+      const response = await fetch(`http://localhost:8000/api/labs/${labId}/stop`, {
+        method: 'POST'
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        alert(data.message)
+        // Refresh active labs
+        const activeLabsRes = await fetch('http://localhost:8000/api/labs/active')
+        const activeLabsData = await activeLabsRes.json()
+        setActiveLabs(activeLabsData.active_labs || [])
+      } else {
+        const error = await response.json()
+        alert(`Failed to stop lab: ${error.detail?.message || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error stopping lab:', error)
+      alert('Error stopping lab')
     } finally {
       setLoading(false)
     }
@@ -103,11 +171,18 @@ function App() {
                     <div key={labIdx} className="lab-card">
                       <h4>{lab.name}</h4>
                       <p>{lab.description}</p>
+                      {lab.file_path && <p className="lab-meta">File: {lab.file_path}</p>}
                       {lab.nodes && <p className="lab-meta">Nodes: {lab.nodes}</p>}
                       {lab.kinds && lab.kinds.length > 0 && (
                         <p className="lab-meta">Kinds: {lab.kinds.join(', ')}</p>
                       )}
-                      <button className="btn-primary">Launch Lab</button>
+                      <button 
+                        className="btn-primary" 
+                        onClick={() => launchLab(lab)}
+                        disabled={loading}
+                      >
+                        {loading ? 'Launching...' : 'Launch Lab'}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -146,6 +221,37 @@ function App() {
             ))
           ) : (
             <p>No containers loaded. Click "Refresh Containers" to discover available containers!</p>
+          )}
+        </section>
+
+        <section className="active-labs-section">
+          <h2>Active Labs</h2>
+          {activeLabs.length > 0 ? (
+            <div className="active-labs-grid">
+              {activeLabs.map((lab, idx) => (
+                <div key={idx} className="active-lab-card">
+                  <h4>{lab.name}</h4>
+                  <p className="lab-id">ID: {lab.lab_id}</p>
+                  <p className="lab-meta">Nodes: {lab.node_count || 0}</p>
+                  <p className={`status ${lab.status}`}>Status: {lab.status}</p>
+                  {lab.original_file && <p className="lab-meta">File: {lab.original_file}</p>}
+                  {lab.created_at && (
+                    <p className="lab-meta">
+                      Created: {new Date(parseFloat(lab.created_at) * 1000).toLocaleString()}
+                    </p>
+                  )}
+                  <button 
+                    className="btn-danger" 
+                    onClick={() => stopLab(lab.lab_id)}
+                    disabled={loading}
+                  >
+                    {loading ? 'Stopping...' : 'Stop Lab'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No active labs. Launch a lab from the available labs above!</p>
           )}
         </section>
 
