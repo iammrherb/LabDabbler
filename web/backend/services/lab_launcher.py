@@ -2,11 +2,14 @@ import asyncio
 import json
 import yaml
 import subprocess
+import aiohttp
+import os
 from typing import Dict, List, Optional
 from pathlib import Path
 import logging
 import uuid
 import shutil
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -21,27 +24,54 @@ class LabLauncherService:
         self.lab_configs_dir.mkdir(exist_ok=True)
         
     async def launch_lab(self, lab_file_path: str) -> Dict:
-        """Launch a containerlab topology from an existing .clab.yml file"""
+        """Launch a containerlab topology from an existing .clab.yml file or URL"""
         try:
-            lab_file = Path(lab_file_path)
+            # Check if lab_file_path is a URL
+            if lab_file_path.startswith(('http://', 'https://')):
+                lab_file, lab_config = await self.download_and_parse_lab_file(lab_file_path)
+                if not lab_file or lab_config is None:
+                    return {
+                        "success": False,
+                        "error": "Failed to download lab file",
+                        "message": f"Could not download or parse lab file from {lab_file_path}"
+                    }
+            else:
+                # Handle local file path
+                lab_file = Path(lab_file_path)
+                
+                # Verify the lab file exists
+                if not lab_file.exists():
+                    return {
+                        "success": False,
+                        "error": "Lab file not found",
+                        "message": f"Lab file {lab_file} does not exist"
+                    }
+                
+                # Load and parse the lab configuration
+                try:
+                    with open(lab_file, 'r') as f:
+                        lab_config = yaml.safe_load(f)
+                    
+                    # Check if yaml.safe_load returned None (empty or invalid file)
+                    if lab_config is None:
+                        return {
+                            "success": False,
+                            "error": "Invalid lab file",
+                            "message": f"Lab file {lab_file} is empty or contains invalid YAML"
+                        }
+                except Exception as e:
+                    return {
+                        "success": False,
+                        "error": f"Failed to parse lab file: {e}",
+                        "message": "Lab file is not valid YAML"
+                    }
             
-            # Verify the lab file exists
-            if not lab_file.exists():
+            # Ensure lab_config is a dictionary
+            if not isinstance(lab_config, dict):
                 return {
                     "success": False,
-                    "error": "Lab file not found",
-                    "message": f"Lab file {lab_file} does not exist"
-                }
-            
-            # Load and parse the lab configuration
-            try:
-                with open(lab_file, 'r') as f:
-                    lab_config = yaml.safe_load(f)
-            except Exception as e:
-                return {
-                    "success": False,
-                    "error": f"Failed to parse lab file: {e}",
-                    "message": "Lab file is not valid YAML"
+                    "error": "Invalid lab configuration",
+                    "message": "Lab file must contain a valid YAML dictionary"
                 }
             
             # Get lab name from config - this ensures consistency
@@ -92,6 +122,56 @@ class LabLauncherService:
                 "error": str(e),
                 "message": "Internal error while launching lab"
             }
+    
+    async def download_and_parse_lab_file(self, url: str) -> tuple[Optional[Path], Optional[Dict]]:
+        """Download a lab file from URL and parse it"""
+        try:
+            # Prepare headers with GitHub authentication if downloading from GitHub
+            headers = {}
+            if 'github' in url.lower():
+                github_token = os.getenv("GITHUB_TOKEN")
+                if github_token:
+                    headers['Authorization'] = f'token {github_token}'
+                    logger.info("Using GitHub token for authenticated download")
+            
+            async with aiohttp.ClientSession(headers=headers) as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        
+                        # Parse YAML content
+                        try:
+                            lab_config = yaml.safe_load(content)
+                            # Check if yaml.safe_load returned None
+                            if lab_config is None:
+                                logger.error(f"Downloaded file from {url} is empty or contains no valid YAML")
+                                return None, None
+                            # Ensure it's a dictionary
+                            if not isinstance(lab_config, dict):
+                                logger.error(f"Downloaded file from {url} does not contain a valid YAML dictionary")
+                                return None, None
+                        except yaml.YAMLError as e:
+                            logger.error(f"Failed to parse YAML from {url}: {e}")
+                            return None, None
+                        
+                        # Create a temporary file with proper handling
+                        with tempfile.NamedTemporaryFile(
+                            mode='w', 
+                            suffix='.clab.yml', 
+                            dir=self.lab_configs_dir, 
+                            delete=False
+                        ) as temp_file_obj:
+                            temp_file_obj.write(content)
+                            temp_file = Path(temp_file_obj.name)
+                        
+                        logger.info(f"Downloaded lab file from {url} to {temp_file}")
+                        return temp_file, lab_config
+                    else:
+                        logger.error(f"Failed to download lab file from {url}: HTTP {response.status}")
+                        return None, None
+        except Exception as e:
+            logger.error(f"Error downloading lab file from {url}: {e}")
+            return None, None
     
     async def stop_lab(self, lab_id: str) -> Dict:
         """Stop a running lab"""

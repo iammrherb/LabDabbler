@@ -1,0 +1,274 @@
+{
+  "repositories": {
+    "srl-labs/containerlab": [
+      {
+        "name": "srl01",
+        "path": "lab-examples/srl01/srl01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srl01/srl01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/srl01/srl01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srl01/srl01.clab.yml",
+        "description": "Basic SR Linux lab - single node setup",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "srl02",
+        "path": "lab-examples/srl02/srl02.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srl02/srl02.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/srl02/srl02.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srl02/srl02.clab.yml",
+        "description": "SR Linux lab - two node topology",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "srl03",
+        "path": "lab-examples/srl03/srl03.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srl03/srl03.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/srl03/srl03.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srl03/srl03.clab.yml",
+        "description": "SR Linux lab - three node topology",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 8,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "srlceos01",
+        "path": "lab-examples/srlceos01/srlceos01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srlceos01/srlceos01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/srlceos01/srlceos01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srlceos01/srlceos01.clab.yml",
+        "description": "SR Linux + Arista cEOS multi-vendor topology",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "arista_ceos",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "srlfrr01",
+        "path": "lab-examples/srlfrr01/srlfrr01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srlfrr01/srlfrr01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/srlfrr01/srlfrr01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srlfrr01/srlfrr01.clab.yml",
+        "description": "SR Linux + FRRouting topology",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "srlxrd01",
+        "path": "lab-examples/srlxrd01/srlxrd01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srlxrd01/srlxrd01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/srlxrd01/srlxrd01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/srlxrd01/srlxrd01.clab.yml",
+        "description": "SR Linux + Cisco XRd topology",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "cisco_xrd",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "clos01",
+        "path": "lab-examples/clos01/clos01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/clos01/clos01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/clos01/clos01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/clos01/clos01.clab.yml",
+        "description": "CLOS data center topology #1",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 5,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "clos02",
+        "path": "lab-examples/clos02/clos02.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/clos02/clos02.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/clos02/clos02.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/clos02/clos02.clab.yml",
+        "description": "CLOS data center topology #2",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 14,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "frr01",
+        "path": "lab-examples/frr01/frr01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/frr01/frr01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/frr01/frr01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/frr01/frr01.clab.yml",
+        "description": "FRRouting containerlab topology",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 6,
+        "kinds": [
+          "linux"
+        ],
+        "source": "github"
+      },
+      {
+        "name": "sonic01",
+        "path": "lab-examples/sonic01/sonic01.clab.yml",
+        "file_path": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/sonic01/sonic01.clab.yml",
+        "repository": "srl-labs/containerlab",
+        "html_url": "https://github.com/srl-labs/containerlab/blob/main/lab-examples/sonic01/sonic01.clab.yml",
+        "download_url": "https://raw.githubusercontent.com/srl-labs/containerlab/main/lab-examples/sonic01/sonic01.clab.yml",
+        "description": "SONiC network operating system lab",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "sonic-vs",
+          "nokia_srlinux"
+        ],
+        "source": "github"
+      }
+    ],
+    "PacketAnglers/clab-topos": [
+      {
+        "name": "atd-dc",
+        "path": "atd-dc/atd-dc.yml",
+        "file_path": "https://raw.githubusercontent.com/PacketAnglers/clab-topos/main/atd-dc/atd-dc.yml",
+        "repository": "PacketAnglers/clab-topos",
+        "html_url": "https://github.com/PacketAnglers/clab-topos/blob/main/atd-dc/atd-dc.yml",
+        "download_url": "https://raw.githubusercontent.com/PacketAnglers/clab-topos/main/atd-dc/atd-dc.yml",
+        "description": "Arista Test Drive Datacenter topology",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "ceos",
+            "linux"
+          ],
+          "defaults": {
+            "env": {
+              "INTFTYPE": "et"
+            }
+          },
+          "mgmt": {}
+        },
+        "nodes": 8,
+        "kinds": [
+          "ceos",
+          "linux"
+        ],
+        "source": "github"
+      }
+    ]
+  },
+  "total_labs": 11,
+  "curated_labs": 11,
+  "automated_labs": 0,
+  "failed_labs": [
+    "vxlan01",
+    "2tier-l3ls",
+    "k8s-multicast",
+    "meshnet-cni",
+    "arista-network-ci",
+    "cvx01",
+    "cvx02"
+  ],
+  "failed_repos": [],
+  "last_scan": "14700.870469716",
+  "scan_method": "hybrid_curated_and_automated",
+  "rate_limited": false,
+  "github_token_configured": false,
+  "notes": [
+    "Only curated labs were loaded. Automated scanning was limited by rate limits or API issues."
+  ]
+}
