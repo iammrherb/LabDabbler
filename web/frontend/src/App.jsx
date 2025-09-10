@@ -13,11 +13,12 @@ function App() {
 
   const fetchData = async () => {
     try {
-      // Note: Using localhost for backend API calls in development
+      // Use backend API via port 8000
+      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
       const [labsRes, containersRes, activeLabsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/labs?include_github=true'),
-        fetch('http://localhost:8000/api/containers'),
-        fetch('http://localhost:8000/api/labs/active')
+        fetch(`${apiBase}/api/labs?include_github=true`),
+        fetch(`${apiBase}/api/containers`),
+        fetch(`${apiBase}/api/labs/active`)
       ])
       
       const labsData = await labsRes.json()
@@ -37,7 +38,8 @@ function App() {
   const refreshContainers = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8000/api/containers/refresh', {
+      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const response = await fetch(`${apiBase}/api/containers/refresh`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -52,12 +54,13 @@ function App() {
   const scanGitHubLabs = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8000/api/labs/scan', {
+      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const response = await fetch(`${apiBase}/api/labs/scan`, {
         method: 'POST'
       })
       const data = await response.json()
       // Refresh labs after scanning
-      const labsRes = await fetch('http://localhost:8000/api/labs?include_github=true')
+      const labsRes = await fetch(`${apiBase}/api/labs?include_github=true`)
       const labsData = await labsRes.json()
       setLabs(labsData)
     } catch (error) {
@@ -78,7 +81,8 @@ function App() {
         return
       }
       
-      const response = await fetch('http://localhost:8000/api/labs/launch', {
+      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const response = await fetch(`${apiBase}/api/labs/launch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -90,7 +94,7 @@ function App() {
         const data = await response.json()
         alert(`Lab "${data.lab_name}" launched successfully!`)
         // Refresh active labs
-        const activeLabsRes = await fetch('http://localhost:8000/api/labs/active')
+        const activeLabsRes = await fetch(`${apiBase}/api/labs/active`)
         const activeLabsData = await activeLabsRes.json()
         setActiveLabs(activeLabsData.active_labs || [])
       } else {
@@ -108,7 +112,8 @@ function App() {
   const stopLab = async (labId) => {
     setLoading(true)
     try {
-      const response = await fetch(`http://localhost:8000/api/labs/${labId}/stop`, {
+      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const response = await fetch(`${apiBase}/api/labs/${labId}/stop`, {
         method: 'POST'
       })
       
@@ -116,7 +121,7 @@ function App() {
         const data = await response.json()
         alert(data.message)
         // Refresh active labs
-        const activeLabsRes = await fetch('http://localhost:8000/api/labs/active')
+        const activeLabsRes = await fetch(`${apiBase}/api/labs/active`)
         const activeLabsData = await activeLabsRes.json()
         setActiveLabs(activeLabsData.active_labs || [])
       } else {

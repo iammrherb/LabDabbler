@@ -1,0 +1,624 @@
+{
+  "portnox": [
+    {
+      "name": "ztna-gateway",
+      "image": "portnox/ztna-gateway:latest",
+      "description": "",
+      "tags": [
+        "latest",
+        "1.1.1152"
+      ],
+      "pull_count": 55,
+      "star_count": 0,
+      "last_updated": "2025-06-23T14:50:37.832637Z",
+      "category": "external"
+    }
+  ],
+  "network_os_native": [
+    {
+      "name": "Nokia SR Linux (Latest)",
+      "image": "ghcr.io/nokia/srlinux:latest",
+      "kind": "nokia_srlinux",
+      "description": "Nokia SR Linux Network OS - Latest Release",
+      "vendor": "Nokia",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "ghcr.io",
+      "documentation": "https://learn.srlinux.dev/"
+    },
+    {
+      "name": "Nokia SR Linux 24.10.1",
+      "image": "ghcr.io/nokia/srlinux:24.10.1",
+      "kind": "nokia_srlinux",
+      "description": "Nokia SR Linux - ARM64 Native with Universal Support",
+      "vendor": "Nokia",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "ghcr.io",
+      "features": [
+        "ARM64 native",
+        "NETCONF enabled",
+        "gRPC server"
+      ]
+    },
+    {
+      "name": "Nokia SR Linux 24.7.2",
+      "image": "ghcr.io/nokia/srlinux:24.7.2",
+      "kind": "nokia_srlinux",
+      "description": "Nokia SR Linux - Stable Release with NETCONF",
+      "vendor": "Nokia",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "ghcr.io",
+      "features": [
+        "NETCONF port 830",
+        "Enhanced security"
+      ]
+    },
+    {
+      "name": "Arista cEOS (Latest)",
+      "image": "ceos:latest",
+      "kind": "arista_ceos",
+      "description": "Arista Container EOS - Latest Release",
+      "vendor": "Arista",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "registration_required",
+      "registry": "arista.com (manual download)",
+      "download_url": "https://www.arista.com/en/support/software-download",
+      "requirements": "Arista.com account required",
+      "installation_notes": "Download tar.xz file and import with docker load"
+    },
+    {
+      "name": "Arista cEOS 4.32.0F",
+      "image": "ceos:4.32.0F",
+      "kind": "arista_ceos",
+      "description": "Arista Container EOS - Stable 4.32.0F",
+      "vendor": "Arista",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "registration_required",
+      "registry": "arista.com (manual download)"
+    },
+    {
+      "name": "Cisco XRd Control Plane",
+      "image": "localhost/ios-xr:latest",
+      "kind": "cisco_xrd",
+      "description": "Cisco XRd Control Plane Router",
+      "vendor": "Cisco",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "cco_required",
+      "registry": "software.cisco.com (manual download)",
+      "requirements": "Active Cisco service contract required",
+      "installation_notes": "Download from CCO and docker load locally"
+    },
+    {
+      "name": "Cisco XRd vRouter",
+      "image": "localhost/xrd-vrouter:latest",
+      "kind": "cisco_xrd",
+      "description": "Cisco XRd vRouter with Data Plane",
+      "vendor": "Cisco",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "cco_required",
+      "registry": "software.cisco.com (manual download)"
+    },
+    {
+      "name": "Juniper cRPD Latest",
+      "image": "enterprise-hub.juniper.net:443/crpd-docker-prod/crpd:latest",
+      "kind": "juniper_crpd",
+      "description": "Juniper Containerized Routing Protocol Daemon",
+      "vendor": "Juniper",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "enterprise_required",
+      "registry": "enterprise-hub.juniper.net",
+      "requirements": "Juniper enterprise account required",
+      "features": [
+        "Full Junos CLI",
+        "BGP/OSPF/ISIS support",
+        "ARM64 support"
+      ]
+    },
+    {
+      "name": "Juniper cRPD 24.2R1.14",
+      "image": "enterprise-hub.juniper.net:443/crpd-docker-prod/crpd:24.2R1.14",
+      "kind": "juniper_crpd",
+      "description": "Juniper cRPD - Stable 24.2R1.14 Release",
+      "vendor": "Juniper",
+      "category": "network_os_native",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "enterprise_required",
+      "registry": "enterprise-hub.juniper.net"
+    }
+  ],
+  "network_os_vm_based": [
+    {
+      "name": "Nokia SR-OS (vSIM)",
+      "image": "vrnetlab/vr-sros:latest",
+      "kind": "nokia_sros",
+      "description": "Nokia SR-OS Virtual SIM - VM-based",
+      "vendor": "Nokia",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "requirements": "Nokia SR-OS qcow2 image required",
+      "build_info": "Use hellt/vrnetlab project to build"
+    },
+    {
+      "name": "Juniper vMX",
+      "image": "vrnetlab/vr-vmx:latest",
+      "kind": "juniper_vmx",
+      "description": "Juniper vMX Router - VM-based",
+      "vendor": "Juniper",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Juniper vQFX",
+      "image": "vrnetlab/vr-vqfx:latest",
+      "kind": "juniper_vqfx",
+      "description": "Juniper vQFX Switch - VM-based",
+      "vendor": "Juniper",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Juniper vSRX",
+      "image": "vrnetlab/vr-vsrx:latest",
+      "kind": "juniper_vsrx",
+      "description": "Juniper vSRX Firewall - VM-based",
+      "vendor": "Juniper",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Cisco IOS XRv9k",
+      "image": "vrnetlab/vr-xrv9k:latest",
+      "kind": "cisco_xrv9k",
+      "description": "Cisco IOS XRv9000 - VM-based",
+      "vendor": "Cisco",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Cisco Nexus 9000v",
+      "image": "vrnetlab/vr-n9kv:latest",
+      "kind": "cisco_n9kv",
+      "description": "Cisco Nexus 9000v Switch - VM-based",
+      "vendor": "Cisco",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Cisco CSR 1000v",
+      "image": "vrnetlab/vr-csr:latest",
+      "kind": "cisco_csr1000v",
+      "description": "Cisco CSR 1000v Router - VM-based",
+      "vendor": "Cisco",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Arista vEOS",
+      "image": "vrnetlab/vr-veos:latest",
+      "kind": "arista_veos",
+      "description": "Arista vEOS Switch - VM-based",
+      "vendor": "Arista",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "MikroTik RouterOS CHR (Stable)",
+      "image": "docker.io/iparchitechs/chr:stable",
+      "kind": "mikrotik_ros",
+      "description": "MikroTik RouterOS CHR - Stable Release",
+      "vendor": "MikroTik",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "docker.io/iparchitechs",
+      "features": [
+        "Pre-built images",
+        "Multiple versions available"
+      ]
+    },
+    {
+      "name": "MikroTik RouterOS CHR (Long-term)",
+      "image": "docker.io/iparchitechs/chr:long-term",
+      "kind": "mikrotik_ros",
+      "description": "MikroTik RouterOS CHR - Long-term Support",
+      "vendor": "MikroTik",
+      "category": "network_os_vm_based",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "docker.io/iparchitechs"
+    }
+  ],
+  "open_source_network": [
+    {
+      "name": "FRRouting (Latest)",
+      "image": "frrouting/frr:latest",
+      "kind": "linux",
+      "description": "FRRouting Protocol Suite - Latest",
+      "vendor": "FRRouting Project",
+      "category": "open_source_network",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io/frrouting",
+      "protocols": [
+        "BGP",
+        "OSPF",
+        "ISIS",
+        "RIP",
+        "EIGRP",
+        "PIM"
+      ],
+      "documentation": "https://docs.frrouting.org/"
+    },
+    {
+      "name": "FRRouting 10.1",
+      "image": "frrouting/frr:v10.1.0",
+      "kind": "linux",
+      "description": "FRRouting 10.1 - Stable Release",
+      "vendor": "FRRouting Project",
+      "category": "open_source_network",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io/frrouting"
+    },
+    {
+      "name": "VyOS Rolling",
+      "image": "vyos/vyos:1.4-rolling",
+      "kind": "vyos",
+      "description": "VyOS Router - Rolling Release",
+      "vendor": "VyOS",
+      "category": "open_source_network",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "docker.io/vyos",
+      "features": [
+        "Linux-based",
+        "Enterprise features",
+        "CLI similar to Vyatta"
+      ]
+    },
+    {
+      "name": "VyOS 1.4 LTS",
+      "image": "vyos/vyos:1.4-lts",
+      "kind": "vyos",
+      "description": "VyOS Router - Long Term Support",
+      "vendor": "VyOS",
+      "category": "open_source_network",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "docker.io/vyos"
+    },
+    {
+      "name": "SONiC Virtual Switch",
+      "image": "docker-sonic-vs:latest",
+      "kind": "sonic-vs",
+      "description": "Microsoft SONiC - Virtual Switch Container",
+      "vendor": "Microsoft/SONiC",
+      "category": "open_source_network",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "build_required",
+      "registry": "Build from Azure Pipeline",
+      "requirements": "Download from sonic-build.azurewebsites.net",
+      "features": [
+        "Cloud-scale networking",
+        "Redis-based state",
+        "Modular containers"
+      ]
+    },
+    {
+      "name": "OpenWrt Latest",
+      "image": "openwrt/rootfs:latest",
+      "kind": "linux",
+      "description": "OpenWrt Router OS - Container Rootfs",
+      "vendor": "OpenWrt Project",
+      "category": "open_source_network",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io/openwrt",
+      "features": [
+        "Lightweight",
+        "Embedded router OS",
+        "Package management"
+      ]
+    }
+  ],
+  "security_firewalls": [
+    {
+      "name": "Fortinet FortiGate VM (Latest)",
+      "image": "vrnetlab/vr-fortios:latest",
+      "kind": "fortinet_fortigate",
+      "description": "Fortinet FortiGate Firewall - VM-based",
+      "vendor": "Fortinet",
+      "category": "security_firewalls",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "requirements": "FortiOS qcow2 image from Fortinet support",
+      "build_info": "Requires FortiGate VM license for full functionality",
+      "ports": [
+        "80:80",
+        "443:443"
+      ]
+    },
+    {
+      "name": "Fortinet FortiGate 7.0.14",
+      "image": "vrnetlab/vr-fortios:7.0.14",
+      "kind": "fortinet_fortigate",
+      "description": "Fortinet FortiGate 7.0.14 - Tested Version",
+      "vendor": "Fortinet",
+      "category": "security_firewalls",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Palo Alto PAN-OS (Latest)",
+      "image": "vrnetlab/vr-pan:latest",
+      "kind": "paloalto_panos",
+      "description": "Palo Alto PAN-OS Firewall - VM-based",
+      "vendor": "Palo Alto Networks",
+      "category": "security_firewalls",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "requirements": "PAN-OS qcow2 image from Palo Alto support portal",
+      "features": [
+        "Web UI on port 443",
+        "SSH access",
+        "API support"
+      ]
+    },
+    {
+      "name": "Palo Alto PAN-OS 10.2.6",
+      "image": "vrnetlab/vr-pan:10.2.6",
+      "kind": "paloalto_panos",
+      "description": "Palo Alto PAN-OS 10.2.6 - Stable Release",
+      "vendor": "Palo Alto Networks",
+      "category": "security_firewalls",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "Check Point CloudGuard",
+      "image": "vrnetlab/vr-checkpoint:latest",
+      "kind": "checkpoint_cloudguard",
+      "description": "Check Point CloudGuard Security Gateway",
+      "vendor": "Check Point",
+      "category": "security_firewalls",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab"
+    },
+    {
+      "name": "pfSense",
+      "image": "pfsense/pfsense:latest",
+      "kind": "generic_vm",
+      "description": "pfSense Firewall - Open Source",
+      "vendor": "Netgate/pfSense",
+      "category": "security_firewalls",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "docker.io/pfsense",
+      "features": [
+        "Open source",
+        "Web interface",
+        "VPN support"
+      ]
+    }
+  ],
+  "security": [
+    {
+      "name": "kali-linux",
+      "image": "kalilinux/kali-rolling:latest",
+      "description": "Kali Linux Penetration Testing",
+      "category": "security"
+    },
+    {
+      "name": "metasploit",
+      "image": "metasploitframework/metasploit-framework:latest",
+      "description": "Metasploit Framework",
+      "category": "security"
+    },
+    {
+      "name": "nmap",
+      "image": "instrumentisto/nmap:latest",
+      "description": "Network Discovery and Security Auditing",
+      "category": "security"
+    },
+    {
+      "name": "wireshark",
+      "image": "linuxserver/wireshark:latest",
+      "description": "Network Protocol Analyzer",
+      "ports": [
+        "3000:3000"
+      ],
+      "category": "security"
+    }
+  ],
+  "services": [
+    {
+      "name": "FreeRADIUS Server",
+      "image": "freeradius/freeradius-server:latest",
+      "description": "FreeRADIUS Authentication Server",
+      "ports": [
+        "1812:1812/udp",
+        "1813:1813/udp"
+      ],
+      "category": "services",
+      "protocols": [
+        "RADIUS",
+        "802.1X",
+        "EAP"
+      ],
+      "access": "public",
+      "registry": "docker.io/freeradius"
+    },
+    {
+      "name": "BIND9 DNS Server",
+      "image": "internetsystemsconsortium/bind9:latest",
+      "description": "BIND9 DNS Server - Internet Systems Consortium",
+      "ports": [
+        "53:53/tcp",
+        "53:53/udp"
+      ],
+      "category": "services",
+      "protocols": [
+        "DNS",
+        "DNSSEC"
+      ],
+      "access": "public",
+      "registry": "docker.io/internetsystemsconsortium"
+    },
+    {
+      "name": "ISC DHCP Server",
+      "image": "networkboot/dhcpd:latest",
+      "description": "ISC DHCP Server for Network Boot",
+      "category": "services",
+      "protocols": [
+        "DHCP",
+        "BOOTP"
+      ],
+      "access": "public",
+      "registry": "docker.io/networkboot"
+    },
+    {
+      "name": "TACACS+ Server",
+      "image": "dchidell/docker-tacacs:latest",
+      "description": "TACACS+ Authentication Server",
+      "ports": [
+        "49:49/tcp"
+      ],
+      "category": "services",
+      "protocols": [
+        "TACACS+"
+      ],
+      "access": "public",
+      "registry": "docker.io/dchidell"
+    },
+    {
+      "name": "TFTP Server",
+      "image": "pghalliday/tftp:latest",
+      "description": "TFTP Server for Network Devices",
+      "ports": [
+        "69:69/udp"
+      ],
+      "category": "services",
+      "protocols": [
+        "TFTP"
+      ],
+      "access": "public",
+      "registry": "docker.io/pghalliday"
+    },
+    {
+      "name": "NTP Server",
+      "image": "cturra/ntp:latest",
+      "description": "Network Time Protocol Server",
+      "ports": [
+        "123:123/udp"
+      ],
+      "category": "services",
+      "protocols": [
+        "NTP"
+      ],
+      "access": "public",
+      "registry": "docker.io/cturra"
+    }
+  ],
+  "last_updated": "15323.149295417"
+}

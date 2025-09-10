@@ -4,7 +4,7 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["libyaml"]
+packages = ["libyaml", "jq"]
 
 [workflows]
 runButton = "Project"
@@ -53,3 +53,7 @@ externalPort = 80
 [[ports]]
 localPort = 8000
 externalPort = 8000
+
+[[ports]]
+localPort = 42601
+externalPort = 3000
