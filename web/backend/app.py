@@ -6,6 +6,7 @@ import os
 import yaml
 import json
 import logging
+import asyncio
 from pathlib import Path
 from services.container_discovery import ContainerDiscoveryService
 from services.github_lab_scanner import GitHubLabScanner
@@ -599,6 +600,266 @@ async def get_scheduler_status():
         "success": True,
         "scheduler_status": status
     }
+
+# Lab Builder API Endpoints
+@app.post("/api/lab-builder/save")
+async def save_topology(topology_data: dict):
+    """Save a custom topology to the workspace"""
+    try:
+        # Ensure the lab-builder directory exists
+        lab_builder_dir = DATA_DIR / "lab_builder" / "saved_topologies"
+        lab_builder_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate unique ID and add metadata
+        topology_id = f"topology-{int(asyncio.get_event_loop().time())}"
+        topology_data["id"] = topology_id
+        topology_data["saved_at"] = asyncio.get_event_loop().time()
+        
+        # Save to file
+        topology_file = lab_builder_dir / f"{topology_id}.json"
+        with open(topology_file, 'w') as f:
+            json.dump(topology_data, f, indent=2)
+        
+        return {
+            "success": True,
+            "message": f"Topology '{topology_data.get('name', topology_id)}' saved successfully",
+            "topology_id": topology_id
+        }
+    except Exception as e:
+        logger.error(f"Error saving topology: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/lab-builder/saved")
+async def get_saved_topologies():
+    """Get all saved topologies"""
+    try:
+        lab_builder_dir = DATA_DIR / "lab_builder" / "saved_topologies"
+        topologies = []
+        
+        if lab_builder_dir.exists():
+            for topology_file in lab_builder_dir.glob("*.json"):
+                try:
+                    with open(topology_file, 'r') as f:
+                        topology_data = json.load(f)
+                    topologies.append(topology_data)
+                except Exception as e:
+                    logger.error(f"Error loading topology {topology_file}: {e}")
+                    continue
+        
+        # Sort by saved_at descending
+        topologies.sort(key=lambda x: x.get("saved_at", 0), reverse=True)
+        
+        return {
+            "success": True,
+            "topologies": topologies
+        }
+    except Exception as e:
+        logger.error(f"Error getting saved topologies: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/lab-builder/saved/{topology_id}")
+async def delete_saved_topology(topology_id: str):
+    """Delete a saved topology"""
+    try:
+        lab_builder_dir = DATA_DIR / "lab_builder" / "saved_topologies"
+        topology_file = lab_builder_dir / f"{topology_id}.json"
+        
+        if not topology_file.exists():
+            raise HTTPException(status_code=404, detail="Topology not found")
+        
+        topology_file.unlink()
+        
+        return {
+            "success": True,
+            "message": "Topology deleted successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting topology: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/lab-builder/launch")
+async def launch_custom_topology(lab_data: dict):
+    """Launch a custom topology created in the lab builder"""
+    try:
+        topology = lab_data.get("topology", {})
+        lab_name = lab_data.get("name", f"custom-lab-{int(asyncio.get_event_loop().time())}")
+        
+        # Create temporary lab directory
+        temp_lab_dir = DATA_DIR / "lab_builder" / "temp" / lab_name
+        temp_lab_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate containerlab YAML
+        lab_config = {
+            "name": lab_name,
+            "topology": {
+                "nodes": {},
+                "links": []
+            }
+        }
+        
+        # Process nodes from the lab builder format
+        if "nodes" in topology:
+            for node_id, node_data in topology["nodes"].items():
+                node_config = {
+                    "kind": node_data.get("kind", "linux"),
+                    "image": node_data.get("image", "alpine:latest")
+                }
+                
+                # Add optional configurations
+                if node_data.get("config", {}).get("startup_config"):
+                    node_config["startup_config"] = node_data["config"]["startup_config"]
+                
+                if node_data.get("config", {}).get("env"):
+                    node_config["env"] = node_data["config"]["env"]
+                
+                if node_data.get("config", {}).get("ports"):
+                    node_config["ports"] = node_data["config"]["ports"]
+                
+                if node_data.get("config", {}).get("binds"):
+                    node_config["binds"] = node_data["config"]["binds"]
+                
+                lab_config["topology"]["nodes"][node_data.get("name", node_id)] = node_config
+        
+        # Process links
+        if "links" in topology:
+            for link in topology["links"]:
+                if "endpoints" in link and len(link["endpoints"]) == 2:
+                    endpoint1 = link["endpoints"][0]
+                    endpoint2 = link["endpoints"][1]
+                    
+                    # Find node names from IDs
+                    node1_name = None
+                    node2_name = None
+                    
+                    for node_id, node_data in topology.get("nodes", {}).items():
+                        if node_id == endpoint1.get("node"):
+                            node1_name = node_data.get("name", node_id)
+                        if node_id == endpoint2.get("node"):
+                            node2_name = node_data.get("name", node_id)
+                    
+                    if node1_name and node2_name:
+                        link_config = {
+                            "endpoints": [
+                                f"{node1_name}:{endpoint1.get('interface', 'eth0')}",
+                                f"{node2_name}:{endpoint2.get('interface', 'eth0')}"
+                            ]
+                        }
+                        lab_config["topology"]["links"].append(link_config)
+        
+        # Save the lab file
+        lab_file = temp_lab_dir / f"{lab_name}.clab.yml"
+        with open(lab_file, 'w') as f:
+            yaml.dump(lab_config, f, default_flow_style=False)
+        
+        # Launch using the lab launcher service
+        result = await lab_launcher.launch_lab(str(lab_file))
+        
+        return {
+            "success": True,
+            "message": f"Custom topology '{lab_name}' launched successfully",
+            "lab_name": lab_name,
+            "lab_file": str(lab_file),
+            "result": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Error launching custom topology: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/lab-builder/export/{topology_id}")
+async def export_topology(topology_id: str, format: str = "clab"):
+    """Export a saved topology in various formats"""
+    try:
+        lab_builder_dir = DATA_DIR / "lab_builder" / "saved_topologies"
+        topology_file = lab_builder_dir / f"{topology_id}.json"
+        
+        if not topology_file.exists():
+            raise HTTPException(status_code=404, detail="Topology not found")
+        
+        with open(topology_file, 'r') as f:
+            topology_data = json.load(f)
+        
+        if format == "clab":
+            # Convert to containerlab YAML format
+            lab_config = {
+                "name": topology_data.get("name", topology_id),
+                "topology": {
+                    "nodes": {},
+                    "links": []
+                }
+            }
+            
+            # Process nodes
+            for node_id, node_data in topology_data.get("nodes", {}).items():
+                node_config = {
+                    "kind": node_data.get("kind", "linux"),
+                    "image": node_data.get("image", "alpine:latest")
+                }
+                
+                # Add configurations
+                if node_data.get("config", {}).get("startup_config"):
+                    node_config["startup_config"] = node_data["config"]["startup_config"]
+                if node_data.get("config", {}).get("env"):
+                    node_config["env"] = node_data["config"]["env"]
+                if node_data.get("config", {}).get("ports"):
+                    node_config["ports"] = node_data["config"]["ports"]
+                if node_data.get("config", {}).get("binds"):
+                    node_config["binds"] = node_data["config"]["binds"]
+                
+                lab_config["topology"]["nodes"][node_data.get("name", node_id)] = node_config
+            
+            # Process links
+            for link in topology_data.get("links", []):
+                if "endpoints" in link and len(link["endpoints"]) == 2:
+                    endpoint1 = link["endpoints"][0]
+                    endpoint2 = link["endpoints"][1]
+                    
+                    # Find node names
+                    node1_name = None
+                    node2_name = None
+                    
+                    for node_id, node_data in topology_data.get("nodes", {}).items():
+                        if node_id == endpoint1.get("node"):
+                            node1_name = node_data.get("name", node_id)
+                        if node_id == endpoint2.get("node"):
+                            node2_name = node_data.get("name", node_id)
+                    
+                    if node1_name and node2_name:
+                        link_config = {
+                            "endpoints": [
+                                f"{node1_name}:{endpoint1.get('interface', 'eth0')}",
+                                f"{node2_name}:{endpoint2.get('interface', 'eth0')}"
+                            ]
+                        }
+                        lab_config["topology"]["links"].append(link_config)
+            
+            yaml_content = yaml.dump(lab_config, default_flow_style=False)
+            
+            return {
+                "success": True,
+                "format": "yaml",
+                "content": yaml_content,
+                "filename": f"{topology_data.get('name', topology_id)}.clab.yml"
+            }
+        
+        elif format == "json":
+            return {
+                "success": True,
+                "format": "json",
+                "content": json.dumps(topology_data, indent=2),
+                "filename": f"{topology_data.get('name', topology_id)}.json"
+            }
+        
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported export format")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error exporting topology: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

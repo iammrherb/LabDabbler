@@ -3,6 +3,7 @@ import './App.css'
 import VRNetLabManager from './components/VRNetLabManager'
 import ContainerCatalog from './components/ContainerCatalog'
 import RepositoryManager from './components/RepositoryManager'
+import LabBuilder from './components/LabBuilder'
 
 function App() {
   const [labs, setLabs] = useState([])
@@ -175,6 +176,12 @@ function App() {
           >
             🏗️ VRNetlab
           </button>
+          <button 
+            className={`nav-btn ${currentView === 'builder' ? 'active' : ''}`}
+            onClick={() => setCurrentView('builder')}
+          >
+            🎨 Lab Builder
+          </button>
         </nav>
       </header>
 
@@ -185,6 +192,8 @@ function App() {
           <RepositoryManager />
         ) : currentView === 'vrnetlab' ? (
           <VRNetLabManager />
+        ) : currentView === 'builder' ? (
+          <LabBuilder />
         ) : (
           <>
         <section className="labs-section">

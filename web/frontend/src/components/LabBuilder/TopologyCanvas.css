@@ -1,0 +1,405 @@
+.topology-canvas {
+  flex: 1;
+  position: relative;
+  background: #fafafa;
+  overflow: hidden;
+  user-select: none;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.canvas-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.node-group {
+  cursor: pointer;
+}
+
+.node-circle {
+  transition: r 0.2s ease;
+}
+
+.node-circle:hover {
+  filter: brightness(1.1);
+}
+
+.node-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  max-width: 100px;
+  word-wrap: break-word;
+}
+
+.node-type {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.link {
+  cursor: pointer;
+  transition: stroke-width 0.2s ease;
+}
+
+.link:hover {
+  stroke-width: 3;
+}
+
+.link-preview {
+  pointer-events: none;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 10;
+  }
+}
+
+.drop-zone {
+  pointer-events: none;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.canvas-info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  line-height: 1.3;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.canvas-info div {
+  margin: 0;
+}
+
+.canvas-instructions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.canvas-instructions h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.canvas-instructions ul {
+  text-align: left;
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.canvas-instructions li {
+  margin-bottom: 0.5rem;
+}
+
+.linking-instruction {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #28a745;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  pointer-events: none;
+  z-index: 10;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  z-index: 1000;
+  min-width: 150px;
+  animation: contextMenuAppear 0.2s ease;
+}
+
+@keyframes contextMenuAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: #333;
+}
+
+.context-menu button:hover {
+  background: #f8f9fa;
+}
+
+.context-menu button.danger {
+  color: #dc3545;
+}
+
+.context-menu button.danger:hover {
+  background: #f8d7da;
+}
+
+/* Grid styling */
+.canvas-svg rect {
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .canvas-info {
+    font-size: 0.7rem;
+    padding: 0.4rem;
+  }
+  
+  .canvas-instructions {
+    max-width: 300px;
+    padding: 1.5rem;
+  }
+  
+  .canvas-instructions h3 {
+    font-size: 1rem;
+  }
+  
+  .canvas-instructions ul {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .canvas-info {
+    position: relative;
+    background: rgba(0, 0, 0, 0.7);
+    margin: 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .canvas-instructions {
+    max-width: 280px;
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .canvas-instructions h3 {
+    font-size: 0.9rem;
+  }
+  
+  .canvas-instructions ul {
+    font-size: 0.75rem;
+    padding-left: 1.2rem;
+  }
+  
+  .linking-instruction {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .context-menu {
+    min-width: 120px;
+  }
+  
+  .context-menu button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Touch support for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .node-circle:hover {
+    filter: none;
+  }
+  
+  .link:hover {
+    stroke-width: inherit;
+  }
+  
+  .context-menu button:hover {
+    background: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .topology-canvas {
+    background: #222;
+  }
+  
+  .canvas {
+    background: #222;
+  }
+  
+  .canvas-svg defs pattern path {
+    stroke: #444;
+  }
+  
+  .node-label {
+    fill: #fff;
+  }
+  
+  .node-type {
+    fill: #ccc;
+  }
+  
+  .link {
+    stroke: #999;
+  }
+  
+  .canvas-instructions {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+  }
+  
+  .canvas-instructions h3 {
+    color: #fff;
+  }
+  
+  .canvas-instructions ul {
+    color: #ccc;
+  }
+  
+  .context-menu {
+    background: #333;
+    border-color: #555;
+  }
+  
+  .context-menu button {
+    color: #fff;
+  }
+  
+  .context-menu button:hover {
+    background: #404040;
+  }
+  
+  .context-menu button.danger {
+    color: #ff6b6b;
+  }
+  
+  .context-menu button.danger:hover {
+    background: #4a2c2c;
+  }
+}
+
+/* Performance optimizations */
+.canvas-svg {
+  will-change: transform;
+}
+
+.node-group {
+  will-change: transform;
+}
+
+.link {
+  will-change: stroke-width;
+}
+
+/* Accessibility */
+.canvas:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-circle,
+  .link,
+  .drop-zone,
+  .linking-instruction,
+  .context-menu {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .canvas-info,
+  .canvas-instructions,
+  .linking-instruction,
+  .context-menu {
+    display: none;
+  }
+  
+  .topology-canvas {
+    background: white;
+  }
+  
+  .canvas-svg defs pattern path {
+    stroke: #ccc;
+  }
+}
