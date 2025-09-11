@@ -1,0 +1,38 @@
+{
+  "containerlab-official": {
+    "last_scanned": "2025-09-11T00:15:14.719519",
+    "lab_count": 36,
+    "exists": true,
+    "path": "data/repositories/containerlab-official"
+  },
+  "hellt-clabs": {
+    "last_scanned": "2025-09-11T00:15:14.790089",
+    "lab_count": 10,
+    "exists": true,
+    "path": "data/repositories/hellt-clabs"
+  },
+  "packetanglers-topos": {
+    "last_scanned": "2025-09-11T00:15:14.790570",
+    "lab_count": 0,
+    "exists": true,
+    "path": "data/repositories/packetanglers-topos"
+  },
+  "learn-srlinux": {
+    "last_scanned": "2025-09-11T00:15:14.794345",
+    "lab_count": 2,
+    "exists": true,
+    "path": "data/repositories/learn-srlinux"
+  },
+  "clab-config-demo": {
+    "last_scanned": "2025-09-11T00:15:14.794373",
+    "lab_count": 0,
+    "exists": false,
+    "path": null
+  },
+  "instruqt-clab-topologies": {
+    "last_scanned": "2025-09-11T00:15:14.794386",
+    "lab_count": 0,
+    "exists": false,
+    "path": null
+  }
+}

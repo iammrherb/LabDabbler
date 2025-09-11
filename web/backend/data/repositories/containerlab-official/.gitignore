@@ -1,0 +1,58 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin
+bin/*
+rpm
+rpm/*
+dist
+private
+clab-*
+.envrc
+
+tmp/
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+tests/coverage
+
+# clab directories
+lab-examples/**/clab-*
+
+# ignore the following files/directories
+graph/*
+
+license.key
+container-lab
+containerlab
+site/
+.vscode/
+.idea/
+.DS_Store
+__rd*
+tests/out
+# ignore backup clab topo files
+**/.*clab.y*ml.bak
+**/*.y*ml.bak
+
+.python-version
+
+.devcontainer/private-*
+
+
+# readd test labDir files
+!core/test_data/clab-*
+__pycache__
+
+.env
+
+.zed
+
+# to keep robot things away
+venv/
+.venv/

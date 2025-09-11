@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/clab.schema.json
+# Copyright 2020 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: 2-linux-nodes
+
+topology:
+  nodes:
+    l1:
+      kind: linux
+      image: alpine:3
+      cmd: ash -c "echo $MYVAR > /tmp/var && sleep 9999"
+      binds:
+        - 01-test.txt:/01-test.txt
+        - 01-test.json:/test.json
+      env:
+        MYVAR: MYVAR is SET
+      exec:
+        - echo this_is_an_exec_test
+        - cat /etc/os-release
+      cpu: 1.5
+      memory: 1G
+      mgmt-ipv4: 172.20.20.99
+      mgmt-ipv6: 3fff:172:20:20::99
+      healthcheck:
+        test:
+          - CMD-SHELL
+          - cat /etc/os-release
+        start-period: 3
+        retries: 1
+        interval: 5
+        timeout: 2
+
+    l2:
+      kind: linux
+      image: nginx:stable-alpine
+      ports:
+        - 56180:80
+      mgmt-ipv4: 172.20.20.100
+      mgmt-ipv6: 3fff:172:20:20::100
+      aliases:
+        - l2.mydomain.com
+      dns:
+        servers:
+          - 8.8.8.8
+          - 1.2.3.4
+        search:
+          - my.domain
+        options:
+          - rotate
+    l3:
+      kind: linux
+      image: nginx:stable-alpine
+      network-mode: host
+
+  links:
+    - endpoints: ["l1:eth1", "l2:some1"]
+      mtu: 2000
+      vars:
+        foo: bar
+        some: ["thing", "else"]
+    - endpoints: ["l1:eth2", "l2:eth2"]
+    - type: veth
+      endpoints:
+        - node: l1
+          interface: eth3
+          mac: 02:00:00:00:00:00
+        - node: l2
+          interface: eth3
+          mac: 02:00:00:00:00:01
+
+    - type: host
+      host-interface: l2eth4
+      endpoint:
+        node: l2
+        interface: eth4
+        mac: 02:00:00:00:00:04
+
+    - type: mgmt-net
+      host-interface: l2eth5mgmt
+      endpoint:
+        node: l2
+        interface: eth5
+        mac: 02:00:00:00:00:05
+
+    - type: dummy
+      endpoint:
+        node: l2
+        interface: somedummy

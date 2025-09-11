@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import VRNetLabManager from './components/VRNetLabManager'
 import ContainerCatalog from './components/ContainerCatalog'
+import RepositoryManager from './components/RepositoryManager'
 
 function App() {
   const [labs, setLabs] = useState([])
@@ -19,7 +20,7 @@ function App() {
       // Use backend API via port 8000
       const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
       const [labsRes, containersRes, activeLabsRes] = await Promise.all([
-        fetch(`${apiBase}/api/labs?include_github=true`),
+        fetch(`${apiBase}/api/labs?include_github=true&include_repositories=true`),
         fetch(`${apiBase}/api/containers`),
         fetch(`${apiBase}/api/labs/active`)
       ])
@@ -157,6 +158,12 @@ function App() {
             📊 Dashboard
           </button>
           <button 
+            className={`nav-btn ${currentView === 'repositories' ? 'active' : ''}`}
+            onClick={() => setCurrentView('repositories')}
+          >
+            🗂️ Repositories
+          </button>
+          <button 
             className={`nav-btn ${currentView === 'catalog' ? 'active' : ''}`}
             onClick={() => setCurrentView('catalog')}
           >
@@ -174,6 +181,8 @@ function App() {
       <main className="container">
         {currentView === 'catalog' ? (
           <ContainerCatalog />
+        ) : currentView === 'repositories' ? (
+          <RepositoryManager />
         ) : currentView === 'vrnetlab' ? (
           <VRNetLabManager />
         ) : (

@@ -1,0 +1,143 @@
+site_name: Lab catalog
+nav:
+  - Home: index.md
+  - Routing & Switching:
+      - About: rs/rs.md
+      - BGP VPLS Deep dive: rs/bgp-vpls.md
+      - Cumulus Test Drive: rs/cvx03.md
+      - Cumulus In The Cloud: rs/cvx04.md
+      - Cumulus 5.x EVPN VXLAN BGP fabric: rs/cvx05.md
+      - Arista BGP EVPN: rs/arista-bgp-evpn.md
+  - Telemetry:
+      - About: telemetry/telemetry.md
+      - Securing gNMI with TLS: security/gnmitls.md
+      - ISIS Watcher: telemetry/isis-watcher.md
+  - Automation:
+      - About: automation/automation.md
+      - Network Unit Testing With NUTS: automation/nuts-network-testing.md
+  - Security:
+      - About: security/security.md
+      - Certificate management with CMPv2: security/cmpv2.md
+      - Securing gNMI with TLS: security/gnmitls.md
+
+site_author: Roman Dodin
+site_description: >-
+  Opensource catalog of containerlab based labs
+# Repository
+repo_name: hellt/clabs
+repo_url: https://github.com/hellt/clabs
+edit_uri: ""
+theme:
+  name: material
+  custom_dir: docs/overrides
+
+  # 404 page
+  static_templates:
+    - 404.html
+
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+  features:
+    - navigation.top
+    # - navigation.instant
+    - navigation.tabs
+    - search.suggest
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.action.edit
+    - toc.follow
+    - content.tooltips
+    - navigation.indexes
+
+  language: en
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: cyan
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  font:
+    text: Manrope
+    code: Fira Mono
+  icon:
+    logo: fontawesome/solid/vial
+  favicon: images/vial.svg
+
+# Plugins
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/hellt
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/ntdvps
+  analytics:
+    provider: google
+    property: UA-101537614-4
+
+extra_css:
+  - stylesheets/extra.css
+
+# Extensions
+markdown_extensions:
+  - markdown.extensions.admonition
+  - markdown.extensions.attr_list
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - md_in_html
+  - toc:
+      permalink: "#"
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      linenums_style: pymdownx-inline
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: hellt
+      repo: clabs
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.blocks.tab:
+      alternate_style: true
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.definition
+  - pymdownx.blocks.details

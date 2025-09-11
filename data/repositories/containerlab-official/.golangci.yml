@@ -1,0 +1,138 @@
+version: "2"
+linters:
+  default: all
+  disable:
+    # disabling for *now* so ci can pass nicely, but (some?) of these likely should be adressed
+    - contextcheck
+    - cyclop
+    - depguard
+    - dupl
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exptostd
+    - forbidigo
+    - forcetypeassert
+    - funcorder
+    - gochecknoglobals
+    - gocognit
+    - gocyclo
+    - gomoddirectives
+    - gosec
+    - ireturn
+    - musttag
+    - nestif
+    - nilnil
+    - nlreturn
+    - noinlineerr
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - revive
+    - tagliatelle
+    - testpackage
+    - usetesting
+    - varnamelen
+    - wrapcheck
+    - wsl # deprecated, wsl_v5 included in all ofc
+  settings:
+    dupl:
+      threshold: 100
+    funlen:
+      lines: 100
+      statements: 50
+    goconst:
+      min-len: 2
+      min-occurrences: 3
+    gocritic:
+      disabled-checks:
+        - whyNoLint
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    gocyclo:
+      min-complexity: 15
+    govet:
+      settings:
+        printf:
+          funcs:
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+    importas:
+      alias:
+        - pkg: github.com/srl-labs/containerlab/(\w+)
+          alias: clab$1
+        - pkg: github.com/srl-labs/containerlab/(\w+)/(\w+)
+          alias: clab$1$2
+        - pkg: github.com/srl-labs/containerlab/(\w+)/(\w+)/(\w+)
+          alias: clab$1$2$3
+      no-unaliased: true
+    lll:
+      line-length: 100
+    misspell:
+      locale: US
+    nolintlint:
+      require-explanation: false
+      require-specific: false
+      allow-unused: false
+  exclusions:
+    rules:
+      # we *care* about tests, but... like less :P
+      - linters:
+          - mnd
+          - dupl
+          - lll
+          - goconst
+          - funlen
+        path: _test\.go
+      # its nice to be explicit, this feels less explicit
+      - linters:
+          - staticcheck
+        text: could remove embedded field
+      # ssh bits have a lot of mnd that is pretty clear what it is for/doing, so just ignore
+      - linters:
+          - mnd
+        path: core/config/transport/
+    # slowly enforcing things, excluding these packages (for now!)
+    paths:
+      - cert
+      - errors
+      - exec
+      - git
+      - internal
+      - links
+      - mocks
+      - netconf
+      - nodes
+      - runtime
+      - schemas
+      - types
+      - utils
+      - virt
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/golangci/golangci-lint
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  uniq-by-line: false

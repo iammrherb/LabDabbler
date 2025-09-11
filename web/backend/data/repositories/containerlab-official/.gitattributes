@@ -1,0 +1,6 @@
+# Do not detect languages in the following folders
+templates/** -linguist-detectable
+docs/** -linguist-detectable
+lab-examples/** -linguist-detectable
+# nextui is vendored
+core/graph_templates/nextui/** linguist-vendored

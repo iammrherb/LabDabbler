@@ -1,0 +1,92 @@
+{
+  "core_repositories": [
+    {
+      "name": "containerlab-official",
+      "url": "https://github.com/srl-labs/containerlab.git",
+      "branch": "main",
+      "category": "official",
+      "description": "Official containerlab examples and documentation",
+      "lab_paths": [
+        "lab-examples/"
+      ],
+      "auto_sync": true,
+      "sync_frequency": 86400
+    },
+    {
+      "name": "hellt-clabs",
+      "url": "https://github.com/hellt/clabs.git",
+      "branch": "main",
+      "category": "community",
+      "description": "Community containerlab topologies by hellt",
+      "lab_paths": [
+        "labs/"
+      ],
+      "auto_sync": true,
+      "sync_frequency": 86400
+    },
+    {
+      "name": "packetanglers-topos",
+      "url": "https://github.com/PacketAnglers/clab-topos.git",
+      "branch": "main",
+      "category": "community",
+      "description": "PacketAnglers containerlab topologies collection",
+      "lab_paths": [
+        "./"
+      ],
+      "auto_sync": true,
+      "sync_frequency": 86400
+    },
+    {
+      "name": "learn-srlinux",
+      "url": "https://github.com/srl-labs/learn-srlinux.git",
+      "branch": "main",
+      "category": "educational",
+      "description": "SR Linux learning labs and tutorials",
+      "lab_paths": [
+        "labs/"
+      ],
+      "auto_sync": true,
+      "sync_frequency": 86400
+    }
+  ],
+  "additional_sources": [
+    {
+      "name": "clab-config-demo",
+      "url": "https://github.com/hellt/clab-config-demo.git",
+      "branch": "main",
+      "category": "demo",
+      "description": "Containerlab configuration demonstration",
+      "lab_paths": [
+        "./"
+      ],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "instruqt-clab-topologies",
+      "url": "https://github.com/ttafsir/instruqt-clab-topologies.git",
+      "branch": "main",
+      "category": "educational",
+      "description": "Instruqt-based containerlab topologies",
+      "lab_paths": [
+        "./"
+      ],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "test-repo",
+      "url": "https://github.com/example/test-repo.git",
+      "branch": "main",
+      "category": "test",
+      "description": "Test repository",
+      "auto_sync": false,
+      "lab_paths": [
+        "./"
+      ],
+      "sync_frequency": 604800
+    }
+  ],
+  "last_updated": "2025-09-11T00:15:23.123644",
+  "version": "1.0.0"
+}

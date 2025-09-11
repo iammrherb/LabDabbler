@@ -1,0 +1,155 @@
+---
+# -------------------------------------------------------------
+# Arista ATD Data Center Topology
+# Maps to the Arista Test Drive (ATD) Data Center Topology
+# -------------------------------------------------------------
+
+name: atd-dc
+prefix: ""
+
+mgmt:
+  network: mgmt
+  ipv4_subnet: 172.100.100.0/24
+
+topology:
+
+  defaults:
+    env:
+      INTFTYPE: et
+
+  kinds:
+    ceos:
+      image: ceos:4.27.3F
+    linux:
+      image: mitchv85/ohv-host
+
+  nodes: 
+
+#########################
+# SPINE                 #
+#########################
+
+    SPINE1:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.101
+      startup-config: ./clab-topos/atd-dc/configs/SPINE1.cfg
+      ports:
+        - '22001:22'
+        - '8001:80'
+        - '44301:443'
+
+    SPINE2:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.102
+      startup-config: ./clab-topos/atd-dc/configs/SPINE2.cfg
+      ports:
+        - '22002:22'
+        - '8002:80'
+        - '44302:443'
+
+#########################
+# LEAF                  #
+#########################
+
+    LEAF1:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.103
+      startup-config: ./clab-topos/atd-dc/configs/LEAF1.cfg
+      ports:
+        - '22003:22'
+        - '8003:80'
+        - '44303:443'
+
+    LEAF2:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.104
+      startup-config: ./clab-topos/atd-dc/configs/LEAF2.cfg
+      ports:
+        - '22004:22'
+        - '8004:80'
+        - '44304:443'
+
+    LEAF3:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.105
+      startup-config: ./clab-topos/atd-dc/configs/LEAF3.cfg
+      ports:
+        - '22005:22'
+        - '8005:80'
+        - '44305:443'
+
+    LEAF4:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.106
+      startup-config: ./clab-topos/atd-dc/configs/LEAF4.cfg
+      ports:
+        - '22006:22'
+        - '8006:80'
+        - '44306:443'
+
+###########################################
+# HOST                                    #
+###########################################
+
+    HOST1:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.107
+      startup-config: ./clab-topos/atd-dc/configs/HOST1.cfg
+      ports:
+        - '22007:22'
+        - '8007:80'
+        - '44307:443'
+
+    HOST2:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.108
+      startup-config: ./clab-topos/atd-dc/configs/HOST2.cfg
+      ports:
+        - '22008:22'
+        - '8008:80'
+        - '44308:443'
+
+  links:
+####################
+# SPINE1 to LEAF   #
+####################
+    - endpoints: ["SPINE1:et2", "LEAF1:et2"]
+    - endpoints: ["SPINE1:et3", "LEAF2:et2"]
+    - endpoints: ["SPINE1:et4", "LEAF3:et2"]
+    - endpoints: ["SPINE1:et5", "LEAF4:et2"]
+####################
+# SPINE2 to LEAF   #
+####################
+    - endpoints: ["SPINE2:et2", "LEAF1:et3"]
+    - endpoints: ["SPINE2:et3", "LEAF2:et3"]
+    - endpoints: ["SPINE2:et4", "LEAF3:et3"]
+    - endpoints: ["SPINE2:et5", "LEAF4:et3"]
+####################
+# SPINE1 to SPINE2 #
+####################
+    - endpoints: ["SPINE1:et1", "SPINE2:et1"]
+    - endpoints: ["SPINE1:et6", "SPINE2:et6"]
+####################
+# LEAF1 to LEAF2   #
+####################
+    - endpoints: ["LEAF1:et1", "LEAF2:et1"]
+    - endpoints: ["LEAF1:et6", "LEAF2:et6"]
+####################
+# HOST1            #
+####################
+    - endpoints: ["HOST1:et1", "LEAF1:et4"]
+    - endpoints: ["HOST1:et3", "LEAF1:et5"]
+    - endpoints: ["HOST1:et2", "LEAF2:et4"]
+    - endpoints: ["HOST1:et4", "LEAF2:et5"]
+####################
+# LEAF3 to LEAF4   #
+####################
+    - endpoints: ["LEAF3:et1", "LEAF4:et1"]
+    - endpoints: ["LEAF3:et6", "LEAF4:et6"]
+####################
+# HOST2            #
+####################
+    - endpoints: ["HOST2:et1", "LEAF3:et4"]
+    - endpoints: ["HOST2:et3", "LEAF3:et5"]
+    - endpoints: ["HOST2:et2", "LEAF4:et4"]
+    - endpoints: ["HOST2:et4", "LEAF4:et5"]

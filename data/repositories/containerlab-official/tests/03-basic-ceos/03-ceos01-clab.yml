@@ -1,0 +1,21 @@
+# Copyright 2020 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: 03-01-two-ceos
+
+topology:
+  kinds:
+    ceos:
+      image: ceos:4.32.0F
+      env:
+        CLAB_MGMT_VRF: MGMT
+  nodes:
+    n1:
+      kind: ceos
+    n2:
+      kind: ceos
+      mgmt-ipv4: 172.20.20.22
+
+  links:
+    - endpoints: ["n1:eth1", "n2:eth1"]

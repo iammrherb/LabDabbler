@@ -1,0 +1,115 @@
+name: smoke-tests
+
+"on":
+  workflow_call:
+    inputs:
+      py_ver:
+        required: true
+        type: string
+      runtime:
+        type: string
+        default: "docker"
+
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET }}
+    strategy:
+      fail-fast: false
+      matrix:
+        test-suite:
+          - "01*.robot"
+          - "02*.robot"
+          - "03*.robot"
+          - "04*.robot"
+          - "05*.robot"
+          - "06*.robot"
+          - "07*.robot"
+          - "08*.robot"
+          - "09*.robot"
+          - "10*.robot"
+          - "11*.robot"
+          - "12*.robot"
+          - "13*.robot"
+          - "14*.robot"
+          - "15*.robot"
+          - "16*.robot"
+          - "17*.robot"
+          - "18*.robot"
+          - "19*.robot"
+          - "20*.robot"
+          - "21*.robot"
+          - "22*.robot"
+          - "23*.robot"
+          - "24*.robot"
+
+    # allow podman job to fail, since it started to fail on github actions
+    continue-on-error: ${{ inputs.runtime == 'podman' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: containerlab
+
+      - name: Move containerlab to usr/bin
+        run: sudo mv ./containerlab /usr/bin/containerlab && sudo chown root:root /usr/bin/containerlab && sudo chmod 4755 /usr/bin/containerlab
+
+      - name: Setup Podman
+        if: inputs.runtime == 'podman'
+        run: sudo bash ./.github/workflows/install-podman.sh
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          # Install a specific version of uv.
+          version: "0.5.28"
+          enable-cache: true
+
+      - uses: actions/setup-python@v5
+        with:
+          # cache: pip
+          # cache-dependency-path: "tests/requirements.txt"
+          python-version-file: "pyproject.toml"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Sanitize test-suite name
+        run: echo "TEST_SUITE=$(echo ${{ matrix.test-suite }} | tr -d '*')" >> $GITHUB_ENV
+
+      # - name: setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - name: Activate virtualenv
+        run: |
+          . .venv/bin/activate
+          echo PATH=$PATH >> $GITHUB_ENV
+
+      - name: Run smoke tests
+        run: |
+          ./tests/rf-run.sh ${{ inputs.runtime }} ./tests/01-smoke/${{ matrix.test-suite }}
+
+      # upload test reports as a zip file
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 01-smoke-log-${{ env.TEST_SUITE }}-${{ inputs.runtime }}
+          path: ./tests/out/*.html
+
+      # upload coverage report from unit tests, as they are then
+      # merged with e2e tests coverage
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-smoke-tests-${{ env.TEST_SUITE }}-${{ inputs.runtime }}
+          path: /tmp/clab-tests/coverage/*
+          retention-days: 7

@@ -1,0 +1,31 @@
+name: topo4
+topology:
+  defaults:
+    license: default.lic
+    binds:
+      - default.lic:/dst3
+    env:
+      env1: global
+      env2: global
+      env3: global
+    user: customglobal
+  kinds:
+    nokia_srlinux:
+      license: kind.lic
+      binds:
+        - kind.lic:/dst2
+      env:
+        env2: kind
+        env4: kind
+      user: customkind
+  nodes:
+    node1:
+      kind: nokia_srlinux
+      type: ixrd3
+      license: node1.lic
+      binds:
+        - node1.lic:/dst1
+      env:
+        env1: node
+        env5: node
+      user: customnode

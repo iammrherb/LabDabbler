@@ -1,0 +1,25 @@
+# Copyright 2020 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: 02-01-two-srls
+
+topology:
+  kinds:
+    nokia_srlinux:
+      image: ghcr.io/nokia/srlinux
+  nodes:
+    srl1:
+      kind: nokia_srlinux
+      startup-config: srl1-startup.cli
+      mgmt-ipv4: 172.20.20.200
+    srl2:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux
+      env:
+        SRL_LOCATION: test123
+      startup-config: https://raw.githubusercontent.com/srl-labs/containerlab/main/tests/02-basic-srl/srl2-startup.cli
+      mgmt-ipv4: 172.20.20.201
+
+  links:
+    - endpoints: ["srl1:ethernet-1/1", "srl2:e1-1"]

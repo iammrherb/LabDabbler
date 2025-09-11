@@ -1,0 +1,353 @@
+site_name: Learn SR Linux
+nav:
+  - Home: index.md
+  - Get Started:
+      - get-started/index.md
+      - Lab: get-started/lab.md
+      - CLI: get-started/cli.md
+      - Interfaces: get-started/interface.md
+      - Network Instances: get-started/network-instance.md
+      # - IGP: get-started/igp.md
+      - BGP: get-started/bgp.md
+  - Management:
+      - mgmt/index.md
+      - CLI:
+          - cli/index.md
+          - Show Commands:
+              - cli/show-commands/index.md
+              - Chassis and Environment: cli/show-commands/chassis-and-env.md
+              - Interface: cli/show-commands/interface.md
+              - LAG: cli/show-commands/lag.md
+              - Network Instance: cli/show-commands/network-instance.md
+              - OSPF: cli/show-commands/ospf.md
+              - IS-IS: cli/show-commands/is-is.md
+              - BGP: cli/show-commands/bgp.md
+              - EVPN: cli/show-commands/evpn.md
+              - ACL: cli/show-commands/acl.md
+              - CPM Filter: cli/show-commands/cpm-filter.md
+              - Mirroring: cli/show-commands/mirroring.md
+              - DHCP Relay: cli/show-commands/dhcp-relay.md
+              - TACACS: cli/show-commands/tacacs.md
+          - Wildcards and ranges: blog/posts/2023/cli-ranges.md
+      - SNMP:
+          - SNMP Framework: snmp/snmp_framework.md
+
+  # - Knowledge Base:
+  #     - Hardware types: kb/hwtypes.md
+  #     - Management interfaces: kb/mgmt.md
+  #     - Configuration management: kb/cfgmgmt.md
+  #     - Interfaces: kb/ifaces.md
+  #     - Network instances: kb/netwinstance.md
+  - Programmability:
+      - programmability/index.md
+      - YANG:
+          - yang/index.md
+          - YANG Browser: yang/browser.md
+      - NDK:
+          - ndk/index.md
+          - Developers Guide:
+              - NDK Architecture: ndk/guide/architecture.md
+              - NDK Operations: ndk/guide/operations.md
+              - Agent Components: ndk/guide/agent.md
+              - Developing with NDK:
+                  - Go:
+                      - ndk/guide/dev/go/index.md
+                      - With Bond:
+                          - ndk/guide/dev/go/with-bond/index.md
+                          - Main function: ndk/guide/dev/go/with-bond/main.md
+                          - Bond agent: ndk/guide/dev/go/with-bond/bond.md
+                          - Greeter app: ndk/guide/dev/go/with-bond/app.md
+                          - Logging: ndk/guide/dev/go/with-bond/logging.md
+                      - The Hard Way:
+                          - ndk/guide/dev/go/the-hard-way/index.md
+                          - Main function: ndk/guide/dev/go/the-hard-way/main.md
+                          - App Instance: ndk/guide/dev/go/the-hard-way/app-instance.md
+                          - App Start: ndk/guide/dev/go/the-hard-way/app-start.md
+                          - Receiving Configuration: ndk/guide/dev/go/the-hard-way/receiving-config.md
+                          - Notification Stream: ndk/guide/dev/go/the-hard-way/notif-stream.md
+                          - Handling Notifications: ndk/guide/dev/go/the-hard-way/handling-notif.md
+                          - Processing Config: ndk/guide/dev/go/the-hard-way/processing-config.md
+                          - Updating State: ndk/guide/dev/go/the-hard-way/updating-state.md
+                      - Build & Package: ndk/guide/dev/go/build-and-package.md
+                  - Python:
+                      - ndk/guide/dev/py/index.md
+                      - Greeter App: ndk/guide/dev/py/greeter-py.md
+              - Agent Installation & Operations: ndk/guide/agent-install-and-ops.md
+          - App Catalog:
+              - ndk/apps/index.md
+              - EVPN Proxy: ndk/apps/evpn-proxy.md
+              - kButler: ndk/apps/kbutler.md
+              - Prometheus Telemetry Exporter: ndk/apps/srl-prom-exporter.md
+              - SR Linux GPT: ndk/apps/srl-gpt.md
+              - Satellite Tracker: ndk/apps/satellite.md
+          - Releases:
+              - ndk/releases/index.md
+              - 0.2: ndk/releases/0.2.md
+              - 0.3: ndk/releases/0.3.md
+              - 0.4: ndk/releases/0.4.md
+      - Ansible:
+          - ansible/index.md
+          - nokia.srlinux collection:
+              - ansible/collection/index.md
+              - get: ansible/collection/get.md
+              - config: ansible/collection/config.md
+              - validate: ansible/collection/validate.md
+              - cli: ansible/collection/cli.md
+      - CLI Plugins:
+          - cli/plugins/index.md
+          - Getting started: cli/plugins/getting-started.md
+          - MultiCLI Project: cli/plugins/multicli.md
+  - Tutorials:
+      # - SR Linux tutorials: tutorials/about.md
+      - tutorials/index.md
+      - EVPN:
+          - Layer 2 EVPN Basics:
+              - Introduction: tutorials/l2evpn/intro.md
+              - Fabric configuration: tutorials/l2evpn/fabric.md
+              - EVPN configuration: tutorials/l2evpn/evpn.md
+              - Summary: tutorials/l2evpn/summary.md
+          - EVPN Multihoming:
+              - Basics:
+                  - tutorials/evpn-mh/basics/index.md
+                  - Configuration: tutorials/evpn-mh/basics/conf.md
+                  - Verification: tutorials/evpn-mh/basics/verify.md
+          - Layer 3 EVPN:
+              - RT5-only L3 EVPN:
+                  - tutorials/l3evpn/rt5-only/index.md
+                  - Underlay Routing: tutorials/l3evpn/rt5-only/underlay.md
+                  - Overlay Routing: tutorials/l3evpn/rt5-only/overlay.md
+                  - L3 EVPN Instance: tutorials/l3evpn/rt5-only/l3evpn.md
+                  - L3 EVPN with BGP PE-CE: tutorials/l3evpn/rt5-only/l3evpn-bgp-pe-ce.md
+                  - Summary: tutorials/l3evpn/rt5-only/summary.md
+      - Infrastructure:
+          - KNE:
+              - tutorials/infrastructure/kne/index.md
+              - Installation: tutorials/infrastructure/kne/installation.md
+              - Topology: tutorials/infrastructure/kne/topology.md
+              - SR Linux with Openconfig services:
+                  - tutorials/infrastructure/kne/srl-with-oc-services/index.md
+      - MPLS:
+          - LDP-based MPLS:
+              - Introduction: tutorials/mpls/mpls-ldp/intro.md
+              - Routing: tutorials/mpls/mpls-ldp/routing.md
+              - LDP: tutorials/mpls/mpls-ldp/ldp.md
+      - Programmability:
+          - Event Handler:
+              - Oper Group:
+                  - Introduction: tutorials/programmability/event-handler/oper-group/oper-group-intro.md
+                  - Lab setup: tutorials/programmability/event-handler/oper-group/lab.md
+                  - Problem statement: tutorials/programmability/event-handler/oper-group/problem-statement.md
+                  - Configuring oper-group: tutorials/programmability/event-handler/oper-group/oper-group-cfg.md
+                  - Script: tutorials/programmability/event-handler/oper-group/script.md
+                  - Oper group in action: tutorials/programmability/event-handler/oper-group/opergroup-operation.md
+                  - Summary: tutorials/programmability/event-handler/oper-group/summary.md
+          - JSON-RPC:
+              - Basics: tutorials/programmability/json-rpc/basics.md
+          - Ansible:
+              - Using nokia.srlinux collection: tutorials/programmability/ansible/using-nokia-srlinux-collection.md
+              - Intent-based management with Ansible:
+                  - tutorials/programmability/ansible/intent-based-management/index.md
+                  - Lab environment: tutorials/programmability/ansible/intent-based-management/env.md
+                  - Project structure: tutorials/programmability/ansible/intent-based-management/project-structure.md
+                  - Configuring the fabric: tutorials/programmability/ansible/intent-based-management/config.md
+                  - Summary: tutorials/programmability/ansible/intent-based-management/summary.md
+  - Community: community.md
+  - Blog:
+      - blog/index.md
+      - Subscribe: blog/subscribe.md
+      - Tags: blog/tags.md
+      - In the Media: blog/media.md
+
+site_author: SR Linux
+site_description: >-
+  Open documentation for open Network OS
+# Repository
+repo_name: srl-labs/learn-srlinux
+repo_url: https://github.com/srl-labs/learn-srlinux
+edit_uri: edit/main/docs/
+site_url: "https://learn.srlinux.dev/"
+copyright: Copyright &copy; 2021-2025 Nokia
+theme:
+  name: material
+  custom_dir: docs/overrides
+
+  # 404 page
+  static_templates:
+    - 404.html
+
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+  features:
+    - navigation.top
+    # - navigation.instant # removed until code selection are fixed https://github.com/squidfunk/mkdocs-material/issues/5066
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - content.code.annotate
+    - content.code.copy
+    - content.action.edit
+    - toc.follow
+    - content.tooltips
+    - content.footnote.tooltips
+    - navigation.indexes
+
+  language: en
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  font:
+    text: NokiaPureText
+    code: Fira Code
+  icon:
+    logo: nokia/srlinux
+    repo: fontawesome/brands/github
+    edit: material/file-edit-outline
+  favicon: images/srlinux.svg
+
+# Plugins
+plugins:
+  - meta
+  - glightbox
+  - macros:
+      j2_block_start_string: "-{{%"
+      j2_block_end_string: "%}}-"
+      j2_variable_start_string: "-{{"
+      j2_variable_end_string: "}}-"
+      # include_yaml:
+      #   - macros/vars.yml
+      include_dir: macros
+      module_name: macros/main
+  - blog:
+      blog_dir: blog
+      post_url_date_format: yyyy
+      archive: false
+      categories: false
+      post_excerpt_max_authors: 2
+      authors_profiles: true
+  - tags
+  - typeset
+  - search
+  - minify:
+      minify_html: true
+  - rss:
+      match_path: blog/posts/.*
+      abstract_chars_count: 5000
+      date_from_meta:
+        as_creation: date
+      categories:
+        - tags
+      comments_path: "#__comments"
+  - redirects:
+      redirect_maps:
+        "ndk/intro.md": "ndk/index.md"
+        "yang/yang.md": "yang/index.md"
+        "tutorials/programmability/json-rpc/ansible.md": "tutorials/programmability/ansible/using-nokia-srlinux-collection.md"
+  - git-revision-date-localized:
+      enable_creation_date: true
+      enabled: !ENV [CI, false]
+  - git-committers:
+      repository: srl-labs/learn-srlinux
+      branch: main
+      enabled: !ENV [CI, false]
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/tZvgjQ6PZf
+    - icon: fontawesome/brands/github
+      link: https://github.com/srl-labs
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/ntdvps
+  analytics:
+    provider: google
+    property: G-VNYX781Q48
+  tags:
+    # tags and their identifiers
+    media: media # media tag is used to show posts in media.md
+  annotate:
+    bash:
+      - .s1
+      - .s2
+
+# Extensions
+markdown_extensions:
+  - markdown.extensions.admonition
+  - markdown.extensions.attr_list
+  - markdown.extensions.md_in_html
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - toc:
+      permalink: "#"
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      line_spans: __span
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: srl-labs
+      repo: learn-srlinux
+  - pymdownx.mark
+  - pymdownx.smartsymbols:
+      fractions: false
+  - pymdownx.snippets:
+      check_paths: true
+      url_download: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.blocks.tab:
+      alternate_style: true
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.definition
+  - pymdownx.blocks.details
+  - pymdownx.blocks.html:
+      custom:
+        - tag: td
+          mode: block
+        - tag: th
+          mode: block
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_css:
+  - stylesheets/nokia.css
+  - stylesheets/nokia-fonts.css
+  - stylesheets/diagrams.css
+  - stylesheets/animations.css
+  - stylesheets/expandable-blocks.css
+
+extra_javascript:
+  - javascripts/sh-annotation.js
+  - javascripts/expandable-blocks.js

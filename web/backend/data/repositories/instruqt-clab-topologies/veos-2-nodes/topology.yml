@@ -1,0 +1,12 @@
+---
+name: veos_topo
+topology:
+  nodes:
+    veos1:
+      kind: vr-veos
+      image: vrnetlab/vr-veos:4.27.0F
+    veos2:
+      kind: vr-veos
+      image: vrnetlab/vr-veos:4.27.0F
+  links:
+    - endpoints: ["veos1:eth1", "veos2:eth1"]

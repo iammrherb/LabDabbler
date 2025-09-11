@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import os
 import yaml
 import json
@@ -10,10 +11,39 @@ from services.container_discovery import ContainerDiscoveryService
 from services.github_lab_scanner import GitHubLabScanner
 from services.lab_launcher import LabLauncherService
 from services.vrnetlab_service import VRNetLabService
+from services.repository_management import RepositoryManagementService
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="LabDabbler - Master Lab Repository", version="1.0.0")
+# Initialize services at module level
+container_service = ContainerDiscoveryService(Path("./data"))
+lab_scanner = GitHubLabScanner(Path("./data"))
+lab_launcher = LabLauncherService(Path("./data"))
+vrnetlab_service = VRNetLabService(Path("./data"))
+repository_service = RepositoryManagementService(Path("./data"))
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan - startup and shutdown"""
+    # Startup
+    logger.info("Starting LabDabbler backend services...")
+    try:
+        await repository_service.start_background_sync()
+        logger.info("Background sync scheduler started successfully")
+    except Exception as e:
+        logger.error(f"Failed to start background sync scheduler: {e}")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down LabDabbler backend services...")
+    try:
+        await repository_service.stop_background_sync()
+        logger.info("Background sync scheduler stopped successfully")
+    except Exception as e:
+        logger.error(f"Error stopping background sync scheduler: {e}")
+
+app = FastAPI(title="LabDabbler - Master Lab Repository", version="1.0.0", lifespan=lifespan)
 
 # Configure CORS for frontend
 app.add_middleware(
@@ -30,20 +60,19 @@ LABS_DIR = PROJECT_ROOT / "labs"
 CONFIGS_DIR = PROJECT_ROOT / "configs"
 DATA_DIR = PROJECT_ROOT / "data"
 
-# Paths configured successfully
-
-# Initialize services
-container_service = ContainerDiscoveryService(DATA_DIR)
-lab_scanner = GitHubLabScanner(DATA_DIR)
-lab_launcher = LabLauncherService(DATA_DIR)
-vrnetlab_service = VRNetLabService(DATA_DIR)
+# Update service data directories to use PROJECT_ROOT/data
+container_service.data_dir = DATA_DIR
+lab_scanner.data_dir = DATA_DIR
+lab_launcher.data_dir = DATA_DIR
+vrnetlab_service.data_dir = DATA_DIR
+repository_service.data_dir = DATA_DIR
 
 @app.get("/")
 async def root():
     return {"message": "LabDabbler Master Lab Repository API", "version": "1.0.0"}
 
 @app.get("/api/labs")
-async def get_labs(include_github: bool = True):
+async def get_labs(include_github: bool = True, include_repositories: bool = True):
     """Get all available labs with their .clab.yml file paths"""
     labs = []
     
@@ -88,7 +117,33 @@ async def get_labs(include_github: bool = True):
                 if category_labs["labs"]:
                     labs.append(category_labs)
     
-    # GitHub labs
+    # Repository labs (new centralized repository management)
+    if include_repositories:
+        try:
+            repository_labs = await repository_service.get_all_labs_from_repositories()
+            
+            # Group repository labs by repository
+            repo_lab_groups = {}
+            for lab in repository_labs:
+                repo_name = lab.get("repository", "unknown")
+                if repo_name not in repo_lab_groups:
+                    repo_lab_groups[repo_name] = {
+                        "category": f"repo-{repo_name}",
+                        "source": "repository",
+                        "repository": repo_name,
+                        "labs": []
+                    }
+                repo_lab_groups[repo_name]["labs"].append(lab)
+            
+            # Add repository lab groups to the main labs list
+            for repo_group in repo_lab_groups.values():
+                if repo_group["labs"]:
+                    labs.append(repo_group)
+                    
+        except Exception as e:
+            logger.error(f"Error loading repository labs: {e}")
+    
+    # GitHub labs (legacy support)
     if include_github:
         github_labs = lab_scanner.load_labs()
         if github_labs and "repositories" in github_labs:
@@ -441,6 +496,108 @@ async def get_supported_vendors():
     return {
         "success": True,
         "vendors": vrnetlab_service.supported_vendors
+    }
+
+# Repository Management API Endpoints
+
+@app.post("/api/repositories/initialize")
+async def initialize_repositories():
+    """Initialize the repository management system with default repositories"""
+    result = await repository_service.initialize_repositories()
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
+
+@app.get("/api/repositories")
+async def get_repositories():
+    """Get all managed repositories"""
+    result = await repository_service.get_all_repositories()
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
+
+@app.get("/api/repositories/{repo_name}/status")
+async def get_repository_status(repo_name: str):
+    """Get detailed status of a specific repository"""
+    result = await repository_service.get_repository_status(repo_name)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail=result)
+
+@app.post("/api/repositories/{repo_name}/sync")
+async def sync_repository(repo_name: str):
+    """Sync a specific repository"""
+    result = await repository_service.sync_repository(repo_name)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.post("/api/repositories/sync-all")
+async def sync_all_repositories():
+    """Sync all configured repositories"""
+    result = await repository_service.sync_all_repositories()
+    return result
+
+@app.post("/api/repositories/add")
+async def add_repository(request: dict):
+    """Add a new repository to the configuration"""
+    result = await repository_service.add_repository(request)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.delete("/api/repositories/{repo_name}")
+async def remove_repository(repo_name: str):
+    """Remove a repository from the configuration"""
+    result = await repository_service.remove_repository(repo_name)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.get("/api/repositories/labs")
+async def get_repository_labs():
+    """Get all labs from managed repositories"""
+    labs = await repository_service.get_all_labs_from_repositories()
+    return {
+        "success": True,
+        "labs": labs,
+        "total_labs": len(labs)
+    }
+
+@app.post("/api/repositories/auto-sync")
+async def auto_sync_repositories():
+    """Perform automatic sync for repositories with auto_sync enabled"""
+    result = await repository_service.auto_sync_repositories()
+    return result
+
+@app.get("/api/repositories/sync-status")
+async def get_sync_status():
+    """Get sync status for all repositories"""
+    status = await repository_service.get_sync_status()
+    return {
+        "success": True,
+        "sync_status": status
+    }
+
+@app.get("/api/repositories/scheduler-status")
+async def get_scheduler_status():
+    """Get status of the background sync scheduler"""
+    status = repository_service.get_scheduler_status()
+    return {
+        "success": True,
+        "scheduler_status": status
     }
 
 if __name__ == "__main__":

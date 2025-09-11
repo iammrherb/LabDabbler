@@ -1,0 +1,10 @@
+.vscode
+private
+clab-*
+site/
+tmp
+.*clab.y*ml
+.*clab.y*ml.bak
+.cache
+srlinux-getting-started
+**/__pycache__
