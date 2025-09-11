@@ -1,0 +1,115 @@
+# LabDabbler Production Configuration
+app:
+  name: "LabDabbler"
+  version: "1.0.0"
+  environment: "production"
+  debug: false
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  timeout: 30
+  keepalive: 2
+  max_requests: 1000
+
+database:
+  pool_size: 20
+  max_overflow: 30
+  pool_timeout: 30
+  pool_recycle: 3600
+  echo: false
+
+security:
+  cors:
+    allow_origins:
+      - "https://labdabbler.com"
+      - "https://www.labdabbler.com"
+      - "https://api.labdabbler.com"
+    allow_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allow_headers:
+      - "Accept"
+      - "Accept-Language"
+      - "Content-Type"
+      - "Authorization"
+    allow_credentials: true
+    max_age: 86400
+
+  rate_limiting:
+    enabled: true
+    default_limits:
+      - "100/hour"
+      - "20/minute"
+    paths:
+      "/api/labs/launch": "10/hour"
+      "/api/vrnetlab/upload": "5/hour"
+      "/api/containers/refresh": "2/hour"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  handlers:
+    - type: "file"
+      filename: "/var/log/labdabbler/app.log"
+      max_size: "100MB"
+      backup_count: 5
+    - type: "console"
+      level: "WARNING"
+
+monitoring:
+  metrics:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+  health_checks:
+    enabled: true
+    path: "/health"
+    interval: 30
+
+cache:
+  redis:
+    enabled: true
+    default_ttl: 3600
+    key_prefix: "labdabbler:"
+
+performance:
+  compression:
+    enabled: true
+    minimum_size: 1024
+    types:
+      - "application/json"
+      - "text/html"
+      - "text/css"
+      - "text/javascript"
+      - "application/javascript"
+
+containerlab:
+  binary_path: "/usr/bin/clab"
+  default_runtime: "docker"
+  timeout: 300
+  cleanup_on_failure: true
+
+file_handling:
+  max_upload_size: 1073741824  # 1GB
+  allowed_extensions:
+    - ".yml"
+    - ".yaml"
+    - ".json"
+    - ".cfg"
+    - ".conf"
+    - ".qcow2"
+    - ".vmdk"
+    - ".iso"
+  virus_scanning:
+    enabled: false  # Set to true if antivirus is available
+
+repositories:
+  sync_interval: 3600  # 1 hour
+  auto_sync: true
+  max_parallel_syncs: 3
+  timeout: 600  # 10 minutes

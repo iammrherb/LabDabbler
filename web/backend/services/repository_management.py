@@ -886,8 +886,17 @@ class RepositoryManagementService:
     
     def get_scheduler_status(self) -> Dict:
         """Get the current status of the background sync scheduler"""
+        next_sync_check = None
+        if self.scheduler:
+            try:
+                job = self.scheduler.get_job('auto_sync_check')
+                if job and job.next_run_time:
+                    next_sync_check = job.next_run_time.isoformat()
+            except Exception:
+                next_sync_check = None
+                
         return {
             "scheduler_running": self._scheduler_started,
             "scheduler_active": self.scheduler is not None and self.scheduler.running if self.scheduler else False,
-            "next_sync_check": self.scheduler.get_job('auto_sync_check').next_run_time.isoformat() if self.scheduler and self.scheduler.get_job('auto_sync_check') and self.scheduler.get_job('auto_sync_check').next_run_time else None
+            "next_sync_check": next_sync_check
         }

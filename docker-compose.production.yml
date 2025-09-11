@@ -1,0 +1,217 @@
+version: '3.8'
+
+services:
+  # Nginx reverse proxy with SSL termination
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: labdabbler-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - labdabbler-network
+    labels:
+      - "traefik.enable=false"
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./web/frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: labdabbler-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - frontend_static:/usr/share/nginx/html:ro
+    networks:
+      - labdabbler-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend service
+  backend:
+    build:
+      context: ./web/backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: labdabbler-backend
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://labdabbler_user:${DATABASE_PASSWORD}@postgres:5432/labdabbler_production
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - backend_data:/app/data
+      - backend_labs:/app/labs
+      - backend_configs:/app/configs
+      - backend_uploads:/app/uploads
+      - backend_logs:/var/log/labdabbler
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - labdabbler-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: labdabbler-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=labdabbler_production
+      - POSTGRES_USER=labdabbler_user
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=scram-sha-256
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    networks:
+      - labdabbler-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U labdabbler_user -d labdabbler_production"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    container_name: labdabbler-redis
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf:ro
+    networks:
+      - labdabbler-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    command: redis-server /etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: labdabbler-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - labdabbler-network
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: labdabbler-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - labdabbler-network
+    depends_on:
+      - prometheus
+
+  # Log aggregation - Fluentd
+  fluentd:
+    image: fluent/fluentd:v1.16-debian-1
+    container_name: labdabbler-fluentd
+    restart: unless-stopped
+    volumes:
+      - ./logging/fluent.conf:/fluentd/etc/fluent.conf:ro
+      - backend_logs:/var/log/labdabbler:ro
+      - nginx_logs:/var/log/nginx:ro
+      - fluentd_logs:/var/log/fluentd
+    networks:
+      - labdabbler-network
+
+networks:
+  labdabbler-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  # Application data
+  backend_data:
+    driver: local
+  backend_labs:
+    driver: local
+  backend_configs:
+    driver: local
+  backend_uploads:
+    driver: local
+  frontend_static:
+    driver: local
+  
+  # Database and cache
+  postgres_data:
+    driver: local
+  postgres_backups:
+    driver: local
+  redis_data:
+    driver: local
+  
+  # Logs
+  backend_logs:
+    driver: local
+  nginx_logs:
+    driver: local
+  fluentd_logs:
+    driver: local
+  
+  # Monitoring
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
