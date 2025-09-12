@@ -211,7 +211,9 @@ class GitHubService:
             "customizations": {
                 "vscode": {
                     "extensions": [
-                        # Containerlab specific extensions
+                        # Official Containerlab VS Code extension
+                        "srl-labs.vscode-containerlab",
+                        # Core containerlab and YAML support
                         "redhat.vscode-yaml",
                         "ms-vscode.vscode-json",
                         # Network automation and development
@@ -224,28 +226,89 @@ class GitHubService:
                         "GitHub.copilot-chat",
                         # Terminal and shell
                         "ms-vscode.vscode-terminal",
-                        # Docker support
+                        # Docker and container support
                         "ms-azuretools.vscode-docker",
-                        # File management
-                        "christian-kohler.path-intellisense"
+                        "ms-vscode-remote.remote-containers",
+                        # File management and productivity
+                        "christian-kohler.path-intellisense",
+                        "vscode-icons-team.vscode-icons",
+                        # Network diagrams and visualization
+                        "hediet.vscode-drawio"
                     ],
                     "settings": {
+                        # Terminal and shell configuration
                         "terminal.integrated.defaultProfile.linux": "bash",
                         "terminal.integrated.shell.linux": "/bin/bash",
                         "python.defaultInterpreterPath": "/usr/bin/python3",
+                        
+                        # Containerlab extension configuration
+                        "containerlab.defaultSshUser": "admin",
+                        "containerlab.sudo": False,
+                        "containerlab.refreshInterval": 10000,
+                        "containerlab.execCommandMapping": {
+                            "srl": "/bin/bash",
+                            "ceos": "/bin/bash", 
+                            "crpd": "/bin/bash",
+                            "sonic": "/bin/bash",
+                            "cvx": "/bin/bash",
+                            "vr-sros": "/bin/bash",
+                            "vr-vmx": "/bin/bash",
+                            "vr-xrv9k": "/bin/bash",
+                            "vr-veos": "/bin/bash",
+                            "linux": "/bin/bash"
+                        },
+                        
+                        # YAML and file configuration
                         "yaml.schemas": {
-                            "https://raw.githubusercontent.com/srl-labs/containerlab/main/schemas/clab.schema.json": "*.clab.yml"
+                            "https://raw.githubusercontent.com/srl-labs/containerlab/main/schemas/clab.schema.json": [
+                                "*.clab.yml",
+                                "*.clab.yaml"
+                            ]
                         },
                         "files.associations": {
                             "*.clab.yml": "yaml",
-                            "*.clab.yaml": "yaml"
+                            "*.clab.yaml": "yaml",
+                            "*.topoviewer.yml": "yaml"
                         },
+                        "yaml.format.enable": True,
+                        "yaml.validate": True,
+                        "yaml.hover": True,
+                        "yaml.completion": True,
+                        
+                        # Editor configuration
                         "editor.formatOnSave": True,
-                        "editor.defaultFormatter": "redhat.vscode-yaml"
+                        "editor.defaultFormatter": "redhat.vscode-yaml",
+                        "editor.minimap.enabled": True,
+                        "editor.wordWrap": "on",
+                        "editor.rulers": [80, 120],
+                        
+                        # File explorer configuration
+                        "files.exclude": {
+                            "**/clab-*": True,
+                            "**/.git": True,
+                            "**/node_modules": True,
+                            "**/__pycache__": True
+                        },
+                        "explorer.fileNesting.enabled": True,
+                        "explorer.fileNesting.patterns": {
+                            "*.clab.yml": "*.clab.yaml,graph.html,topology-data.json"
+                        },
+                        
+                        # Icons and UI
+                        "workbench.iconTheme": "vscode-icons",
+                        "workbench.tree.indent": 15,
+                        
+                        # Docker integration
+                        "docker.showStartPage": False,
+                        "docker.dockerPath": "/usr/bin/docker",
+                        
+                        # Extension specific behaviors
+                        "extensions.autoUpdate": False,
+                        "extensions.autoCheckUpdates": False
                     }
                 }
             },
-            "forwardPorts": [5000, 8000, 8080, 8443],
+            "forwardPorts": [5000, 8000, 8080, 8443, 9443, 57400],
             "portsAttributes": {
                 "5000": {
                     "label": "Lab Web Interface",
@@ -262,11 +325,26 @@ class GitHubService:
                 "8443": {
                     "label": "HTTPS Web Interface",
                     "onAutoForward": "ignore"
+                },
+                "9443": {
+                    "label": "Nokia SR Linux gNMI",
+                    "onAutoForward": "ignore"
+                },
+                "57400": {
+                    "label": "Nokia SR Linux gNMI/gNOI",
+                    "onAutoForward": "ignore"
                 }
             },
             "remoteEnv": {
-                "CONTAINERLAB_VERSION": "0.68.0"
-            }
+                "CONTAINERLAB_VERSION": "0.68.0",
+                "CLAB_LABDIR_BASE": "/workspaces",
+                "CLAB_RUNTIME": "docker"
+            },
+            "postCreateCommand": "echo 'Containerlab VS Code extension ready! 🚀' && containerlab version",
+            "initializeCommand": "docker --version && echo 'Docker available for containerlab'",
+            "mounts": [
+                "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+            ]
         }
         
         return devcontainer_config
@@ -359,63 +437,103 @@ class GitHubService:
 
 {lab_config.get('description', 'A containerlab topology for network simulation and testing.')}
 
-## Quick Start with GitHub Codespaces
+## 🚀 Quick Start with GitHub Codespaces
 
-1. Click the green "Code" button above
-2. Select "Create codespace on main"
+1. Click the green "**Code**" button above
+2. Select "**Create codespace on main**"
 3. Wait for the environment to initialize (2-3 minutes)
-4. Run the lab:
-   ```bash
-   containerlab deploy --topo {lab_config.get('name', 'lab')}.clab.yml
-   ```
+4. The **Containerlab VS Code extension** will be automatically loaded
+5. Click the **Containerlab icon** in the Activity Bar to explore your lab
+6. Right-click on your lab topology to **Deploy** directly from VS Code!
 
-## Lab Overview
+## 📊 Lab Overview
 
 - **Nodes**: {len(lab_config.get('topology', {}).get('nodes', {}))}
 - **Links**: {len(lab_config.get('topology', {}).get('links', []))}
-- **Topology**: {lab_config.get('name', 'lab')}.clab.yml
+- **Topology**: `{lab_config.get('name', 'lab')}.clab.yml`
 
-## Available Tools
+## 🛠️ Enhanced VS Code Experience
 
-- **Containerlab**: Network topology deployment
-- **Netlab**: Topology generation and configuration
-- **VRNetlab**: Virtual router container builder
+This lab comes with the **official Containerlab VS Code extension** pre-configured:
+
+### ✨ Extension Features
+- **🔍 Auto-discovery**: Automatically finds `.clab.yml` files in your workspace
+- **🌳 Tree View**: Visual topology explorer in VS Code sidebar
+- **⚡ Context Actions**: Right-click to deploy, destroy, inspect labs
+- **🖥️ Container Management**: Start, stop, attach shell, view logs
+- **📊 Topology Visualization**: Integrated TopoViewer for interactive diagrams
+- **🔧 YAML Intellisense**: Smart completion and validation for containerlab files
+- **🔗 Interface Tools**: Traffic capture, link impairments, SSH access
+
+### 🎛️ Quick Actions
+- **Deploy Lab**: Right-click topology → Deploy
+- **Inspect Lab**: Right-click topology → Inspect  
+- **Attach to Node**: Right-click container → Attach Shell
+- **View Topology**: Right-click topology → Graph
+- **SSH to Node**: Right-click container → SSH
+
+## 🖥️ Available Tools
+
+- **Containerlab VS Code Extension**: Full lab management from VS Code
+- **Containerlab CLI**: Network topology deployment engine
+- **TopoViewer**: Interactive topology visualization
+- **Draw.io Integration**: Network diagram creation and editing
+- **Netlab**: Advanced topology generation
 - **LabDabbler**: Web-based lab management interface
 
-## Usage
+## 📝 Usage Examples
 
-### Deploy the lab
+### Using VS Code Extension (Recommended)
+1. Open the Containerlab panel in VS Code (click the containerlab icon)
+2. Right-click on `{lab_config.get('name', 'lab')}.clab.yml` → **Deploy**
+3. Monitor deployment progress in the integrated terminal
+4. Right-click containers to access shells, view logs, or SSH
+
+### Using CLI Commands
 ```bash
+# Deploy the lab
 containerlab deploy --topo {lab_config.get('name', 'lab')}.clab.yml
-```
 
-### Check lab status
-```bash
+# Check lab status  
 containerlab inspect --topo {lab_config.get('name', 'lab')}.clab.yml
-```
 
-### Access lab nodes
-```bash
+# Access lab nodes
 containerlab exec --topo {lab_config.get('name', 'lab')}.clab.yml
-```
 
-### Destroy the lab
-```bash
+# View topology graph
+containerlab graph --topo {lab_config.get('name', 'lab')}.clab.yml
+
+# Destroy the lab
 containerlab destroy --topo {lab_config.get('name', 'lab')}.clab.yml
 ```
 
-## LabDabbler Web Interface
+## 🌐 LabDabbler Web Interface
 
-The lab includes a web-based management interface accessible at http://localhost:5000 after starting:
+Access the full lab management interface at http://localhost:5000:
 
 ```bash
 cd web/frontend && npm run dev &
 cd web/backend && python app.py &
 ```
 
+## 🔧 VS Code Extension Configuration
+
+The extension is pre-configured with optimal settings:
+- **SSH User**: `admin` (configurable per node type)
+- **Auto-refresh**: Every 10 seconds
+- **YAML Validation**: Containerlab schema validation enabled
+- **File Associations**: `.clab.yml` files recognized automatically
+
+## 📚 Learning Resources
+
+- [Containerlab Documentation](https://containerlab.dev/)
+- [VS Code Extension Guide](https://containerlab.dev/manual/vsc-extension/)
+- [LabDabbler Documentation](https://github.com/labdabbler/docs)
+
 ---
 
-*This lab was generated by LabDabbler - Master Lab Repository*
+*🧪 This lab was generated by **LabDabbler** with enhanced VS Code integration*
+*⚡ Powered by the official Containerlab VS Code extension*
 """
             
             # Create package structure
