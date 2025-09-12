@@ -22,6 +22,7 @@ from services.lab_launcher import LabLauncherService
 from services.vrnetlab_service import VRNetLabService
 from services.repository_management import RepositoryManagementService
 from services.runtime import RuntimeProviderFactory
+from services.github_service import GitHubService
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ runtime_factory = RuntimeProviderFactory(Path("./data"))
 lab_launcher = LabLauncherService(Path("./data"))
 vrnetlab_service = VRNetLabService(Path("./data"))
 repository_service = RepositoryManagementService(Path("./data"))
+github_service = GitHubService(Path("./data"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -86,6 +88,7 @@ runtime_factory.data_dir = DATA_DIR
 lab_launcher.data_dir = DATA_DIR
 vrnetlab_service.data_dir = DATA_DIR
 repository_service.data_dir = DATA_DIR
+github_service.data_dir = DATA_DIR
 
 @app.get("/")
 async def root():
@@ -992,6 +995,173 @@ async def test_runtime_provider(config: dict):
         raise
     except Exception as e:
         logger.error(f"Error testing runtime provider: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# GitHub Integration API Endpoints
+@app.get("/api/github/repositories")
+async def get_github_repositories(limit: int = 100):
+    """Get user's GitHub repositories"""
+    try:
+        repositories = await github_service.list_user_repositories(limit=limit)
+        return {
+            "success": True,
+            "repositories": repositories,
+            "total": len(repositories)
+        }
+    except Exception as e:
+        logger.error(f"Error getting GitHub repositories: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/github/repositories/{owner}/{repo}/labs")
+async def scan_repository_labs(owner: str, repo: str):
+    """Scan a GitHub repository for containerlab files"""
+    try:
+        lab_files = await github_service.search_containerlab_files(owner, repo)
+        labs = []
+        
+        for file_info in lab_files:
+            try:
+                # Get file content
+                content = await github_service.get_file_content(owner, repo, file_info["path"])
+                if content:
+                    lab_config = yaml.safe_load(content)
+                    labs.append({
+                        "name": lab_config.get("name", file_info["name"].replace(".clab.yml", "")),
+                        "path": file_info["path"],
+                        "description": f"Lab from {owner}/{repo}",
+                        "nodes": len(lab_config.get("topology", {}).get("nodes", {})),
+                        "links": len(lab_config.get("topology", {}).get("links", [])),
+                        "repository": f"{owner}/{repo}",
+                        "github_url": file_info.get("html_url", ""),
+                        "raw_url": file_info.get("url", "").replace("api.github.com/repos", "raw.githubusercontent.com").replace("/contents/", "/main/")
+                    })
+            except Exception as e:
+                logger.error(f"Error processing lab file {file_info.get('path')}: {e}")
+                continue
+        
+        return {
+            "success": True,
+            "labs": labs,
+            "total": len(labs),
+            "repository": f"{owner}/{repo}"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error scanning repository {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/github/labs/package")
+async def create_github_lab_package(request: dict):
+    """Create a GitHub-ready lab package with Codespaces configuration"""
+    try:
+        lab_config = request.get("lab_config", {})
+        lab_files = request.get("lab_files", {})
+        
+        package = await github_service.create_lab_package(lab_config, lab_files)
+        
+        if package["success"]:
+            return package
+        else:
+            raise HTTPException(status_code=400, detail=package)
+            
+    except Exception as e:
+        logger.error(f"Error creating GitHub lab package: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/github/labs/deploy")
+async def deploy_lab_to_github(request: dict):
+    """Deploy a lab package to a GitHub repository"""
+    try:
+        repo_owner = request.get("repo_owner")
+        repo_name = request.get("repo_name")
+        lab_package = request.get("lab_package")
+        
+        if not repo_owner or not repo_name or not lab_package:
+            raise HTTPException(status_code=400, detail="repo_owner, repo_name, and lab_package are required")
+        
+        result = await github_service.push_lab_to_github(repo_owner, repo_name, lab_package)
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result)
+            
+    except Exception as e:
+        logger.error(f"Error deploying lab to GitHub: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/github/export-to-codespaces")
+async def export_topology_to_codespaces(request: dict):
+    """Export a topology from Lab Builder directly to GitHub Codespaces"""
+    try:
+        topology_data = request.get("topology")
+        repo_owner = request.get("repo_owner")
+        repo_name = request.get("repo_name")
+        
+        if not topology_data or not repo_owner or not repo_name:
+            raise HTTPException(status_code=400, detail="topology, repo_owner, and repo_name are required")
+        
+        # Generate containerlab YAML from topology
+        lab_config = {
+            "name": topology_data.get("name", "custom-lab"),
+            "topology": {
+                "nodes": {},
+                "links": []
+            }
+        }
+        
+        # Convert topology format to containerlab format
+        for node_id, node in topology_data.get("nodes", {}).items():
+            lab_config["topology"]["nodes"][node["name"]] = {
+                "kind": node.get("kind", "linux"),
+                "image": node.get("image", "alpine:latest")
+            }
+        
+        for link in topology_data.get("links", []):
+            if len(link.get("endpoints", [])) == 2:
+                endpoint1 = link["endpoints"][0]
+                endpoint2 = link["endpoints"][1]
+                
+                node1_name = topology_data["nodes"][endpoint1["node"]]["name"]
+                node2_name = topology_data["nodes"][endpoint2["node"]]["name"]
+                
+                lab_config["topology"]["links"].append({
+                    "endpoints": [
+                        f"{node1_name}:{endpoint1.get('interface', 'eth1')}",
+                        f"{node2_name}:{endpoint2.get('interface', 'eth1')}"
+                    ]
+                })
+        
+        # Generate lab files
+        lab_yaml = yaml.dump(lab_config, default_flow_style=False)
+        lab_files = {
+            f"{lab_config['name']}.clab.yml": lab_yaml
+        }
+        
+        # Create lab package
+        package_result = await github_service.create_lab_package(lab_config, lab_files)
+        
+        if not package_result["success"]:
+            raise HTTPException(status_code=400, detail=package_result)
+        
+        # Deploy to GitHub
+        deploy_result = await github_service.push_lab_to_github(
+            repo_owner, repo_name, package_result
+        )
+        
+        if deploy_result["success"]:
+            return {
+                "success": True,
+                "message": f"Lab exported to {repo_owner}/{repo_name}",
+                "repository_url": deploy_result["repository_url"],
+                "codespaces_url": deploy_result["codespaces_url"],
+                "files_created": deploy_result["files_created"]
+            }
+        else:
+            raise HTTPException(status_code=400, detail=deploy_result)
+            
+    except Exception as e:
+        logger.error(f"Error exporting to Codespaces: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
