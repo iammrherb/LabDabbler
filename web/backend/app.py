@@ -1,14 +1,21 @@
+import sys
+import os
+from pathlib import Path
+
+# Ensure the current directory is in Python path for imports
+current_dir = Path(__file__).parent
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
+
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from typing import Optional
-import os
 import yaml
 import json
 import logging
 import asyncio
-from pathlib import Path
 from services.container_discovery import ContainerDiscoveryService
 from services.github_lab_scanner import GitHubLabScanner
 from services.lab_launcher import LabLauncherService
