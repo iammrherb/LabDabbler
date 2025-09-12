@@ -1,6 +1,97 @@
 import { useState, useEffect, useMemo } from 'react'
 import './ContainerPalette.css'
 
+// Helper functions defined outside component to avoid hoisting issues
+const getCategoryIcon = (category) => {
+  const icons = {
+    'network_os_native': '🔧',
+    'network_os_vm_based': '🖥️',
+    'portnox': '🛡️',
+    'open_source_network': '🌐',
+    'security_firewalls': '🔥',
+    'security': '🔒',
+    'security_pentesting': '⚔️',
+    'security_monitoring': '👁️',
+    'services': '⚙️',
+    'network_simulation': '🧪',
+    'network_monitoring': '📊',
+    'network_automation': '🤖',
+    'development': '💻',
+    'ci_cd': '🚀',
+    'databases': '🗄️',
+    'message_queues': '📬',
+    'web_servers': '🌍',
+    'monitoring_observability': '📈',
+    'analytics': '📉',
+    'testing_load': '⚡',
+    'vrnetlab_built': '🏗️'
+  }
+  return icons[category] || '📦'
+}
+
+const getCategoryDisplayName = (category) => {
+  const names = {
+    'network_os_native': 'Network OS (Native)',
+    'network_os_vm_based': 'Network OS (VM)',
+    'portnox': 'Portnox Security',
+    'open_source_network': 'Open Source Network',
+    'security_firewalls': 'Firewalls',
+    'security': 'Security Tools',
+    'security_pentesting': 'Penetration Testing',
+    'security_monitoring': 'Security Monitoring',
+    'services': 'Network Services',
+    'network_simulation': 'Network Simulation',
+    'network_monitoring': 'Network Monitoring',
+    'network_automation': 'Network Automation',
+    'development': 'Development Tools',
+    'ci_cd': 'CI/CD Tools',
+    'databases': 'Databases',
+    'message_queues': 'Message Queues',
+    'web_servers': 'Web Servers',
+    'monitoring_observability': 'Monitoring & Observability',
+    'analytics': 'Analytics',
+    'testing_load': 'Load Testing',
+    'vrnetlab_built': 'VRNetlab Images'
+  }
+  return names[category] || category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+}
+
+const getContainerKind = (container) => {
+  // Determine containerlab kind based on container info
+  if (container.kind) return container.kind
+  
+  const image = container.image || ''
+  const vendor = (container.vendor || '').toLowerCase()
+  const name = (container.name || '').toLowerCase()
+  
+  // Network OS specific kinds
+  if (image.includes('srlinux')) return 'nokia_srlinux'
+  if (image.includes('ceos')) return 'arista_ceos'
+  if (image.includes('sros')) return 'nokia_sros'
+  if (image.includes('juniper')) return 'juniper'
+  if (image.includes('cisco')) return 'cisco'
+  if (vendor.includes('nokia')) return 'nokia_srlinux'
+  if (vendor.includes('arista')) return 'arista_ceos'
+  if (vendor.includes('juniper')) return 'juniper'
+  if (vendor.includes('cisco')) return 'cisco'
+  
+  // Default to linux for most containers
+  return 'linux'
+}
+
+const getVendorColor = (vendor) => {
+  const colors = {
+    'nokia': '#124191',
+    'arista': '#f05a28',
+    'cisco': '#1ba0d7',
+    'juniper': '#84bd00',
+    'portnox': '#6c5ce7',
+    'fortinet': '#ee5a52',
+    'palo alto': '#fa6d1c'
+  }
+  return colors[(vendor || '').toLowerCase()] || '#666'
+}
+
 function ContainerPalette({ containers, onContainerDrag }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -66,60 +157,6 @@ function ContainerPalette({ containers, onContainerDrag }) {
     return filtered
   }, [categorizedContainers, searchQuery, selectedCategory])
 
-  const getCategoryIcon = (category) => {
-    const icons = {
-      'network_os_native': '🔧',
-      'network_os_vm_based': '🖥️',
-      'portnox': '🛡️',
-      'open_source_network': '🌐',
-      'security_firewalls': '🔥',
-      'security': '🔒',
-      'security_pentesting': '⚔️',
-      'security_monitoring': '👁️',
-      'services': '⚙️',
-      'network_simulation': '🧪',
-      'network_monitoring': '📊',
-      'network_automation': '🤖',
-      'development': '💻',
-      'ci_cd': '🚀',
-      'databases': '🗄️',
-      'message_queues': '📬',
-      'web_servers': '🌍',
-      'monitoring_observability': '📈',
-      'analytics': '📉',
-      'testing_load': '⚡',
-      'vrnetlab_built': '🏗️'
-    }
-    return icons[category] || '📦'
-  }
-
-  const getCategoryDisplayName = (category) => {
-    const names = {
-      'network_os_native': 'Network OS (Native)',
-      'network_os_vm_based': 'Network OS (VM)',
-      'portnox': 'Portnox Security',
-      'open_source_network': 'Open Source Network',
-      'security_firewalls': 'Firewalls',
-      'security': 'Security Tools',
-      'security_pentesting': 'Penetration Testing',
-      'security_monitoring': 'Security Monitoring',
-      'services': 'Network Services',
-      'network_simulation': 'Network Simulation',
-      'network_monitoring': 'Network Monitoring',
-      'network_automation': 'Network Automation',
-      'development': 'Development Tools',
-      'ci_cd': 'CI/CD Tools',
-      'databases': 'Databases',
-      'message_queues': 'Message Queues',
-      'web_servers': 'Web Servers',
-      'monitoring_observability': 'Monitoring & Observability',
-      'analytics': 'Analytics',
-      'testing_load': 'Load Testing',
-      'vrnetlab_built': 'VRNetlab Images'
-    }
-    return names[category] || category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-  }
-
   const toggleCategory = (categoryKey) => {
     const newExpanded = new Set(expandedCategories)
     if (newExpanded.has(categoryKey)) {
@@ -151,41 +188,6 @@ function ContainerPalette({ containers, onContainerDrag }) {
     setDraggedContainer(null)
   }
 
-  const getContainerKind = (container) => {
-    // Determine containerlab kind based on container info
-    if (container.kind) return container.kind
-    
-    const image = container.image || ''
-    const vendor = (container.vendor || '').toLowerCase()
-    const name = (container.name || '').toLowerCase()
-    
-    // Network OS specific kinds
-    if (image.includes('srlinux')) return 'nokia_srlinux'
-    if (image.includes('ceos')) return 'arista_ceos'
-    if (image.includes('sros')) return 'nokia_sros'
-    if (image.includes('juniper')) return 'juniper'
-    if (image.includes('cisco')) return 'cisco'
-    if (vendor.includes('nokia')) return 'nokia_srlinux'
-    if (vendor.includes('arista')) return 'arista_ceos'
-    if (vendor.includes('juniper')) return 'juniper'
-    if (vendor.includes('cisco')) return 'cisco'
-    
-    // Default to linux for most containers
-    return 'linux'
-  }
-
-  const getVendorColor = (vendor) => {
-    const colors = {
-      'nokia': '#124191',
-      'arista': '#f05a28',
-      'cisco': '#1ba0d7',
-      'juniper': '#84bd00',
-      'portnox': '#6c5ce7',
-      'fortinet': '#ee5a52',
-      'palo alto': '#fa6d1c'
-    }
-    return colors[(vendor || '').toLowerCase()] || '#666'
-  }
 
   return (
     <div className="container-palette">

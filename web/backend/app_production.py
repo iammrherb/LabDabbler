@@ -1,7 +1,7 @@
 """
 Production-ready FastAPI application for LabDabbler backend
 """
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -140,36 +140,97 @@ from app import *  # Import all routes from the original app
 # Add production-specific endpoints
 @app.get("/metrics")
 async def get_metrics():
-    """Prometheus metrics endpoint"""
+    """Prometheus metrics endpoint in text exposition format"""
     if not redis_client:
-        return {"error": "Metrics not available - Redis not configured"}
+        # Return basic metrics even without Redis
+        metrics_text = """# HELP labdabbler_up Application up status
+# TYPE labdabbler_up gauge
+labdabbler_up 1
+
+# HELP labdabbler_redis_available Redis availability status
+# TYPE labdabbler_redis_available gauge
+labdabbler_redis_available 0
+"""
+        return Response(content=metrics_text, media_type="text/plain")
     
     try:
-        # Collect metrics from Redis
-        metrics = {}
+        # Build Prometheus format metrics
+        metrics_lines = []
+        
+        # Application up metric
+        metrics_lines.extend([
+            "# HELP labdabbler_up Application up status",
+            "# TYPE labdabbler_up gauge",
+            "labdabbler_up 1",
+            ""
+        ])
+        
+        # Redis availability
+        metrics_lines.extend([
+            "# HELP labdabbler_redis_available Redis availability status", 
+            "# TYPE labdabbler_redis_available gauge",
+            "labdabbler_redis_available 1",
+            ""
+        ])
         
         # Request counters
+        metrics_lines.extend([
+            "# HELP labdabbler_requests_total Total number of requests",
+            "# TYPE labdabbler_requests_total counter"
+        ])
+        
         request_keys = redis_client.keys("metrics:requests:*")
         for key in request_keys:
-            metrics[key] = redis_client.get(key)
+            count = redis_client.get(key) or "0"
+            endpoint = key.replace("metrics:requests:", "")
+            metrics_lines.append(f'labdabbler_requests_total{{endpoint="{endpoint}"}} {count}')
+        
+        if not request_keys:
+            metrics_lines.append('labdabbler_requests_total{endpoint="unknown"} 0')
+        metrics_lines.append("")
         
         # Response times
+        metrics_lines.extend([
+            "# HELP labdabbler_response_time_seconds Average response time in seconds",
+            "# TYPE labdabbler_response_time_seconds gauge"
+        ])
+        
         timing_keys = redis_client.keys("metrics:timing:*")
         for key in timing_keys:
             timings = redis_client.lrange(key, 0, -1)
             if timings:
                 avg_time = sum(float(t) for t in timings) / len(timings)
-                metrics[f"{key}:avg"] = avg_time
-                metrics[f"{key}:count"] = len(timings)
+                endpoint = key.replace("metrics:timing:", "")
+                metrics_lines.append(f'labdabbler_response_time_seconds{{endpoint="{endpoint}"}} {avg_time:.6f}')
         
-        # Slow requests
+        if not timing_keys:
+            metrics_lines.append('labdabbler_response_time_seconds{endpoint="unknown"} 0')
+        metrics_lines.append("")
+        
+        # Slow requests counter
         slow_requests = redis_client.lrange("metrics:slow_requests", 0, -1)
-        metrics["slow_requests"] = slow_requests
+        metrics_lines.extend([
+            "# HELP labdabbler_slow_requests_total Total number of slow requests",
+            "# TYPE labdabbler_slow_requests_total counter",
+            f"labdabbler_slow_requests_total {len(slow_requests)}",
+            ""
+        ])
         
-        return metrics
+        metrics_text = "\n".join(metrics_lines)
+        return Response(content=metrics_text, media_type="text/plain")
+        
     except Exception as e:
         logger.error(f"Error collecting metrics: {e}")
-        return {"error": "Failed to collect metrics"}
+        # Return error metric in Prometheus format
+        error_metrics = """# HELP labdabbler_up Application up status
+# TYPE labdabbler_up gauge
+labdabbler_up 1
+
+# HELP labdabbler_metrics_error Metrics collection error status
+# TYPE labdabbler_metrics_error gauge
+labdabbler_metrics_error 1
+"""
+        return Response(content=error_metrics, media_type="text/plain")
 
 @app.get("/api/health/detailed")
 async def detailed_health_check():

@@ -4,6 +4,8 @@ import VRNetLabManager from './components/VRNetLabManager'
 import ContainerCatalog from './components/ContainerCatalog'
 import RepositoryManager from './components/RepositoryManager'
 import LabBuilder from './components/LabBuilder'
+import ErrorBoundary from './components/ErrorBoundary'
+import './components/ErrorBoundary.css'
 
 function App() {
   const [labs, setLabs] = useState([])

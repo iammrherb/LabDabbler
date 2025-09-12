@@ -100,6 +100,19 @@ class EnvironmentSecrets:
     def get_redis_url(self) -> str:
         """Get complete Redis URL with password"""
         base_url = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+        
+        # If the URL already includes password (redis://:password@host:port/db), return as is
+        if '@' in base_url and ':' in base_url.split('@')[0]:
+            return base_url
+        
+        # Otherwise, construct URL with password from environment
+        redis_password = self.get_secret('redis_password')
+        if redis_password and not base_url.startswith('redis://:'):
+            # Parse the base URL and inject password
+            if base_url.startswith('redis://'):
+                # Replace redis:// with redis://:password@
+                return base_url.replace('redis://', f'redis://:{redis_password}@')
+        
         return base_url
 
 # Global instance

@@ -648,6 +648,15 @@ class GitHubLabScanner:
                     if response.status == 200:
                         return await response.json()
                     
+                    elif response.status == 401:
+                        # Authentication failure - graceful degradation
+                        if self.github_token:
+                            logger.error(f"GitHub authentication failed with token. Check GITHUB_TOKEN validity.")
+                        else:
+                            logger.info(f"GitHub API requires authentication for this operation. Skipping automated search.")
+                        logger.info("Falling back to curated lab collection only.")
+                        return None
+                    
                     elif response.status == 403:
                         # Rate limited - check if we have rate limit info
                         remaining = response.headers.get('X-RateLimit-Remaining', '0')

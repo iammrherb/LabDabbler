@@ -64,7 +64,7 @@ check_prerequisites() {
     success "Prerequisites check passed"
 }
 
-# Check environment variables
+# Check environment variables and security configuration
 check_environment() {
     log "Checking environment configuration..."
     
@@ -73,6 +73,7 @@ check_environment() {
         "REDIS_PASSWORD"
         "SECRET_KEY"
         "JWT_SECRET"
+        "GRAFANA_PASSWORD"
     )
     
     missing_vars=()
@@ -95,6 +96,65 @@ check_environment() {
     success "Environment configuration check passed"
 }
 
+# Security validation for production deployment
+check_security_configuration() {
+    log "Performing security configuration checks..."
+    
+    # Source environment file
+    set -a
+    source "$ENV_FILE"
+    set +a
+    
+    security_issues=()
+    
+    # Check for default/weak passwords
+    if [[ "$DATABASE_PASSWORD" == *"CHANGE_ME"* ]] || [ ${#DATABASE_PASSWORD} -lt 32 ]; then
+        security_issues+=("DATABASE_PASSWORD: Must be changed from default and be at least 32 characters")
+    fi
+    
+    if [[ "$REDIS_PASSWORD" == *"CHANGE_ME"* ]] || [ ${#REDIS_PASSWORD} -lt 24 ]; then
+        security_issues+=("REDIS_PASSWORD: Must be changed from default and be at least 24 characters")
+    fi
+    
+    if [[ "$SECRET_KEY" == *"CHANGE_ME"* ]] || [ ${#SECRET_KEY} -lt 32 ]; then
+        security_issues+=("SECRET_KEY: Must be changed from default and be at least 32 characters")
+    fi
+    
+    if [[ "$JWT_SECRET" == *"CHANGE_ME"* ]] || [ ${#JWT_SECRET} -lt 32 ]; then
+        security_issues+=("JWT_SECRET: Must be changed from default and be at least 32 characters")
+    fi
+    
+    if [[ "$GRAFANA_PASSWORD" == *"CHANGE_ME"* ]] || [ ${#GRAFANA_PASSWORD} -lt 12 ]; then
+        security_issues+=("GRAFANA_PASSWORD: Must be changed from default and be at least 12 characters")
+    fi
+    
+    # Check ALLOWED_HOSTS configuration
+    if [[ "$ALLOWED_HOSTS" == *"your-domain.com"* ]]; then
+        security_issues+=("ALLOWED_HOSTS: Must be updated with your actual domain names")
+    fi
+    
+    # Check CORS_ORIGINS configuration
+    if [[ "$CORS_ORIGINS" == *"your-domain.com"* ]]; then
+        security_issues+=("CORS_ORIGINS: Must be updated with your actual frontend URLs")
+    fi
+    
+    # Check for weak patterns in passwords
+    if [[ "$DATABASE_PASSWORD" =~ ^[a-zA-Z0-9]*$ ]]; then
+        warning "DATABASE_PASSWORD: Consider using special characters for stronger security"
+    fi
+    
+    if [[ "$REDIS_PASSWORD" =~ ^[a-zA-Z0-9]*$ ]]; then
+        warning "REDIS_PASSWORD: Consider using special characters for stronger security"
+    fi
+    
+    # Report security issues
+    if [ ${#security_issues[@]} -ne 0 ]; then
+        error "CRITICAL SECURITY ISSUES DETECTED:\n$(printf '%s\n' "${security_issues[@]}")\n\nPlease fix these issues in $ENV_FILE before deploying to production."
+    fi
+    
+    success "Security configuration validation passed"
+}
+
 # Backup current deployment
 backup_current() {
     log "Creating backup of current deployment..."
@@ -103,11 +163,15 @@ backup_current() {
     timestamp=$(date +"%Y%m%d_%H%M%S")
     backup_file="$BACKUP_DIR/labdabbler_backup_$timestamp.tar.gz"
     
-    # Backup data volumes
+    # Backup data volumes (using project prefix)
+    PROJECT_NAME=$(basename "$(pwd)" | tr '[:upper:]' '[:lower:]')
     docker run --rm \
-        -v labdabbler_postgres_data:/data/postgres \
-        -v labdabbler_redis_data:/data/redis \
-        -v labdabbler_backend_data:/data/backend \
+        -v "${PROJECT_NAME}_postgres_data:/data/postgres" \
+        -v "${PROJECT_NAME}_redis_data:/data/redis" \
+        -v "${PROJECT_NAME}_backend_data:/data/backend" \
+        -v "${PROJECT_NAME}_backend_labs:/data/labs" \
+        -v "${PROJECT_NAME}_backend_configs:/data/configs" \
+        -v "${PROJECT_NAME}_backend_uploads:/data/uploads" \
         -v "$PWD/$BACKUP_DIR:/backup" \
         alpine:latest \
         tar -czf "/backup/labdabbler_backup_$timestamp.tar.gz" /data
@@ -250,6 +314,7 @@ deploy() {
     
     check_prerequisites
     check_environment
+    check_security_configuration
     
     # Ask for confirmation in interactive mode
     if [ -t 0 ]; then

@@ -1,36 +1,42 @@
 {
   "containerlab-official": {
-    "last_scanned": "2025-09-11T00:15:14.719519",
+    "last_scanned": "2025-09-12T03:46:04.168179",
     "lab_count": 36,
     "exists": true,
     "path": "data/repositories/containerlab-official"
   },
   "hellt-clabs": {
-    "last_scanned": "2025-09-11T00:15:14.790089",
+    "last_scanned": "2025-09-12T03:46:04.234055",
     "lab_count": 10,
     "exists": true,
     "path": "data/repositories/hellt-clabs"
   },
   "packetanglers-topos": {
-    "last_scanned": "2025-09-11T00:15:14.790570",
+    "last_scanned": "2025-09-12T03:46:04.234754",
     "lab_count": 0,
     "exists": true,
     "path": "data/repositories/packetanglers-topos"
   },
   "learn-srlinux": {
-    "last_scanned": "2025-09-11T00:15:14.794345",
+    "last_scanned": "2025-09-12T03:46:04.239989",
     "lab_count": 2,
     "exists": true,
     "path": "data/repositories/learn-srlinux"
   },
   "clab-config-demo": {
-    "last_scanned": "2025-09-11T00:15:14.794373",
-    "lab_count": 0,
-    "exists": false,
-    "path": null
+    "last_scanned": "2025-09-12T03:46:04.243568",
+    "lab_count": 1,
+    "exists": true,
+    "path": "data/repositories/clab-config-demo"
   },
   "instruqt-clab-topologies": {
-    "last_scanned": "2025-09-11T00:15:14.794386",
+    "last_scanned": "2025-09-12T03:46:04.243720",
+    "lab_count": 0,
+    "exists": true,
+    "path": "data/repositories/instruqt-clab-topologies"
+  },
+  "test-repo": {
+    "last_scanned": "2025-09-12T03:46:04.243749",
     "lab_count": 0,
     "exists": false,
     "path": null

@@ -32,14 +32,34 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-    volumes:
-      - frontend_static:/usr/share/nginx/html:ro
     networks:
       - labdabbler-network
     depends_on:
       - backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Docker-in-Docker service for secure containerlab operations
+  docker-daemon:
+    image: docker:25-dind
+    container_name: labdabbler-docker-daemon
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - docker_certs:/certs
+      - docker_data:/var/lib/docker
+      - backend_labs:/app/labs:ro
+      - backend_configs:/app/configs:ro
+    networks:
+      - labdabbler-network
+    healthcheck:
+      test: ["CMD", "docker", "info"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -59,19 +79,27 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,labdabbler-backend}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost,https://localhost,http://frontend,https://frontend}
+      - WORKER_PROCESSES=${WORKER_PROCESSES:-4}
+      - DOCKER_HOST=tcp://docker-daemon:2376
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_CERT_PATH=/certs/client
     volumes:
       - backend_data:/app/data
       - backend_labs:/app/labs
       - backend_configs:/app/configs
       - backend_uploads:/app/uploads
       - backend_logs:/var/log/labdabbler
-      - /var/run/docker.sock:/var/run/docker.sock
+      - docker_certs:/certs/client:ro
     networks:
       - labdabbler-network
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      docker-daemon:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
@@ -214,4 +242,10 @@ volumes:
   prometheus_data:
     driver: local
   grafana_data:
+    driver: local
+  
+  # Docker-in-Docker
+  docker_certs:
+    driver: local
+  docker_data:
     driver: local
