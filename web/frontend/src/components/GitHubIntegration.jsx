@@ -9,11 +9,12 @@ function GitHubIntegration({ topology, onClose }) {
   const [newRepoName, setNewRepoName] = useState('')
   const [createNew, setCreateNew] = useState(false)
 
-  const getApiBase = () => {
-    const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
-    return window.location.hostname.includes('replit.dev') 
-      ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
-      : `${window.location.protocol}//${window.location.hostname}:8000`
+  let apiBase = 'http://localhost:8000'
+  if (window.location.hostname.includes('replit.dev')) {
+    const hostname = window.location.hostname
+    const replitBase = hostname.split('.')[0]
+    const replitDomain = hostname.split('.').slice(1).join('.')
+    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
   }
 
   useEffect(() => {
@@ -54,7 +55,6 @@ function GitHubIntegration({ topology, onClose }) {
         ? [repositories[0]?.owner?.login || 'user', newRepoName]
         : selectedRepo.split('/')
 
-      const apiBase = getApiBase()
       const response = await fetch(`${apiBase}/api/github/export-to-codespaces`, {
         method: 'POST',
         headers: {

@@ -27,12 +27,13 @@ function VRNetLabManager() {
   })
 
   // Get API base URL
-  const getApiBase = () => {
-    return window.location.hostname.includes('replit.dev') 
-      ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-      : 'http://localhost:8000'
+  let apiBase = 'http://localhost:8000'
+  if (window.location.hostname.includes('replit.dev')) {
+    const hostname = window.location.hostname
+    const replitBase = hostname.split('.')[0]
+    const replitDomain = hostname.split('.').slice(1).join('.')
+    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
   }
-  const apiBase = getApiBase()
 
   useEffect(() => {
     fetchAllData()

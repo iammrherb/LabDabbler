@@ -19,9 +19,14 @@ function App() {
   const fetchData = async () => {
     try {
       // API base - determine correct endpoint for Replit environment
-      const apiBase = window.location.hostname.includes('replit.dev') 
-        ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-        : 'http://localhost:8000'
+      let apiBase = 'http://localhost:8000'
+      if (window.location.hostname.includes('replit.dev')) {
+        // For Replit, replace the port in the subdomain  
+        const hostname = window.location.hostname
+        const replitBase = hostname.split('.')[0] // Get the part before first dot
+        const replitDomain = hostname.split('.').slice(1).join('.') // Get everything after first dot
+        apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
+      }
       
       const [labsRes, containersRes, activeLabsRes] = await Promise.all([
         fetch(`${apiBase}/api/labs?include_github=true&include_repositories=true`),
@@ -113,9 +118,13 @@ function App() {
   const refreshContainers = async () => {
     setLoading(true)
     try {
-      const apiBase = window.location.hostname.includes('replit.dev') 
-        ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-        : 'http://localhost:8000'
+      let apiBase = 'http://localhost:8000'
+      if (window.location.hostname.includes('replit.dev')) {
+        const hostname = window.location.hostname
+        const replitBase = hostname.split('.')[0]
+        const replitDomain = hostname.split('.').slice(1).join('.')
+        apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
+      }
       const response = await fetch(`${apiBase}/api/containers/refresh`, {
         method: 'POST'
       })
@@ -131,9 +140,13 @@ function App() {
   const scanGitHubLabs = async () => {
     setLoading(true)
     try {
-      const apiBase = window.location.hostname.includes('replit.dev') 
-        ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-        : 'http://localhost:8000'
+      let apiBase = 'http://localhost:8000'
+      if (window.location.hostname.includes('replit.dev')) {
+        const hostname = window.location.hostname
+        const replitBase = hostname.split('.')[0]
+        const replitDomain = hostname.split('.').slice(1).join('.')
+        apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
+      }
       const response = await fetch(`${apiBase}/api/labs/scan`, {
         method: 'POST'
       })

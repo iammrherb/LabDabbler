@@ -16,10 +16,12 @@ function RepositoryManager() {
     auto_sync: false
   })
 
-  const getApiBase = () => {
-    return window.location.hostname.includes('replit.dev') 
-      ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-      : 'http://localhost:8000'
+  let apiBase = 'http://localhost:8000'
+  if (window.location.hostname.includes('replit.dev')) {
+    const hostname = window.location.hostname
+    const replitBase = hostname.split('.')[0]
+    const replitDomain = hostname.split('.').slice(1).join('.')
+    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
   }
 
   useEffect(() => {
@@ -29,7 +31,7 @@ function RepositoryManager() {
 
   const fetchRepositories = async () => {
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories`)
+      const response = await fetch(`${apiBase}/api/repositories`)
       const data = await response.json()
       if (data.success) {
         setRepositories(data.repositories)
@@ -41,7 +43,7 @@ function RepositoryManager() {
 
   const fetchSyncStatus = async () => {
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/sync-status`)
+      const response = await fetch(`${apiBase}/api/repositories/sync-status`)
       const data = await response.json()
       if (data.success) {
         setSyncStatus(data.sync_status)
@@ -54,7 +56,7 @@ function RepositoryManager() {
   const initializeRepositories = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/initialize`, {
+      const response = await fetch(`${apiBase}/api/repositories/initialize`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -76,7 +78,7 @@ function RepositoryManager() {
   const syncRepository = async (repoName) => {
     setLoading(true)
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/${repoName}/sync`, {
+      const response = await fetch(`${apiBase}/api/repositories/${repoName}/sync`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -98,7 +100,7 @@ function RepositoryManager() {
   const syncAllRepositories = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/sync-all`, {
+      const response = await fetch(`${apiBase}/api/repositories/sync-all`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -121,7 +123,7 @@ function RepositoryManager() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/add`, {
+      const response = await fetch(`${apiBase}/api/repositories/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -160,7 +162,7 @@ function RepositoryManager() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/${repoName}`, {
+      const response = await fetch(`${apiBase}/api/repositories/${repoName}`, {
         method: 'DELETE'
       })
       const data = await response.json()
@@ -181,7 +183,7 @@ function RepositoryManager() {
 
   const getRepositoryStatus = async (repoName) => {
     try {
-      const response = await fetch(`${getApiBase()}/api/repositories/${repoName}/status`)
+      const response = await fetch(`${apiBase}/api/repositories/${repoName}/status`)
       const data = await response.json()
       if (data.success) {
         setSelectedRepo(data.status)
