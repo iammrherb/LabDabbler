@@ -1,0 +1,29 @@
+name: simple-2node
+
+mgmt:
+  network: clab-mgmt
+  ipv4-subnet: 172.20.20.0/24
+
+topology:
+  nodes:
+    router1:
+      kind: ceos
+      image: ceos:4.27.0F
+      startup-config: |
+        hostname router1
+        interface Ethernet1
+         no switchport
+         ip address 10.0.12.1/24
+        !
+    router2:
+      kind: ceos
+      image: ceos:4.27.0F
+      startup-config: |
+        hostname router2
+        interface Ethernet1
+         no switchport
+         ip address 10.0.12.2/24
+        !
+
+  links:
+    - endpoints: ["router1:eth1", "router2:eth1"]

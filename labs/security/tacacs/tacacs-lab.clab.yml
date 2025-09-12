@@ -1,0 +1,43 @@
+name: tacacs-auth-lab
+
+mgmt:
+  network: clab-mgmt
+  ipv4-subnet: 172.20.20.0/24
+
+topology:
+  nodes:
+    switch1:
+      kind: ceos
+      image: ceos:4.27.0F
+      startup-config: |
+        hostname switch1
+        aaa group server tacacs+ TACACS_GROUP
+         server 192.168.1.100
+        !
+        tacacs-server host 192.168.1.100
+        tacacs-server key tacacs123
+        !
+        aaa authentication login default group TACACS_GROUP local
+        aaa authorization exec default group TACACS_GROUP local
+        !
+        interface Management1
+         ip address 192.168.1.10/24
+        !
+    tacacs-server:
+      kind: linux
+      image: ghcr.io/hellt/tacacs_plus:latest
+      env:
+        TACACS_SECRET: tacacs123
+      startup-config: |
+        ip addr add 192.168.1.100/24 dev eth1
+        systemctl start tacacs_plus
+    client:
+      kind: linux
+      image: alpine:latest
+      startup-config: |
+        ip addr add 192.168.1.200/24 dev eth1
+        apk add openssh-client
+
+  links:
+    - endpoints: ["switch1:ma1", "tacacs-server:eth1"]
+    - endpoints: ["tacacs-server:eth2", "client:eth1"]

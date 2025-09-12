@@ -1,0 +1,62 @@
+name: spine-leaf-fabric
+
+mgmt:
+  network: clab-mgmt
+  ipv4-subnet: 172.20.20.0/24
+
+topology:
+  nodes:
+    spine1:
+      kind: ceos
+      image: ceos:4.27.0F
+      startup-config: |
+        hostname spine1
+        interface Ethernet1
+         no switchport
+         ip address 10.0.1.1/24
+        interface Ethernet2
+         no switchport
+         ip address 10.0.2.1/24
+        !
+    leaf1:
+      kind: ceos
+      image: ceos:4.27.0F
+      startup-config: |
+        hostname leaf1
+        interface Ethernet1
+         no switchport
+         ip address 10.0.1.2/24
+        interface Ethernet2
+         no switchport
+         ip address 10.0.10.1/24
+        !
+    leaf2:
+      kind: ceos
+      image: ceos:4.27.0F
+      startup-config: |
+        hostname leaf2
+        interface Ethernet1
+         no switchport
+         ip address 10.0.2.2/24
+        interface Ethernet2
+         no switchport
+         ip address 10.0.20.1/24
+        !
+    host1:
+      kind: linux
+      image: alpine:latest
+      startup-config: |
+        ip addr add 10.0.10.2/24 dev eth1
+        ip route add default via 10.0.10.1
+    host2:
+      kind: linux
+      image: alpine:latest
+      startup-config: |
+        ip addr add 10.0.20.2/24 dev eth1
+        ip route add default via 10.0.20.1
+
+  links:
+    - endpoints: ["spine1:eth1", "leaf1:eth1"]
+    - endpoints: ["spine1:eth2", "leaf2:eth1"] 
+    - endpoints: ["leaf1:eth2", "host1:eth1"]
+    - endpoints: ["leaf2:eth2", "host2:eth1"]

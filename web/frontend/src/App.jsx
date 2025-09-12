@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import VRNetLabManager from './components/VRNetLabManager'
 import ContainerCatalog from './components/ContainerCatalog'
-import RepositoryManager from './components/RepositoryManager'
 import LabBuilder from './components/LabBuilder'
 import ErrorBoundary from './components/ErrorBoundary'
 import './components/ErrorBoundary.css'
@@ -12,7 +10,7 @@ function App() {
   const [containers, setContainers] = useState({})
   const [activeLabs, setActiveLabs] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentView, setCurrentView] = useState('dashboard')
+  const [currentView, setCurrentView] = useState('labs')
 
   useEffect(() => {
     fetchData()
@@ -24,6 +22,7 @@ function App() {
       const apiBase = window.location.hostname.includes('replit.dev') 
         ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
         : 'http://localhost:8000'
+      
       const [labsRes, containersRes, activeLabsRes] = await Promise.all([
         fetch(`${apiBase}/api/labs?include_github=true&include_repositories=true`),
         fetch(`${apiBase}/api/containers`),
@@ -39,6 +38,73 @@ function App() {
       setActiveLabs(activeLabsData.active_labs || [])
     } catch (error) {
       console.error('Error fetching data:', error)
+      // Fallback sample data for when API is not available
+      setLabs([
+        {
+          category: "Network Basics",
+          source: "sample",
+          labs: [
+            {
+              name: "Simple 2-Node Lab",
+              description: "Basic two-router connectivity lab for learning network fundamentals",
+              file_path: "labs/network/basic/simple-2node.clab.yml",
+              nodes: 2,
+              kinds: ["ceos"]
+            },
+            {
+              name: "Spine-Leaf Fabric",
+              description: "Classic spine-leaf data center fabric with hosts",
+              file_path: "labs/network/basic/spine-leaf.clab.yml", 
+              nodes: 5,
+              kinds: ["ceos", "linux"]
+            }
+          ]
+        },
+        {
+          category: "Security Labs",
+          source: "sample", 
+          labs: [
+            {
+              name: "TACACS+ Authentication",
+              description: "Network device authentication using TACACS+ server",
+              file_path: "labs/security/tacacs/tacacs-lab.clab.yml",
+              nodes: 3,
+              kinds: ["ceos", "linux"]
+            }
+          ]
+        }
+      ])
+      setContainers({
+        networking: [
+          {
+            name: "Arista cEOS",
+            image: "ceos:4.27.0F",
+            description: "Arista Networks container EOS for data center switching",
+            vendor: "Arista",
+            kind: "ceos",
+            pull_count: 50000
+          },
+          {
+            name: "Cisco IOL",
+            image: "cisco/iol:15.6", 
+            description: "Cisco IOS on Linux virtualization platform",
+            vendor: "Cisco",
+            kind: "cisco_iol",
+            pull_count: 25000
+          }
+        ],
+        hosts: [
+          {
+            name: "Alpine Linux",
+            image: "alpine:latest",
+            description: "Lightweight Linux distribution, perfect for network testing",
+            vendor: "Alpine",
+            kind: "linux",
+            pull_count: 1000000
+          }
+        ]
+      })
+      setActiveLabs([])
     } finally {
       setLoading(false)
     }
@@ -165,28 +231,10 @@ function App() {
         
         <nav className="main-navigation">
           <button 
-            className={`nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setCurrentView('dashboard')}
+            className={`nav-btn ${currentView === 'labs' ? 'active' : ''}`}
+            onClick={() => setCurrentView('labs')}
           >
-            📊 Dashboard
-          </button>
-          <button 
-            className={`nav-btn ${currentView === 'repositories' ? 'active' : ''}`}
-            onClick={() => setCurrentView('repositories')}
-          >
-            🗂️ Repositories
-          </button>
-          <button 
-            className={`nav-btn ${currentView === 'catalog' ? 'active' : ''}`}
-            onClick={() => setCurrentView('catalog')}
-          >
-            📦 Container Catalog
-          </button>
-          <button 
-            className={`nav-btn ${currentView === 'vrnetlab' ? 'active' : ''}`}
-            onClick={() => setCurrentView('vrnetlab')}
-          >
-            🏗️ VRNetlab
+            🧪 Labs
           </button>
           <button 
             className={`nav-btn ${currentView === 'builder' ? 'active' : ''}`}
@@ -194,139 +242,149 @@ function App() {
           >
             🎨 Lab Builder
           </button>
+          <button 
+            className={`nav-btn ${currentView === 'catalog' ? 'active' : ''}`}
+            onClick={() => setCurrentView('catalog')}
+          >
+            📦 Containers
+          </button>
         </nav>
       </header>
 
       <main className="container">
         {currentView === 'catalog' ? (
           <ContainerCatalog />
-        ) : currentView === 'repositories' ? (
-          <RepositoryManager />
-        ) : currentView === 'vrnetlab' ? (
-          <VRNetLabManager />
         ) : currentView === 'builder' ? (
           <LabBuilder />
         ) : (
           <>
+        {/* Hero Section */}
+        <section className="hero-section">
+          <div className="hero-content">
+            <h2>🚀 Get Started with Network Labs</h2>
+            <p>Launch existing labs or build your own custom network topologies</p>
+            <div className="hero-actions">
+              <button 
+                className="btn-hero-primary" 
+                onClick={() => setCurrentView('builder')}
+              >
+                🎨 Build New Lab
+              </button>
+              <button 
+                className="btn-hero-secondary" 
+                onClick={scanGitHubLabs} 
+                disabled={loading}
+              >
+                {loading ? 'Importing...' : '📚 Import Labs from GitHub'}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Available Labs Section */}
         <section className="labs-section">
           <div className="section-header">
-            <h2>Available Labs</h2>
-            <button className="btn-secondary" onClick={scanGitHubLabs} disabled={loading}>
-              {loading ? 'Scanning...' : 'Scan GitHub Labs'}
-            </button>
+            <h3>Available Labs</h3>
+            {labs.length > 0 && (
+              <span className="lab-count">{labs.reduce((total, category) => total + category.labs.length, 0)} labs available</span>
+            )}
           </div>
           {labs.length > 0 ? (
-            labs.map((category, idx) => (
-              <div key={idx} className="lab-category">
-                <h3>
-                  {category.category}
-                  {category.source && (
-                    <span className={`source-badge ${category.source}`}>
-                      {category.source}
-                    </span>
-                  )}
-                  {category.repository && (
-                    <span className="repo-info">
-                      from {category.repository}
-                    </span>
-                  )}
-                </h3>
-                <div className="lab-grid">
-                  {category.labs.map((lab, labIdx) => (
-                    <div key={labIdx} className="lab-card">
-                      <h4>{lab.name}</h4>
-                      <p>{lab.description}</p>
-                      {lab.file_path && <p className="lab-meta">File: {lab.file_path}</p>}
-                      {lab.nodes && <p className="lab-meta">Nodes: {lab.nodes}</p>}
-                      {lab.kinds && lab.kinds.length > 0 && (
-                        <p className="lab-meta">Kinds: {lab.kinds.join(', ')}</p>
-                      )}
-                      <button 
-                        className="btn-primary" 
-                        onClick={() => launchLab(lab)}
-                        disabled={loading}
-                      >
-                        {loading ? 'Launching...' : 'Launch Lab'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No labs found. Click "Scan GitHub Labs" to discover labs or create your first lab below!</p>
-          )}
-        </section>
-
-        <section className="containers-section">
-          <div className="section-header">
-            <h2>Available Containers</h2>
-            <button className="btn-secondary" onClick={refreshContainers} disabled={loading}>
-              {loading ? 'Refreshing...' : 'Refresh Containers'}
-            </button>
-          </div>
-          {Object.keys(containers).length > 0 ? (
-            Object.entries(containers).filter(([key]) => key !== 'last_updated').map(([category, containerList]) => (
-              <div key={category} className="container-category">
-                <h3>{category.replace('_', ' ').toUpperCase()}</h3>
-                <div className="container-grid">
-                  {Array.isArray(containerList) && containerList.map((container, idx) => (
-                    <div key={idx} className="container-card">
-                      <h4>{container.name}</h4>
-                      <p className="image-name">{container.image}</p>
-                      <p>{container.description}</p>
-                      {container.vendor && <p className="container-meta">Vendor: {container.vendor}</p>}
-                      {container.kind && <p className="container-meta">Kind: {container.kind}</p>}
-                      {container.pull_count && <p className="container-meta">Pulls: {container.pull_count.toLocaleString()}</p>}
-                      <button className="btn-secondary">Add to Lab</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No containers loaded. Click "Refresh Containers" to discover available containers!</p>
-          )}
-        </section>
-
-        <section className="active-labs-section">
-          <h2>Active Labs</h2>
-          {activeLabs.length > 0 ? (
-            <div className="active-labs-grid">
-              {activeLabs.map((lab, idx) => (
-                <div key={idx} className="active-lab-card">
-                  <h4>{lab.name}</h4>
-                  <p className="lab-id">ID: {lab.lab_id}</p>
-                  <p className="lab-meta">Nodes: {lab.node_count || 0}</p>
-                  <p className={`status ${lab.status}`}>Status: {lab.status}</p>
-                  {lab.original_file && <p className="lab-meta">File: {lab.original_file}</p>}
-                  {lab.created_at && (
-                    <p className="lab-meta">
-                      Created: {new Date(parseFloat(lab.created_at) * 1000).toLocaleString()}
-                    </p>
-                  )}
-                  <button 
-                    className="btn-danger" 
-                    onClick={() => stopLab(lab.lab_id)}
-                    disabled={loading}
-                  >
-                    {loading ? 'Stopping...' : 'Stop Lab'}
-                  </button>
+            <div className="lab-categories">
+              {labs.map((category, idx) => (
+                <div key={idx} className="lab-category">
+                  <h4 className="category-title">
+                    {category.category}
+                    <span className="category-count">({category.labs.length})</span>
+                  </h4>
+                  <div className="lab-grid">
+                    {category.labs.slice(0, 6).map((lab, labIdx) => (
+                      <div key={labIdx} className="lab-card">
+                        <div className="lab-header">
+                          <h5>{lab.name}</h5>
+                        </div>
+                        <div className="lab-content">
+                          <p className="lab-description">{lab.description || 'Network lab topology'}</p>
+                          <div className="lab-meta">
+                            {lab.nodes && <span className="meta-tag">📊 {lab.nodes} nodes</span>}
+                            {lab.kinds && lab.kinds.length > 0 && (
+                              <span className="meta-tag">🏷️ {lab.kinds.slice(0, 2).join(', ')}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="lab-actions">
+                          <button 
+                            className="btn-launch" 
+                            onClick={() => launchLab(lab)}
+                            disabled={loading}
+                          >
+                            {loading ? '⏳' : '🚀'} Launch
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {category.labs.length > 6 && (
+                      <div className="lab-card more-labs">
+                        <div className="more-content">
+                          <span className="more-count">+{category.labs.length - 6}</span>
+                          <span className="more-text">more labs</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p>No active labs. Launch a lab from the available labs above!</p>
+            <div className="empty-state">
+              <div className="empty-icon">🔬</div>
+              <h4>No labs found</h4>
+              <p>Import labs from popular repositories or build your own custom lab</p>
+              <div className="empty-actions">
+                <button className="btn-primary" onClick={scanGitHubLabs} disabled={loading}>
+                  📚 Import Labs
+                </button>
+                <button className="btn-secondary" onClick={() => setCurrentView('builder')}>
+                  🎨 Build Lab
+                </button>
+              </div>
+            </div>
           )}
         </section>
 
-        <section className="lab-builder">
-          <h2>Custom Lab Builder</h2>
-          <div className="builder-placeholder">
-            <p>🏗️ Drag-and-drop lab builder coming soon...</p>
-            <button className="btn-primary">Create Custom Lab</button>
-          </div>
-        </section>
+
+        {/* Active Labs Section */}
+        {activeLabs.length > 0 && (
+          <section className="active-labs-section">
+            <div className="section-header">
+              <h3>Running Labs</h3>
+              <span className="active-count">{activeLabs.length} active</span>
+            </div>
+            <div className="active-labs-grid">
+              {activeLabs.map((lab, idx) => (
+                <div key={idx} className="active-lab-card">
+                  <div className="lab-status-indicator running"></div>
+                  <div className="active-lab-content">
+                    <h5>{lab.name}</h5>
+                    <div className="lab-details">
+                      <span className="detail-item">🔗 {lab.node_count || 0} nodes</span>
+                      <span className="detail-item">⏱️ {lab.created_at ? new Date(parseFloat(lab.created_at) * 1000).toLocaleDateString() : 'Unknown'}</span>
+                    </div>
+                  </div>
+                  <button 
+                    className="btn-stop" 
+                    onClick={() => stopLab(lab.lab_id)}
+                    disabled={loading}
+                    title="Stop Lab"
+                  >
+                    {loading ? '⏳' : '⏹️'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
           </>
         )}
       </main>
