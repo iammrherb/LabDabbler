@@ -23,6 +23,7 @@ from services.vrnetlab_service import VRNetLabService
 from services.repository_management import RepositoryManagementService
 from services.runtime import RuntimeProviderFactory
 from services.github_service import GitHubService
+from services.netlab_service import NetlabService
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ lab_launcher = LabLauncherService(Path("./data"))
 vrnetlab_service = VRNetLabService(Path("./data"))
 repository_service = RepositoryManagementService(Path("./data"))
 github_service = GitHubService(Path("./data"))
+netlab_service = NetlabService(Path("./data"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -89,6 +91,7 @@ lab_launcher.data_dir = DATA_DIR
 vrnetlab_service.data_dir = DATA_DIR
 repository_service.data_dir = DATA_DIR
 github_service.data_dir = DATA_DIR
+netlab_service.data_dir = DATA_DIR
 
 @app.get("/")
 async def root():
@@ -1162,6 +1165,129 @@ async def export_topology_to_codespaces(request: dict):
             
     except Exception as e:
         logger.error(f"Error exporting to Codespaces: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Netlab Integration API Endpoints
+@app.get("/api/netlab/status")
+async def get_netlab_status():
+    """Check netlab installation status"""
+    try:
+        status = await netlab_service.check_netlab_installed()
+        return {
+            "success": True,
+            "netlab": status
+        }
+    except Exception as e:
+        logger.error(f"Error checking netlab status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/netlab/install")
+async def install_netlab():
+    """Install netlab and containerlab"""
+    # Basic security check - only allow in development or with admin flag
+    environment = os.getenv("ENVIRONMENT", "development")
+    admin_mode = os.getenv("ADMIN_MODE", "false").lower() == "true"
+    
+    if environment == "production" and not admin_mode:
+        raise HTTPException(
+            status_code=403, 
+            detail="Netlab installation is restricted in production environment"
+        )
+    
+    try:
+        result = await netlab_service.install_netlab()
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result)
+            
+    except Exception as e:
+        logger.error(f"Error installing netlab: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/netlab/providers")
+async def get_netlab_providers():
+    """Get available netlab providers"""
+    try:
+        result = await netlab_service.get_netlab_providers()
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result)
+            
+    except Exception as e:
+        logger.error(f"Error getting netlab providers: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/netlab/templates")
+async def get_netlab_templates():
+    """Get available netlab templates"""
+    try:
+        result = netlab_service.get_built_in_templates()
+        return result
+    except Exception as e:
+        logger.error(f"Error getting netlab templates: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/netlab/generate")
+async def generate_lab_from_template(request: dict):
+    """Generate a lab from a netlab template"""
+    try:
+        template_type = request.get("template_type")
+        parameters = request.get("parameters", {})
+        lab_name = request.get("lab_name")
+        
+        if not template_type:
+            raise HTTPException(status_code=400, detail="template_type is required")
+        
+        result = await netlab_service.generate_lab_from_template(
+            template_type, parameters, lab_name
+        )
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result)
+            
+    except Exception as e:
+        logger.error(f"Error generating lab from template: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/netlab/labs")
+async def list_netlab_labs():
+    """List all generated netlab labs"""
+    try:
+        result = await netlab_service.list_generated_labs()
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=500, detail=result)
+            
+    except Exception as e:
+        logger.error(f"Error listing netlab labs: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/netlab/validate")
+async def validate_netlab_topology(request: dict):
+    """Validate a netlab topology file"""
+    try:
+        topology_file = request.get("topology_file")
+        
+        if not topology_file:
+            raise HTTPException(status_code=400, detail="topology_file is required")
+        
+        result = await netlab_service.validate_netlab_topology(topology_file)
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result)
+            
+    except Exception as e:
+        logger.error(f"Error validating netlab topology: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

@@ -281,6 +281,27 @@
   background: #0056b3;
 }
 
+.btn-github {
+  background: linear-gradient(135deg, #333 0%, #24292e 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-github:hover:not(:disabled) {
+  background: linear-gradient(135deg, #24292e 0%, #1a1e23 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(36, 41, 46, 0.3);
+}
+
 .btn-secondary {
   background: #6c757d;
   color: white;

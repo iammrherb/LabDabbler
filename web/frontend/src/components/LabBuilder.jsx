@@ -5,6 +5,7 @@ import TopologyCanvas from './LabBuilder/TopologyCanvas'
 import NodeConfigPanel from './LabBuilder/NodeConfigPanel'
 import TopologyControls from './LabBuilder/TopologyControls'
 import TopologyExporter from './LabBuilder/TopologyExporter'
+import GitHubIntegration from './GitHubIntegration'
 
 function LabBuilder() {
   // Topology state
@@ -25,6 +26,7 @@ function LabBuilder() {
   // UI state
   const [showNodeConfig, setShowNodeConfig] = useState(false)
   const [showExporter, setShowExporter] = useState(false)
+  const [showGitHubExport, setShowGitHubExport] = useState(false)
   const [containers, setContainers] = useState([])
   const [loading, setLoading] = useState(true)
   const [validationErrors, setValidationErrors] = useState([])
@@ -333,6 +335,17 @@ function LabBuilder() {
           topology={topology}
           onClose={() => setShowExporter(false)}
           onExport={saveTopology}
+          onGitHubExport={() => {
+            setShowExporter(false)
+            setShowGitHubExport(true)
+          }}
+        />
+      )}
+      
+      {showGitHubExport && (
+        <GitHubIntegration
+          topology={topology}
+          onClose={() => setShowGitHubExport(false)}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import './TopologyExporter.css'
 
-function TopologyExporter({ topology, onClose, onExport }) {
+function TopologyExporter({ topology, onClose, onExport, onGitHubExport }) {
   const [exportFormat, setExportFormat] = useState('clab')
   const [includeConfigs, setIncludeConfigs] = useState(true)
   const [generateConfigFiles, setGenerateConfigFiles] = useState(false)
@@ -364,6 +364,15 @@ function TopologyExporter({ topology, onClose, onExport }) {
               >
                 Cancel
               </button>
+              {exportFormat === 'clab' && onGitHubExport && (
+                <button 
+                  className="btn-github"
+                  onClick={onGitHubExport}
+                  disabled={!isValid}
+                >
+                  🚀 Export to Codespaces
+                </button>
+              )}
               {exportFormat === 'clab' && (
                 <button 
                   className="btn-primary"
