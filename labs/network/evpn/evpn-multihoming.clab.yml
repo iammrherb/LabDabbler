@@ -1,0 +1,54 @@
+name: evpn-multihoming
+topology:
+  defaults:
+    kind: ceos
+  kinds:
+    ceos:
+      image: ceos:latest
+      cmd: /sbin/init
+      systemctl: auto
+    linux:
+      image: networkop/host
+  nodes:
+    spine1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.10
+    spine2:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.11
+    leaf1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.20
+    leaf2:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.21
+    leaf3:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.22
+    leaf4:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.23
+    host1:
+      kind: linux
+      mgmt_ipv4: 192.168.1.30
+    host2:
+      kind: linux  
+      mgmt_ipv4: 192.168.1.31
+  links:
+    # Spine to Leaf connections
+    - endpoints: ["spine1:eth1", "leaf1:eth1"]
+    - endpoints: ["spine1:eth2", "leaf2:eth1"] 
+    - endpoints: ["spine1:eth3", "leaf3:eth1"]
+    - endpoints: ["spine1:eth4", "leaf4:eth1"]
+    - endpoints: ["spine2:eth1", "leaf1:eth2"]
+    - endpoints: ["spine2:eth2", "leaf2:eth2"]
+    - endpoints: ["spine2:eth3", "leaf3:eth2"]
+    - endpoints: ["spine2:eth4", "leaf4:eth2"]
+    # MLAG peer links
+    - endpoints: ["leaf1:eth3", "leaf2:eth3"]
+    - endpoints: ["leaf3:eth3", "leaf4:eth3"]
+    # Multi-homed host connections
+    - endpoints: ["leaf1:eth4", "host1:eth1"]
+    - endpoints: ["leaf2:eth4", "host1:eth2"]
+    - endpoints: ["leaf3:eth4", "host2:eth1"] 
+    - endpoints: ["leaf4:eth4", "host2:eth2"]

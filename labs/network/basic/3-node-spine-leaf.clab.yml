@@ -1,0 +1,34 @@
+name: 3-node-spine-leaf
+topology:
+  defaults:
+    kind: linux
+  kinds:
+    ceos:
+      image: ceos:latest
+      cmd: /sbin/init
+      systemctl: auto
+    linux:
+      image: alpine:latest
+  nodes:
+    spine1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.10
+    leaf1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.11
+    leaf2:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.12
+    host1:
+      kind: linux
+      mgmt_ipv4: 192.168.1.21
+      cmd: /bin/sh
+    host2:
+      kind: linux
+      mgmt_ipv4: 192.168.1.22
+      cmd: /bin/sh
+  links:
+    - endpoints: ["spine1:eth1", "leaf1:eth1"]
+    - endpoints: ["spine1:eth2", "leaf2:eth1"]  
+    - endpoints: ["leaf1:eth2", "host1:eth1"]
+    - endpoints: ["leaf2:eth2", "host2:eth1"]

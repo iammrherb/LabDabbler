@@ -1,0 +1,75 @@
+name: bgp-spine-leaf
+topology:
+  defaults:
+    kind: ceos
+  kinds:
+    ceos:
+      image: ceos:latest
+      cmd: /sbin/init
+      systemctl: auto
+    linux:
+      image: networkop/host
+      cmd: /bin/sh
+  nodes:
+    spine01:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.10
+      startup-config: |
+        hostname spine01
+        ip routing
+        interface Ethernet1
+         no shutdown
+         ip address 10.0.1.0/31
+        interface Ethernet2  
+         no shutdown
+         ip address 10.0.2.0/31
+        router bgp 65000
+         neighbor 10.0.1.1 remote-as 65001
+         neighbor 10.0.2.1 remote-as 65002
+    leaf01:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.11
+      startup-config: |
+        hostname leaf01
+        ip routing
+        interface Ethernet1
+         no shutdown
+         ip address 10.0.1.1/31
+        interface Ethernet2
+         no shutdown
+         ip address 192.168.10.1/24
+        router bgp 65001
+         neighbor 10.0.1.0 remote-as 65000
+         network 192.168.10.0/24
+    leaf02:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.12
+      startup-config: |
+        hostname leaf02
+        ip routing
+        interface Ethernet1
+         no shutdown
+         ip address 10.0.2.1/31
+        interface Ethernet2
+         no shutdown
+         ip address 192.168.20.1/24
+        router bgp 65002
+         neighbor 10.0.2.0 remote-as 65000
+         network 192.168.20.0/24
+    host01:
+      kind: linux
+      mgmt_ipv4: 192.168.1.21
+      exec:
+        - ip addr add 192.168.10.10/24 dev eth1
+        - ip route add default via 192.168.10.1
+    host02:
+      kind: linux
+      mgmt_ipv4: 192.168.1.22
+      exec:
+        - ip addr add 192.168.20.10/24 dev eth1
+        - ip route add default via 192.168.20.1
+  links:
+    - endpoints: ["spine01:eth1", "leaf01:eth1"]
+    - endpoints: ["spine01:eth2", "leaf02:eth1"]
+    - endpoints: ["leaf01:eth2", "host01:eth1"]
+    - endpoints: ["leaf02:eth2", "host02:eth1"]

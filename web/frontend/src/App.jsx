@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import ContainerCatalog from './components/ContainerCatalog'
 import LabBuilder from './components/LabBuilder'
+import CodespacesDeployment from './components/CodespacesDeployment'
 import ErrorBoundary from './components/ErrorBoundary'
 import './components/ErrorBoundary.css'
 
@@ -19,14 +20,8 @@ function App() {
   const fetchData = async () => {
     try {
       // API base - determine correct endpoint for Replit environment
-      let apiBase = 'http://localhost:8000'
-      if (window.location.hostname.includes('replit.dev')) {
-        // For Replit, replace the port in the subdomain  
-        const hostname = window.location.hostname
-        const replitBase = hostname.split('.')[0] // Get the part before first dot
-        const replitDomain = hostname.split('.').slice(1).join('.') // Get everything after first dot
-        apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-      }
+      // Use internal network IP for API calls in Replit environment
+      const apiBase = 'http://172.31.93.98:8000'
       
       const [labsRes, containersRes, activeLabsRes] = await Promise.all([
         fetch(`${apiBase}/api/labs?include_github=true&include_repositories=true`),
@@ -118,13 +113,8 @@ function App() {
   const refreshContainers = async () => {
     setLoading(true)
     try {
-      let apiBase = 'http://localhost:8000'
-      if (window.location.hostname.includes('replit.dev')) {
-        const hostname = window.location.hostname
-        const replitBase = hostname.split('.')[0]
-        const replitDomain = hostname.split('.').slice(1).join('.')
-        apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-      }
+      // Use internal network IP for API calls in Replit environment
+      const apiBase = 'http://172.31.93.98:8000'
       const response = await fetch(`${apiBase}/api/containers/refresh`, {
         method: 'POST'
       })
@@ -140,13 +130,8 @@ function App() {
   const scanGitHubLabs = async () => {
     setLoading(true)
     try {
-      let apiBase = 'http://localhost:8000'
-      if (window.location.hostname.includes('replit.dev')) {
-        const hostname = window.location.hostname
-        const replitBase = hostname.split('.')[0]
-        const replitDomain = hostname.split('.').slice(1).join('.')
-        apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-      }
+      // Use internal network IP for API calls in Replit environment
+      const apiBase = 'http://172.31.93.98:8000'
       const response = await fetch(`${apiBase}/api/labs/scan`, {
         method: 'POST'
       })
@@ -173,9 +158,8 @@ function App() {
         return
       }
       
-      const apiBase = window.location.hostname.includes('replit.dev') 
-        ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-        : 'http://localhost:8000'
+      // Use internal network IP for API calls in Replit environment
+      const apiBase = 'http://172.31.93.98:8000'
       const response = await fetch(`${apiBase}/api/labs/launch`, {
         method: 'POST',
         headers: {
@@ -206,9 +190,8 @@ function App() {
   const stopLab = async (labId) => {
     setLoading(true)
     try {
-      const apiBase = window.location.hostname.includes('replit.dev') 
-        ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
-        : 'http://localhost:8000'
+      // Use internal network IP for API calls in Replit environment
+      const apiBase = 'http://172.31.93.98:8000'
       const response = await fetch(`${apiBase}/api/labs/${labId}/stop`, {
         method: 'POST'
       })
@@ -261,6 +244,12 @@ function App() {
           >
             📦 Containers
           </button>
+          <button 
+            className={`nav-btn deploy-btn ${currentView === 'deploy' ? 'active' : ''}`}
+            onClick={() => setCurrentView('deploy')}
+          >
+            🚀 Deploy to Cloud
+          </button>
         </nav>
       </header>
 
@@ -269,6 +258,8 @@ function App() {
           <ContainerCatalog />
         ) : currentView === 'builder' ? (
           <LabBuilder />
+        ) : currentView === 'deploy' ? (
+          <CodespacesDeployment labData={labs} />
         ) : (
           <>
         {/* Hero Section */}

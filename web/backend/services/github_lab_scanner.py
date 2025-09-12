@@ -158,127 +158,139 @@ class GitHubLabScanner:
         ]
         
     async def scan_all_repos(self) -> Dict:
-        """Comprehensive GitHub lab collection from both curated and automated sources"""
-        logger.info("Starting comprehensive GitHub lab collection...")
+        """Comprehensive GitHub lab collection using local repository data instead of GitHub API"""
+        logger.info("Starting comprehensive GitHub lab collection from local repositories...")
         
         all_labs = {}
         failed_labs = []
         scan_stats = {
-            "curated_labs": 0,
-            "automated_labs": 0,
+            "local_labs": 0,
+            "repo_count": 0,
             "failed_repos": []
         }
         
+        # Phase 1: Scan local repository data (fast, reliable, no API calls needed)
+        logger.info("Phase 1: Scanning local repository data...")
+        repositories_dir = self.data_dir / "repositories"
+        
+        if repositories_dir.exists():
+            for repo_dir in repositories_dir.iterdir():
+                if repo_dir.is_dir():
+                    repo_name = repo_dir.name
+                    logger.info(f"Scanning local repository: {repo_name}")
+                    
+                    try:
+                        repo_labs = self.scan_local_repository(repo_dir, repo_name)
+                        if repo_labs:
+                            all_labs[repo_name] = repo_labs
+                            scan_stats["local_labs"] += len(repo_labs)
+                            scan_stats["repo_count"] += 1
+                            logger.info(f"Found {len(repo_labs)} labs in local repository {repo_name}")
+                        else:
+                            logger.info(f"No labs found in local repository: {repo_name}")
+                    except Exception as e:
+                        scan_stats["failed_repos"].append(repo_name)
+                        logger.error(f"Failed to scan local repository {repo_name}: {e}")
+        
+        # Phase 2: Add curated labs that aren't already in local repos (fallback for missing repos)
+        logger.info("Phase 2: Adding missing curated labs as fallback...")
         headers = self._get_auth_headers()
         
         async with aiohttp.ClientSession(headers=headers) as session:
-            # Phase 1: Fetch curated/known labs (fast, reliable)
-            logger.info("Phase 1: Fetching curated labs...")
             for lab_def in self.known_labs:
-                try:
-                    lab_info = await self.fetch_known_lab(session, lab_def)
-                    if lab_info:
-                        repo_name = lab_def["repo"]
-                        if repo_name not in all_labs:
-                            all_labs[repo_name] = []
-                        all_labs[repo_name].append(lab_info)
-                        scan_stats["curated_labs"] += 1
-                        logger.info(f"Successfully loaded curated lab: {lab_info['name']}")
-                    else:
-                        failed_labs.append(lab_def["name"])
-                        logger.warning(f"Failed to load curated lab: {lab_def['name']}")
-                except Exception as e:
-                    failed_labs.append(lab_def["name"])
-                    logger.error(f"Error loading curated lab {lab_def['name']}: {e}")
-                    
-                # Small delay to be respectful to GitHub 
-                await asyncio.sleep(0.1)
-            
-            # Phase 2: Search API scanning for organizations
-            logger.info("Phase 2: Scanning organizations using GitHub Search API...")
-            for org in self.target_organizations:
-                try:
-                    logger.info(f"Searching for .clab.yml files in organization: {org}")
-                    org_labs = await self.search_organization_labs(session, org)
-                    
-                    if org_labs:
-                        # Group by repository
-                        for lab in org_labs:
-                            repo_name = lab["repository"]
+                repo_name = lab_def["repo"]
+                lab_name = lab_def["name"]
+                
+                # Check if this lab is already in our local data
+                found_locally = False
+                if repo_name in all_labs:
+                    existing_names = {lab['name'] for lab in all_labs[repo_name]}
+                    if lab_name in existing_names:
+                        found_locally = True
+                
+                # If not found locally, try to fetch it
+                if not found_locally:
+                    try:
+                        lab_info = await self.fetch_known_lab(session, lab_def)
+                        if lab_info:
                             if repo_name not in all_labs:
                                 all_labs[repo_name] = []
-                            
-                            # Avoid duplicates from curated list
-                            existing_names = {lab_item['name'] for lab_item in all_labs[repo_name]}
-                            if lab['name'] not in existing_names:
-                                all_labs[repo_name].append(lab)
-                                scan_stats["automated_labs"] += 1
-                        
-                        logger.info(f"Found {len(org_labs)} labs in organization {org}")
-                    else:
-                        logger.warning(f"No labs found in organization: {org}")
-                        
-                except Exception as e:
-                    scan_stats["failed_repos"].append(f"org:{org}")
-                    logger.error(f"Failed to scan organization {org}: {e}")
+                            all_labs[repo_name].append(lab_info)
+                            scan_stats["local_labs"] += 1
+                            logger.info(f"Added fallback curated lab: {lab_info['name']}")
+                        else:
+                            failed_labs.append(lab_def["name"])
+                            logger.warning(f"Failed to load fallback lab: {lab_def['name']}")
+                    except Exception as e:
+                        failed_labs.append(lab_def["name"])
+                        logger.error(f"Error loading fallback lab {lab_def['name']}: {e}")
                     
-                # Longer delay between organizations to respect rate limits
-                await asyncio.sleep(1.0)
-                
-            # Phase 3: Fallback repository scanning for specific repos
-            logger.info("Phase 3: Fallback repository scanning...")
-            for repo in self.target_repositories:
-                try:
-                    logger.info(f"Searching repository: {repo}")
-                    repo_labs = await self.search_repository_labs(session, repo)
-                    
-                    if repo_labs:
-                        if repo not in all_labs:
-                            all_labs[repo] = []
-                        # Avoid duplicates from curated list and org scanning
-                        existing_names = {lab['name'] for lab in all_labs[repo]}
-                        for lab in repo_labs:
-                            if lab['name'] not in existing_names:
-                                all_labs[repo].append(lab)
-                                scan_stats["automated_labs"] += 1
-                        logger.info(f"Found {len(repo_labs)} additional labs in {repo}")
-                    else:
-                        logger.warning(f"No labs found in repository: {repo}")
-                        
-                except Exception as e:
-                    scan_stats["failed_repos"].append(repo)
-                    logger.error(f"Failed to scan repository {repo}: {e}")
-                    
-                # Delay between repositories to respect rate limits
-                await asyncio.sleep(0.5)
+                    # Small delay to be respectful to GitHub 
+                    await asyncio.sleep(0.1)
         
-        # Save comprehensive results with rate limit info
-        rate_limited = len([repo for repo in scan_stats["failed_repos"] if "rate limited" in str(repo)]) > 0
-        
+        # Save comprehensive results
         scan_results = {
             "repositories": all_labs,
             "total_labs": sum(len(labs) for labs in all_labs.values()),
-            "curated_labs": scan_stats["curated_labs"],
-            "automated_labs": scan_stats["automated_labs"],
+            "local_labs": scan_stats["local_labs"],
+            "repo_count": scan_stats["repo_count"],
             "failed_labs": failed_labs,
             "failed_repos": scan_stats["failed_repos"],
             "last_scan": str(asyncio.get_event_loop().time()),
-            "scan_method": "hybrid_curated_and_automated",
-            "rate_limited": rate_limited,
+            "scan_method": "local_repository_scan",
             "github_token_configured": bool(self.github_token),
-            "notes": self._generate_scan_notes(rate_limited, scan_stats)
+            "notes": f"Scanned {scan_stats['repo_count']} local repositories, found {scan_stats['local_labs']} labs total"
         }
         
         with open(self.labs_file, 'w') as f:
             json.dump(scan_results, f, indent=2)
             
-        logger.info(f"Comprehensive lab collection complete. Total: {scan_results['total_labs']} labs "
-                   f"({scan_stats['curated_labs']} curated + {scan_stats['automated_labs']} automated)")
-        
-        if rate_limited:
-            logger.warning("GitHub rate limiting encountered. Consider adding GITHUB_TOKEN environment variable for better results.")
+        logger.info(f"Local repository lab collection complete. Total: {scan_results['total_labs']} labs "
+                   f"from {scan_stats['repo_count']} repositories")
             
         return scan_results
+
+    def scan_local_repository(self, repo_path: Path, repo_name: str) -> List[Dict]:
+        """Scan a local repository directory for .clab.yml files"""
+        labs = []
+        
+        try:
+            # Find all .clab.yml files in the repository
+            for lab_file in repo_path.rglob("*.clab.yml"):
+                try:
+                    with open(lab_file, 'r', encoding='utf-8') as f:
+                        lab_config = yaml.safe_load(f)
+                    
+                    if not lab_config:
+                        continue
+                        
+                    # Extract lab information
+                    lab_name = lab_config.get("name", lab_file.stem.replace(".clab", ""))
+                    relative_path = str(lab_file.relative_to(repo_path))
+                    
+                    lab_info = {
+                        "name": lab_name,
+                        "path": relative_path,
+                        "file_path": str(lab_file),  # Local file path for launching
+                        "repository": repo_name,
+                        "description": self.extract_description(lab_config),
+                        "topology": self.extract_topology_info(lab_config),
+                        "nodes": self.count_nodes(lab_config),
+                        "kinds": self.extract_kinds(lab_config),
+                        "source": "local_repository"
+                    }
+                    
+                    labs.append(lab_info)
+                    logger.debug(f"Found lab: {lab_name} in {relative_path}")
+                    
+                except Exception as e:
+                    logger.warning(f"Failed to process lab file {lab_file}: {e}")
+                    continue
+        
+        except Exception as e:
+            logger.error(f"Error scanning repository {repo_name}: {e}")
+        
+        return labs
     
     def _get_auth_headers(self) -> Dict[str, str]:
         """Get authentication headers for GitHub API requests"""

@@ -1,5 +1,1525 @@
 {
   "repositories": {
+    "clab-config-demo": [
+      {
+        "name": "srlbgp",
+        "path": "srlbgp.clab.yml",
+        "file_path": "data/repositories/clab-config-demo/srlbgp.clab.yml",
+        "repository": "clab-config-demo",
+        "description": "Containerlab topology: srlbgp",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "srl"
+        ],
+        "source": "local_repository"
+      }
+    ],
+    "containerlab-official": [
+      {
+        "name": "br01",
+        "path": "lab-examples/br01/br01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/br01/br01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: br01",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [
+          "bridge",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "cert01",
+        "path": "lab-examples/cert01/cert01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/cert01/cert01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: cert01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "nokia_sros"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "clos01",
+        "path": "lab-examples/clos01/clos01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/clos01/clos01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: clos01",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 5,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "clos02",
+        "path": "lab-examples/clos02/clos02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/clos02/clos02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: clos02",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 14,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "clos02",
+        "path": "lab-examples/clos02/setup.clos02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/clos02/setup.clos02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: clos02",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 14,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "cvx01",
+        "path": "lab-examples/cvx01/topo.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/cvx01/topo.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: cvx01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "cumulus_cvx",
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "cvx02",
+        "path": "lab-examples/cvx02/topo.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/cvx02/topo.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: cvx02",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "cumulus_cvx",
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "fortigate",
+        "path": "lab-examples/fortigate/fortigate.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/fortigate/fortigate.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: fortigate",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "fortinet_fortigate"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "freebsd01",
+        "path": "lab-examples/freebsd01/freebsd01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/freebsd01/freebsd01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: freebsd01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "linux",
+          "freebsd"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "frr01",
+        "path": "lab-examples/frr01/frr01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/frr01/frr01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: frr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 6,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "generic_vm",
+        "path": "lab-examples/generic_vm01/generic_vm.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/generic_vm01/generic_vm.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: generic_vm",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "generic_vm",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "ixiac01",
+        "path": "lab-examples/ixiac01/ixiac01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/ixiac01/ixiac01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: ixiac01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "keysight_ixia-c-one",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "kind01",
+        "path": "lab-examples/k8s_kind01/k8s_kind01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/k8s_kind01/k8s_kind01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: kind01",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 6,
+        "kinds": [
+          "ext-container",
+          "k8s-kind",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "ost-srl",
+        "path": "lab-examples/ost-srl/ost-srl.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/ost-srl/ost-srl.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: ost-srl",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "sonic01",
+        "path": "lab-examples/sonic01/sonic01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/sonic01/sonic01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: sonic01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "sonic-vs",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "sr01",
+        "path": "lab-examples/sr-sim/sros-srl.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/sr-sim/sros-srl.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: sr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srsim",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srl",
+        "path": "lab-examples/srl-quickstart/srl01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srl-quickstart/srl01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srl",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srl2",
+        "path": "lab-examples/srl-quickstart/srl02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srl-quickstart/srl02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srl2",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srl01",
+        "path": "lab-examples/srl01/srl01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srl01/srl01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srl01",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srl02",
+        "path": "lab-examples/srl02/srl02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srl02/srl02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srl02",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srl03",
+        "path": "lab-examples/srl03/srl03.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srl03/srl03.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srl03",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 8,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlceos01",
+        "path": "lab-examples/srlceos01/srlceos01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlceos01/srlceos01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlceos01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "arista_ceos",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlcjunosevo",
+        "path": "lab-examples/srlcjunosevo/srlcjunosevo.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlcjunosevo/srlcjunosevo.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlcjunosevo",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "juniper_cjunosevolved",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlcrpd01",
+        "path": "lab-examples/srlcrpd01/srlcrpd01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlcrpd01/srlcrpd01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlcrpd01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "juniper_crpd",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlfrr01",
+        "path": "lab-examples/srlfrr01/srlfrr01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlfrr01/srlfrr01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlfrr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlvjunos01",
+        "path": "lab-examples/srlvjunos01/srlvjunos01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlvjunos01/srlvjunos01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlvjunos01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "juniper_vjunosswitch",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlvjunos02",
+        "path": "lab-examples/srlvjunos02/srlvjunos02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlvjunos02/srlvjunos02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlvjunos02",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "juniper_vjunosevolved",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srlxrd01",
+        "path": "lab-examples/srlxrd01/srlxrd01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/srlxrd01/srlxrd01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srlxrd01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "cisco_xrd",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vr01",
+        "path": "lab-examples/vr01/vr01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vr01/vr01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_sros",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vr02",
+        "path": "lab-examples/vr02/vr02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vr02/vr02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vr02",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srlinux",
+          "juniper_vmx"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vr03",
+        "path": "lab-examples/vr03/vr03.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vr03/vr03.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vr03",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "cisco_xrv",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vr04",
+        "path": "lab-examples/vr04/vr04.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vr04/vr04.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vr04",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "cisco_xrv9k",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "conf1",
+        "path": "lab-examples/vr05/sros4.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vr05/sros4.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: conf1",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {
+            "kind": "nokia_sros",
+            "image": "vrnetlab/vr-sros:21.2.R1",
+            "license": "~/license/sros.txt",
+            "config": {
+              "vars": {
+                "isis_iid": 1
+              }
+            }
+          },
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [],
+        "source": "local_repository"
+      },
+      {
+        "name": "vr01",
+        "path": "lab-examples/vr05/vr01.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vr05/vr01.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_sros",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vxlan",
+        "path": "lab-examples/vxlan01/vxlan-sros.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vxlan01/vxlan-sros.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vxlan",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "nokia_sros"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vxlan",
+        "path": "lab-examples/vxlan01/vxlan-vmx.clab.yml",
+        "file_path": "data/repositories/containerlab-official/lab-examples/vxlan01/vxlan-vmx.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vxlan",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "juniper_vmx"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "2-linux-nodes",
+        "path": "tests/01-smoke/01-linux-nodes.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/01-linux-nodes.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 2-linux-nodes",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "single-node",
+        "path": "tests/01-smoke/01-linux-single-node.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/01-linux-single-node.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: single-node",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "03-bridge-and-host",
+        "path": "tests/01-smoke/03-linux-nodes-to-bridge-and-host.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/03-linux-nodes-to-bridge-and-host.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 03-bridge-and-host",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "bridge",
+          "linux",
+          "host"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "05-docker-bridge",
+        "path": "tests/01-smoke/05-docker-bridge.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/05-docker-bridge.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 05-docker-bridge",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "single-node",
+        "path": "tests/01-smoke/07-linux-single-node.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/07-linux-single-node.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: single-node",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "external-ca",
+        "path": "tests/01-smoke/09-external-ca.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/09-external-ca.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: external-ca",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "internal-ca",
+        "path": "tests/01-smoke/10-internal-ca.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/10-internal-ca.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: internal-ca",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {
+            "certificate": {
+              "issue": true,
+              "key-size": 1024
+            }
+          },
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "mgmtnetif",
+        "path": "tests/01-smoke/16-mgmtnetinterface.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/16-mgmtnetinterface.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: mgmtnetif",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "macvlan",
+        "path": "tests/01-smoke/macvlan.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/macvlan.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: macvlan",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "container-mode",
+        "path": "tests/01-smoke/netmodes.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/netmodes.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: container-mode",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "node-filter",
+        "path": "tests/01-smoke/node-filter.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/node-filter.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: node-filter",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {
+            "kind": "linux",
+            "image": "alpine:3"
+          },
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [],
+        "source": "local_repository"
+      },
+      {
+        "name": "stages-race",
+        "path": "tests/01-smoke/stages-race.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/stages-race.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: stages-race",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "stages",
+        "path": "tests/01-smoke/stages.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/stages.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: stages",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {
+            "kind": "linux",
+            "image": "debian:bookworm-slim"
+          },
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [],
+        "source": "local_repository"
+      },
+      {
+        "name": "lab1",
+        "path": "tests/01-smoke/single-topo-folder/lab1.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/01-smoke/single-topo-folder/lab1.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: lab1",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "02-01-two-srls",
+        "path": "tests/02-basic-srl/02-srl02.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/02-basic-srl/02-srl02.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 02-01-two-srls",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "srl-bgp",
+        "path": "tests/02-basic-srl/03-srl-bgp.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/02-basic-srl/03-srl-bgp.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: srl-bgp",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "01-basic-k8s-kind",
+        "path": "tests/05-k8s-kind/01-basic-k8s-kind.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/05-k8s-kind/01-basic-k8s-kind.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 01-basic-k8s-kind",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 7,
+        "kinds": [
+          "ext-container",
+          "linux",
+          "bridge",
+          "k8s-kind",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "06-ext-container",
+        "path": "tests/06-ext-container/01-ext-container.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/06-ext-container/01-ext-container.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 06-ext-container",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "ext-container"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "1-sros",
+        "path": "tests/07-sros/1-sros.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/07-sros/1-sros.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: 1-sros",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "nokia_sros"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vxlan",
+        "path": "tests/08-vxlan/01-vxlan.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/08-vxlan/01-vxlan.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vxlan",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vxlan-stitch",
+        "path": "tests/08-vxlan/02-vxlan-stitch.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/08-vxlan/02-vxlan-stitch.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vxlan-stitch",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "vxlan-tools",
+        "path": "tests/08-vxlan/03-vxlan-tools.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/08-vxlan/03-vxlan-tools.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: vxlan-tools",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "forti",
+        "path": "tests/09-fortigate/fortigates.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/09-fortigate/fortigates.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: forti",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "fortinet_fortigate"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "iol",
+        "path": "tests/10-basic-cisco_iol/iol.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/10-basic-cisco_iol/iol.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: iol",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [
+          "cisco_iol"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "e2e-vpp",
+        "path": "tests/11-fdio-vpp/e2e-lab/vpp.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/11-fdio-vpp/e2e-lab/vpp.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: e2e-vpp",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "fdio_vpp",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 4,
+        "kinds": [
+          "linux",
+          "fdio_vpp"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "sr01",
+        "path": "tests/13-srsim/01-srsim.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/13-srsim/01-srsim.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: sr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "nokia_srsim"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "sr03",
+        "path": "tests/13-srsim/03-srsim-dist.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/13-srsim/03-srsim-dist.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: sr03",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srsim"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "linux",
+          "nokia_srsim"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "sr05",
+        "path": "tests/13-srsim/05-srsim-comp.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/13-srsim/05-srsim-comp.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: sr05",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srsim"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "nokia_srsim"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "sr07",
+        "path": "tests/13-srsim/07-srsim-mix.clab.yml",
+        "file_path": "data/repositories/containerlab-official/tests/13-srsim/07-srsim-mix.clab.yml",
+        "repository": "containerlab-official",
+        "description": "Containerlab topology: sr07",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srsim"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 7,
+        "kinds": [
+          "linux",
+          "nokia_srsim"
+        ],
+        "source": "local_repository"
+      }
+    ],
+    "hellt-clabs": [
+      {
+        "name": "EVPN-Overlaid",
+        "path": "labs/arista-bgp-evpn/ceos-evpn-overlaid.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/arista-bgp-evpn/ceos-evpn-overlaid.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: EVPN-Overlaid",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "ceos",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 14,
+        "kinds": [
+          "linux",
+          "ceos"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "cmp",
+        "path": "labs/cmpv2/cmp.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/cmpv2/cmp.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: cmp",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 2,
+        "kinds": [
+          "linux",
+          "vr-sros"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "ctd",
+        "path": "labs/cvx03/lab-final.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/cvx03/lab-final.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: ctd",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 5,
+        "kinds": [
+          "linux",
+          "cvx"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "ctd",
+        "path": "labs/cvx03/lab-start.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/cvx03/lab-start.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: ctd",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 5,
+        "kinds": [
+          "linux",
+          "cvx"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "citc",
+        "path": "labs/cvx04/symm-mh.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/cvx04/symm-mh.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: citc",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 14,
+        "kinds": [
+          "linux",
+          "cvx"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "citc",
+        "path": "labs/cvx04/symm-mlag.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/cvx04/symm-mlag.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: citc",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 14,
+        "kinds": [
+          "linux",
+          "cvx"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "poc3",
+        "path": "labs/cvx05/topo.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/cvx05/topo.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: poc3",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 7,
+        "kinds": [
+          "cumulus_cvx",
+          "linux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "gnmi",
+        "path": "labs/gnmi-tls/gnmi-tls.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/gnmi-tls/gnmi-tls.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: gnmi",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "vr-sros"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "gnmi",
+        "path": "labs/gnmictls/gnmitls.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/gnmictls/gnmitls.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: gnmi",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 1,
+        "kinds": [
+          "vr-sros"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "frr01",
+        "path": "labs/isis-watcher/frr01.clab.yml",
+        "file_path": "data/repositories/hellt-clabs/labs/isis-watcher/frr01.clab.yml",
+        "repository": "hellt-clabs",
+        "description": "Containerlab topology: frr01",
+        "topology": {
+          "name": "",
+          "kinds": [],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 8,
+        "kinds": [
+          "bridge",
+          "linux"
+        ],
+        "source": "local_repository"
+      }
+    ],
+    "learn-srlinux": [
+      {
+        "name": "evpn01",
+        "path": "labs/evpn01.clab.yml",
+        "file_path": "data/repositories/learn-srlinux/labs/evpn01.clab.yml",
+        "repository": "learn-srlinux",
+        "description": "Containerlab topology: evpn01",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "nokia_srlinux",
+            "linux"
+          ],
+          "defaults": {},
+          "mgmt": {}
+        },
+        "nodes": 5,
+        "kinds": [
+          "linux",
+          "nokia_srlinux"
+        ],
+        "source": "local_repository"
+      },
+      {
+        "name": "mpls-ldp",
+        "path": "labs/mpls-ldp/mpls-ldp.clab.yml",
+        "file_path": "data/repositories/learn-srlinux/labs/mpls-ldp/mpls-ldp.clab.yml",
+        "repository": "learn-srlinux",
+        "description": "Containerlab topology: mpls-ldp",
+        "topology": {
+          "name": "",
+          "kinds": [
+            "srl"
+          ],
+          "defaults": {
+            "kind": "srl"
+          },
+          "mgmt": {}
+        },
+        "nodes": 3,
+        "kinds": [
+          "srl"
+        ],
+        "source": "local_repository"
+      }
+    ],
     "srl-labs/containerlab": [
       {
         "name": "srl01",
@@ -62,8 +1582,8 @@
         },
         "nodes": 8,
         "kinds": [
-          "nokia_srlinux",
-          "linux"
+          "linux",
+          "nokia_srlinux"
         ],
         "source": "github"
       },
@@ -83,8 +1603,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "nokia_srlinux",
-          "arista_ceos"
+          "arista_ceos",
+          "nokia_srlinux"
         ],
         "source": "github"
       },
@@ -104,8 +1624,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "nokia_srlinux",
-          "linux"
+          "linux",
+          "nokia_srlinux"
         ],
         "source": "github"
       },
@@ -125,8 +1645,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "nokia_srlinux",
-          "cisco_xrd"
+          "cisco_xrd",
+          "nokia_srlinux"
         ],
         "source": "github"
       },
@@ -149,8 +1669,8 @@
         },
         "nodes": 5,
         "kinds": [
-          "nokia_srlinux",
-          "linux"
+          "linux",
+          "nokia_srlinux"
         ],
         "source": "github"
       },
@@ -173,8 +1693,8 @@
         },
         "nodes": 14,
         "kinds": [
-          "nokia_srlinux",
-          "linux"
+          "linux",
+          "nokia_srlinux"
         ],
         "source": "github"
       },
@@ -214,8 +1734,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "nokia_srlinux",
-          "sonic-vs"
+          "sonic-vs",
+          "nokia_srlinux"
         ],
         "source": "github"
       }
@@ -251,9 +1771,9 @@
       }
     ]
   },
-  "total_labs": 11,
-  "curated_labs": 11,
-  "automated_labs": 0,
+  "total_labs": 89,
+  "local_labs": 89,
+  "repo_count": 4,
   "failed_labs": [
     "vxlan01",
     "2tier-l3ls",
@@ -264,11 +1784,8 @@
     "cvx02"
   ],
   "failed_repos": [],
-  "last_scan": "100499.987122257",
-  "scan_method": "hybrid_curated_and_automated",
-  "rate_limited": false,
+  "last_scan": "108856.339613829",
+  "scan_method": "local_repository_scan",
   "github_token_configured": false,
-  "notes": [
-    "Only curated labs were loaded. Automated scanning was limited by rate limits or API issues."
-  ]
+  "notes": "Scanned 4 local repositories, found 89 labs total"
 }

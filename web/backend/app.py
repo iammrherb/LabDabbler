@@ -626,6 +626,55 @@ async def get_scheduler_status():
         "scheduler_status": status
     }
 
+# GitHub Integration API Endpoints
+
+@app.post("/api/github/deploy-codespaces")
+async def deploy_to_codespaces(request: dict):
+    """Deploy lab data to GitHub Codespaces"""
+    lab_data = request.get("lab_data", {})
+    deployment_type = request.get("deployment_type", "codespaces")
+    
+    result = await github_service.deploy_to_codespaces(lab_data)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.post("/api/github/export-repo")
+async def export_to_github_repo(request: dict):
+    """Export lab data to a GitHub repository"""
+    lab_data = request.get("lab_data", {})
+    export_type = request.get("export_type", "repository")
+    
+    result = await github_service.export_to_github_repo(lab_data)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=400, detail=result)
+
+@app.get("/api/github/popular-repos")
+async def get_popular_lab_repositories():
+    """Get list of popular containerlab repositories for quick deployment"""
+    repos = github_service.get_popular_lab_repositories()
+    return {
+        "success": True,
+        "repositories": repos,
+        "total_repos": len(repos)
+    }
+
+@app.get("/api/github/repo-info/{repo_owner}/{repo_name}")
+async def get_repository_info(repo_owner: str, repo_name: str):
+    """Get information about a specific GitHub repository"""
+    repo_full_name = f"{repo_owner}/{repo_name}"
+    result = await github_service.get_repository_info(repo_full_name)
+    
+    if result["success"]:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail=result)
+
 # Lab Builder API Endpoints
 @app.post("/api/lab-builder/save")
 async def save_topology(topology_data: dict):

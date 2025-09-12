@@ -1,0 +1,92 @@
+name: mpls-l3vpn
+topology:
+  defaults:
+    kind: ceos
+  kinds:
+    ceos:
+      image: ceos:latest
+      cmd: /sbin/init
+      systemctl: auto
+    linux:
+      image: alpine:latest
+  nodes:
+    # Provider Edge routers
+    pe1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.10
+      startup-config: |
+        hostname pe1
+        ip routing
+        mpls ip
+        interface Loopback0
+         ip address 1.1.1.1/32
+        interface Ethernet1
+         no shutdown
+         ip address 10.0.12.1/30
+         mpls ip
+        interface Ethernet2
+         no shutdown
+         ip address 192.168.10.1/24
+         vrf CUSTOMER-A
+        router ospf 1
+         network 1.1.1.1 0.0.0.0 area 0
+         network 10.0.12.0 0.0.0.3 area 0
+        router bgp 65000
+         neighbor 2.2.2.2 remote-as 65000
+         neighbor 2.2.2.2 update-source Loopback0
+         address-family vpnv4
+          neighbor 2.2.2.2 activate
+    pe2:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.11
+      startup-config: |
+        hostname pe2
+        ip routing
+        mpls ip
+        interface Loopback0
+         ip address 2.2.2.2/32
+        interface Ethernet1
+         no shutdown
+         ip address 10.0.12.2/30
+         mpls ip
+        interface Ethernet2
+         no shutdown
+         ip address 192.168.20.1/24
+         vrf CUSTOMER-A
+        router ospf 1
+         network 2.2.2.2 0.0.0.0 area 0
+         network 10.0.12.0 0.0.0.3 area 0
+        router bgp 65000
+         neighbor 1.1.1.1 remote-as 65000
+         neighbor 1.1.1.1 update-source Loopback0
+         address-family vpnv4
+          neighbor 1.1.1.1 activate
+    # Customer sites
+    ce1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.20
+      startup-config: |
+        hostname ce1
+        ip routing
+        interface Ethernet1
+         no shutdown
+         ip address 192.168.10.10/24
+        router bgp 65001
+         neighbor 192.168.10.1 remote-as 65000
+         network 172.16.1.0/24
+    ce2:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.21
+      startup-config: |
+        hostname ce2
+        ip routing
+        interface Ethernet1
+         no shutdown
+         ip address 192.168.20.10/24
+        router bgp 65001
+         neighbor 192.168.20.1 remote-as 65000
+         network 172.16.2.0/24
+  links:
+    - endpoints: ["pe1:eth1", "pe2:eth1"]
+    - endpoints: ["pe1:eth2", "ce1:eth1"]
+    - endpoints: ["pe2:eth2", "ce2:eth1"]

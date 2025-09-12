@@ -1,0 +1,73 @@
+name: advanced-tacacs-lab
+topology:
+  defaults:
+    kind: ceos
+  kinds:
+    ceos:
+      image: ceos:latest
+      cmd: /sbin/init
+      systemctl: auto
+    linux:
+      image: alpine:latest
+  nodes:
+    # Network devices
+    sw1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.10
+      startup-config: |
+        hostname sw1
+        aaa authentication login default group tacacs+ local
+        aaa authorization exec default group tacacs+ local
+        aaa accounting exec default start-stop group tacacs+
+        tacacs-server host 192.168.1.100 key secret123
+        username admin privilege 15 secret admin123
+        username readonly privilege 1 secret readonly123
+    sw2:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.11
+      startup-config: |
+        hostname sw2
+        aaa authentication login default group tacacs+ local
+        aaa authorization exec default group tacacs+ local
+        aaa accounting exec default start-stop group tacacs+
+        tacacs-server host 192.168.1.100 key secret123
+        tacacs-server host 192.168.1.101 key secret123
+        username admin privilege 15 secret admin123
+        username readonly privilege 1 secret readonly123
+    rtr1:
+      kind: ceos
+      mgmt_ipv4: 192.168.1.12
+      startup-config: |
+        hostname rtr1
+        ip routing
+        aaa authentication login default group tacacs+ local
+        aaa authorization exec default group tacacs+ local
+        aaa accounting exec default start-stop group tacacs+
+        tacacs-server host 192.168.1.100 key secret123
+        username admin privilege 15 secret admin123
+    # TACACS+ Servers
+    tacacs-primary:
+      kind: linux
+      mgmt_ipv4: 192.168.1.100
+      binds:
+        - tacacs-primary.cfg:/etc/tac_plus.conf:ro
+      image: dchidell/docker-tacacs
+      cmd: /usr/local/sbin/tac_plus -C /etc/tac_plus.conf -G -d 16
+    tacacs-backup:
+      kind: linux
+      mgmt_ipv4: 192.168.1.101
+      binds:
+        - tacacs-backup.cfg:/etc/tac_plus.conf:ro
+      image: dchidell/docker-tacacs
+      cmd: /usr/local/sbin/tac_plus -C /etc/tac_plus.conf -G -d 16
+    # Management station
+    mgmt:
+      kind: linux
+      mgmt_ipv4: 192.168.1.200
+      image: alpine:latest
+      exec:
+        - apk add openssh-client
+  links:
+    - endpoints: ["sw1:eth1", "sw2:eth1"]
+    - endpoints: ["sw2:eth2", "rtr1:eth1"]
+    - endpoints: ["rtr1:eth2", "mgmt:eth1"]

@@ -80,6 +80,37 @@
   display: none;
 }
 
+/* Special styling for Deploy to Cloud button */
+.deploy-btn {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  animation: pulse-glow 3s infinite;
+}
+
+.deploy-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  border-color: rgba(5, 150, 105, 0.8) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.deploy-btn.active {
+  background: linear-gradient(135deg, #047857, #065f46) !important;
+  color: white !important;
+  border-color: #047857 !important;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+  }
+}
+
 /* Container */
 .container {
   max-width: 1200px;
