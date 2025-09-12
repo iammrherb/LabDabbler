@@ -1,0 +1,288 @@
+{
+  "portnox_containers": {
+    "timestamp": "2025-09-12T15:44:07.694033",
+    "data": [
+      {
+        "name": "portnox-tacacs",
+        "image": "portnox/portnox-tacacs:latest",
+        "description": "Docker image to run Portnox TACACS+ server in a container.",
+        "tags": [
+          "latest",
+          "1.1.52",
+          "1.1.51",
+          "1.1.50"
+        ],
+        "pull_count": 14025,
+        "star_count": 1,
+        "last_updated": "2024-10-31T14:50:29.607316Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network device authentication",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "portnox-dhcp",
+        "image": "portnox/portnox-dhcp:latest",
+        "description": "Portnox DHCP proxy for sending DHCP information from your network equipment to Portnox.",
+        "tags": [
+          "latest",
+          "20250410.1",
+          "20221221"
+        ],
+        "pull_count": 5771,
+        "star_count": 0,
+        "last_updated": "2025-04-15T08:20:49.176934Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network configuration management",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "portnox-radius",
+        "image": "portnox/portnox-radius:latest",
+        "description": "Portnox local RADIUS proxy for redundancy",
+        "tags": [
+          "latest",
+          "1.1.211",
+          "1.1.210",
+          "1.1.180",
+          "1.1.179",
+          "1.1.175",
+          "1.1.171",
+          "1.1.131"
+        ],
+        "pull_count": 3284,
+        "star_count": 0,
+        "last_updated": "2025-07-09T18:25:42.056027Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Authentication and authorization",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "portnox-siem",
+        "image": "portnox/portnox-siem:latest",
+        "description": "",
+        "tags": [
+          "latest",
+          "1.0.1021",
+          "1.0.1012",
+          "1.0.1011"
+        ],
+        "pull_count": 92,
+        "star_count": 0,
+        "last_updated": "2025-09-04T13:12:28.148361Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Security information and event management",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "portnox-unifi-agent",
+        "image": "portnox/portnox-unifi-agent:latest",
+        "description": "",
+        "tags": [
+          "latest"
+        ],
+        "pull_count": 88,
+        "star_count": 0,
+        "last_updated": "2025-08-27T07:00:40.329886Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network device management",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "portnox-autoupdate",
+        "image": "portnox/portnox-autoupdate:latest",
+        "description": "",
+        "tags": [
+          "latest",
+          "1.2.1000",
+          "1.1.1003"
+        ],
+        "pull_count": 76,
+        "star_count": 0,
+        "last_updated": "2025-05-27T07:26:58.815531Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network access control and security",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "ztna-gateway",
+        "image": "portnox/ztna-gateway:latest",
+        "description": "",
+        "tags": [
+          "latest",
+          "1.1.1152"
+        ],
+        "pull_count": 59,
+        "star_count": 0,
+        "last_updated": "2025-06-23T14:50:37.832637Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Zero trust network access",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "local-radius",
+        "image": "portnox/local-radius:latest",
+        "description": "Local RADIUS server for network authentication",
+        "tags": [
+          "latest"
+        ],
+        "vendor": "Portnox",
+        "category": "portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Authentication and authorization",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "tacacs",
+        "image": "portnox/tacacs:latest",
+        "description": "TACACS+ server for network device access control",
+        "tags": [
+          "latest"
+        ],
+        "vendor": "Portnox",
+        "category": "portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network device authentication",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "dhcp",
+        "image": "portnox/dhcp:latest",
+        "description": "DHCP server with network access control integration",
+        "tags": [
+          "latest"
+        ],
+        "vendor": "Portnox",
+        "category": "portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network configuration management",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "ztna-gateway",
+        "image": "portnox/ztna-gateway:latest",
+        "description": "",
+        "tags": [
+          "latest",
+          "1.1.1152"
+        ],
+        "pull_count": 59,
+        "star_count": 0,
+        "last_updated": "2025-06-23T14:50:37.832637Z",
+        "category": "portnox",
+        "vendor": "Portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Zero trust network access",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "unifi-agent",
+        "image": "portnox/unifi-agent:latest",
+        "description": "UniFi network integration agent",
+        "tags": [
+          "latest"
+        ],
+        "vendor": "Portnox",
+        "category": "portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network device management",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "siem-collector",
+        "image": "portnox/siem-collector:latest",
+        "description": "Security event collection and forwarding",
+        "tags": [
+          "latest"
+        ],
+        "vendor": "Portnox",
+        "category": "portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Security information and event management",
+        "documentation": "https://docs.portnox.com/"
+      },
+      {
+        "name": "network-scanner",
+        "image": "portnox/network-scanner:latest",
+        "description": "Network discovery and device profiling",
+        "tags": [
+          "latest"
+        ],
+        "vendor": "Portnox",
+        "category": "portnox",
+        "architecture": [
+          "amd64"
+        ],
+        "access": "public",
+        "registry": "docker.io",
+        "use_case": "Network discovery and security scanning",
+        "documentation": "https://docs.portnox.com/"
+      }
+    ]
+  }
+}

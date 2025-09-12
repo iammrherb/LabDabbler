@@ -62,8 +62,8 @@
         },
         "nodes": 8,
         "kinds": [
-          "linux",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "linux"
         ],
         "source": "github"
       },
@@ -83,8 +83,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "arista_ceos",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "arista_ceos"
         ],
         "source": "github"
       },
@@ -104,8 +104,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "linux",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "linux"
         ],
         "source": "github"
       },
@@ -125,8 +125,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "cisco_xrd",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "cisco_xrd"
         ],
         "source": "github"
       },
@@ -149,8 +149,8 @@
         },
         "nodes": 5,
         "kinds": [
-          "linux",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "linux"
         ],
         "source": "github"
       },
@@ -173,8 +173,8 @@
         },
         "nodes": 14,
         "kinds": [
-          "linux",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "linux"
         ],
         "source": "github"
       },
@@ -214,8 +214,8 @@
         },
         "nodes": 2,
         "kinds": [
-          "sonic-vs",
-          "nokia_srlinux"
+          "nokia_srlinux",
+          "sonic-vs"
         ],
         "source": "github"
       }
@@ -244,8 +244,8 @@
         },
         "nodes": 8,
         "kinds": [
-          "ceos",
-          "linux"
+          "linux",
+          "ceos"
         ],
         "source": "github"
       }
@@ -264,7 +264,7 @@
     "cvx02"
   ],
   "failed_repos": [],
-  "last_scan": "42332.987556355",
+  "last_scan": "100499.987122257",
   "scan_method": "hybrid_curated_and_automated",
   "rate_limited": false,
   "github_token_configured": false,
