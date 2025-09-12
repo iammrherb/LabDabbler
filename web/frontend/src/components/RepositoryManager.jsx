@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './RepositoryManager.css'
+import { getApiBase, api } from '../utils/api'
 
 function RepositoryManager() {
   const [repositories, setRepositories] = useState([])
@@ -16,13 +17,6 @@ function RepositoryManager() {
     auto_sync: false
   })
 
-  let apiBase = 'http://localhost:8000'
-  if (window.location.hostname.includes('replit.dev')) {
-    const hostname = window.location.hostname
-    const replitBase = hostname.split('.')[0]
-    const replitDomain = hostname.split('.').slice(1).join('.')
-    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-  }
 
   useEffect(() => {
     fetchRepositories()
@@ -31,8 +25,7 @@ function RepositoryManager() {
 
   const fetchRepositories = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/repositories`)
-      const data = await response.json()
+      const data = await api.get('/api/repositories')
       if (data.success) {
         setRepositories(data.repositories)
       }
@@ -43,8 +36,7 @@ function RepositoryManager() {
 
   const fetchSyncStatus = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/repositories/sync-status`)
-      const data = await response.json()
+      const data = await api.get('/api/repositories/sync-status')
       if (data.success) {
         setSyncStatus(data.sync_status)
       }
@@ -56,10 +48,7 @@ function RepositoryManager() {
   const initializeRepositories = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/repositories/initialize`, {
-        method: 'POST'
-      })
-      const data = await response.json()
+      const data = await api.post('/api/repositories/initialize', {})
       if (data.success) {
         alert('Repositories initialized successfully!')
         await fetchRepositories()
@@ -78,10 +67,7 @@ function RepositoryManager() {
   const syncRepository = async (repoName) => {
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/repositories/${repoName}/sync`, {
-        method: 'POST'
-      })
-      const data = await response.json()
+      const data = await api.post(`/api/repositories/${repoName}/sync`, {})
       if (data.success) {
         alert(`Repository "${repoName}" synced successfully!`)
         await fetchRepositories()
@@ -100,10 +86,7 @@ function RepositoryManager() {
   const syncAllRepositories = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/repositories/sync-all`, {
-        method: 'POST'
-      })
-      const data = await response.json()
+      const data = await api.post('/api/repositories/sync-all', {})
       alert(data.message)
       await fetchRepositories()
       await fetchSyncStatus()
@@ -123,14 +106,7 @@ function RepositoryManager() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/repositories/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newRepo)
-      })
-      const data = await response.json()
+      const data = await api.post('/api/repositories/add', newRepo)
       if (data.success) {
         alert(`Repository "${newRepo.name}" added successfully!`)
         setShowAddRepo(false)
@@ -162,10 +138,7 @@ function RepositoryManager() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/repositories/${repoName}`, {
-        method: 'DELETE'
-      })
-      const data = await response.json()
+      const data = await api.delete(`/api/repositories/${repoName}`)
       if (data.success) {
         alert(`Repository "${repoName}" removed successfully!`)
         await fetchRepositories()
@@ -183,8 +156,7 @@ function RepositoryManager() {
 
   const getRepositoryStatus = async (repoName) => {
     try {
-      const response = await fetch(`${apiBase}/api/repositories/${repoName}/status`)
-      const data = await response.json()
+      const data = await api.get(`/api/repositories/${repoName}/status`)
       if (data.success) {
         setSelectedRepo(data.status)
       } else {

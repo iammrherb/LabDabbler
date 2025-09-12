@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ContainerCatalog.css'
+import { getApiBase, api } from '../utils/api'
 
 function ContainerCatalog() {
   const [containers, setContainers] = useState([])
@@ -25,13 +26,6 @@ function ContainerCatalog() {
   const [hasMore, setHasMore] = useState(false)
   const resultsPerPage = 24
 
-  let apiBase = 'http://localhost:8000'
-  if (window.location.hostname.includes('replit.dev')) {
-    const hostname = window.location.hostname
-    const replitBase = hostname.split('.')[0]
-    const replitDomain = hostname.split('.').slice(1).join('.')
-    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-  }
 
   useEffect(() => {
     fetchInitialData()
@@ -44,18 +38,11 @@ function ContainerCatalog() {
   const fetchInitialData = async () => {
     try {
       setLoading(true)
-      const [categoriesRes, vendorsRes, architecturesRes, statsRes] = await Promise.all([
-        fetch(`${apiBase}/api/containers/categories`),
-        fetch(`${apiBase}/api/containers/vendors`),
-        fetch(`${apiBase}/api/containers/architectures`),
-        fetch(`${apiBase}/api/containers/stats`)
-      ])
-
       const [categoriesData, vendorsData, architecturesData, statsData] = await Promise.all([
-        categoriesRes.json(),
-        vendorsRes.json(),
-        architecturesRes.json(),
-        statsRes.json()
+        api.get('/api/containers/categories'),
+        api.get('/api/containers/vendors'),
+        api.get('/api/containers/architectures'),
+        api.get('/api/containers/stats')
       ])
 
       setCategories(categoriesData.categories)
@@ -76,17 +63,16 @@ function ContainerCatalog() {
   const searchContainers = async () => {
     try {
       const offset = (currentPage - 1) * resultsPerPage
-      const url = new URL(`${apiBase}/api/containers/search`)
-      
-      url.searchParams.append('q', searchQuery)
-      url.searchParams.append('category', selectedCategory)
-      url.searchParams.append('vendor', selectedVendor)
-      url.searchParams.append('architecture', selectedArchitecture)
-      url.searchParams.append('limit', resultsPerPage.toString())
-      url.searchParams.append('offset', offset.toString())
+      const params = {
+        q: searchQuery,
+        category: selectedCategory,
+        vendor: selectedVendor,
+        architecture: selectedArchitecture,
+        limit: resultsPerPage.toString(),
+        offset: offset.toString()
+      }
 
-      const response = await fetch(url)
-      const data = await response.json()
+      const data = await api.getWithParams('/api/containers/search', params)
 
       setContainers(data.results)
       setTotalResults(data.total)
@@ -101,10 +87,7 @@ function ContainerCatalog() {
   const refreshCatalog = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${apiBase}/api/containers/refresh`, {
-        method: 'POST'
-      })
-      const data = await response.json()
+      const data = await api.post('/api/containers/refresh', {})
       
       alert(`Container catalog refreshed! Found ${data.stats.total_containers} containers in ${data.stats.total_categories} categories.`)
       

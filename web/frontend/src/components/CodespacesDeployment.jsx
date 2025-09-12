@@ -1,37 +1,21 @@
 import { useState } from 'react'
 import './CodespacesDeployment.css'
+import { getApiBase, api } from '../utils/api'
 
 function CodespacesDeployment({ labData }) {
   const [deploymentStatus, setDeploymentStatus] = useState('')
   const [isDeploying, setIsDeploying] = useState(false)
 
-  // Helper function to get API base URL
-  const getApiBase = () => {
-    let apiBase = 'http://localhost:8000'
-    if (window.location.hostname.includes('replit.dev')) {
-      apiBase = `${window.location.protocol}//${window.location.hostname.replace(/^[^.]+/, '8f663c4f-989d-42d5-9d87-278576336cb7-8000-2ajxcvg621drk')}`
-    }
-    return apiBase
-  }
 
   const deployToCodespaces = async () => {
     setIsDeploying(true)
     setDeploymentStatus('Preparing deployment to GitHub Codespaces...')
     
     try {
-      const apiBase = getApiBase()
-      const response = await fetch(`${apiBase}/api/github/deploy-codespaces`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          lab_data: labData,
-          deployment_type: 'codespaces'
-        })
+      const result = await api.post('/api/github/deploy-codespaces', {
+        lab_data: labData,
+        deployment_type: 'codespaces'
       })
-
-      const result = await response.json()
       
       if (result.success) {
         setDeploymentStatus('✅ Deployment successful! Opening GitHub Codespaces...')
@@ -55,19 +39,10 @@ function CodespacesDeployment({ labData }) {
     setDeploymentStatus('Creating GitHub repository...')
     
     try {
-      const apiBase = getApiBase()
-      const response = await fetch(`${apiBase}/api/github/export-repo`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          lab_data: labData,
-          export_type: 'repository'
-        })
+      const result = await api.post('/api/github/export-repo', {
+        lab_data: labData,
+        export_type: 'repository'
       })
-
-      const result = await response.json()
       
       if (result.success) {
         setDeploymentStatus('✅ Repository created successfully!')

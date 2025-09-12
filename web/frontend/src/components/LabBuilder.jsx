@@ -6,6 +6,7 @@ import NodeConfigPanel from './LabBuilder/NodeConfigPanel'
 import TopologyControls from './LabBuilder/TopologyControls'
 import TopologyExporter from './LabBuilder/TopologyExporter'
 import GitHubIntegration from './GitHubIntegration'
+import { getApiBase, api } from '../utils/api'
 
 function LabBuilder() {
   // Topology state
@@ -33,13 +34,6 @@ function LabBuilder() {
   
   // Refs
   const canvasRef = useRef(null)
-  let apiBase = 'http://localhost:8000'
-  if (window.location.hostname.includes('replit.dev')) {
-    const hostname = window.location.hostname
-    const replitBase = hostname.split('.')[0]
-    const replitDomain = hostname.split('.').slice(1).join('.')
-    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-  }
 
   useEffect(() => {
     loadContainers()
@@ -48,8 +42,7 @@ function LabBuilder() {
   const loadContainers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${apiBase}/api/containers/search?limit=1000`)
-      const data = await response.json()
+      const data = await api.getWithParams('/api/containers/search', { limit: 1000 })
       setContainers(data.results || [])
     } catch (error) {
       console.error('Error loading containers:', error)
@@ -213,20 +206,8 @@ function LabBuilder() {
         saved_at: new Date().toISOString()
       }
       
-      const response = await fetch(`${apiBase}/api/lab-builder/save`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(topologyData)
-      })
-      
-      if (response.ok) {
-        alert(`Topology "${name}" saved successfully!`)
-      } else {
-        const error = await response.json()
-        alert(`Failed to save topology: ${error.message}`)
-      }
+      const data = await api.post('/api/lab-builder/save', topologyData)
+      alert(`Topology "${name}" saved successfully!`)
     } catch (error) {
       console.error('Error saving topology:', error)
       alert('Error saving topology')

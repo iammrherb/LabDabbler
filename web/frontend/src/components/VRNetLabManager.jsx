@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './VRNetLabManager.css'
+import { getApiBase, api } from '../utils/api'
 
 function VRNetLabManager() {
   // State management
@@ -26,14 +27,6 @@ function VRNetLabManager() {
     containerTag: 'latest'
   })
 
-  // Get API base URL
-  let apiBase = 'http://localhost:8000'
-  if (window.location.hostname.includes('replit.dev')) {
-    const hostname = window.location.hostname
-    const replitBase = hostname.split('.')[0]
-    const replitDomain = hostname.split('.').slice(1).join('.')
-    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-  }
 
   useEffect(() => {
     fetchAllData()
@@ -57,8 +50,7 @@ function VRNetLabManager() {
 
   const fetchVmImages = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/images`)
-      const data = await response.json()
+      const data = await api.get('/api/vrnetlab/images')
       if (data.success) {
         setVmImages(data.images)
       }
@@ -69,8 +61,7 @@ function VRNetLabManager() {
 
   const fetchBuilds = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/builds`)
-      const data = await response.json()
+      const data = await api.get('/api/vrnetlab/builds')
       if (data.success) {
         setBuilds(data.builds)
       }
@@ -81,8 +72,7 @@ function VRNetLabManager() {
 
   const fetchBuiltContainers = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/containers`)
-      const data = await response.json()
+      const data = await api.get('/api/vrnetlab/containers')
       if (data.success) {
         setBuiltContainers(data.containers)
       }
@@ -93,8 +83,7 @@ function VRNetLabManager() {
 
   const fetchSupportedVendors = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/vendors`)
-      const data = await response.json()
+      const data = await api.get('/api/vrnetlab/vendors')
       if (data.success) {
         setSupportedVendors(data.vendors)
       }
@@ -120,11 +109,7 @@ function VRNetLabManager() {
       formData.append('platform', uploadForm.platform)
       formData.append('version', uploadForm.version)
 
-      const response = await fetch(`${apiBase}/api/vrnetlab/upload`, {
-        method: 'POST',
-        body: formData
-      })
-
+      const response = await api.postFormData('/api/vrnetlab/upload', formData)
       const data = await response.json()
 
       if (response.ok && data.success) {
@@ -154,21 +139,13 @@ function VRNetLabManager() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/build`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          image_id: buildForm.imageId,
-          container_name: buildForm.containerName || undefined,
-          container_tag: buildForm.containerTag
-        })
+      const data = await api.post('/api/vrnetlab/build', {
+        image_id: buildForm.imageId,
+        container_name: buildForm.containerName || undefined,
+        container_tag: buildForm.containerTag
       })
 
-      const data = await response.json()
-
-      if (response.ok && data.success) {
+      if (data.success) {
         alert(`Container build started: ${data.container_name}\\nBuild ID: ${data.build_id}`)
         setBuildForm({ imageId: '', containerName: '', containerTag: 'latest' })
         await fetchBuilds()
@@ -186,13 +163,9 @@ function VRNetLabManager() {
   const initializeVRNetlab = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/init`, {
-        method: 'POST'
-      })
+      const data = await api.post('/api/vrnetlab/init', {})
 
-      const data = await response.json()
-
-      if (response.ok && data.success) {
+      if (data.success) {
         alert('VRNetlab repository initialized successfully!')
       } else {
         alert(`Initialization failed: ${data.error || 'Unknown error'}`)
@@ -211,13 +184,9 @@ function VRNetLabManager() {
     }
 
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/images/${imageId}`, {
-        method: 'DELETE'
-      })
+      const data = await api.delete(`/api/vrnetlab/images/${imageId}`)
 
-      const data = await response.json()
-
-      if (response.ok && data.success) {
+      if (data.success) {
         alert(data.message)
         await fetchVmImages()
       } else {
@@ -231,10 +200,9 @@ function VRNetLabManager() {
 
   const getBuildStatus = async (buildId) => {
     try {
-      const response = await fetch(`${apiBase}/api/vrnetlab/builds/${buildId}/status`)
-      const data = await response.json()
+      const data = await api.get(`/api/vrnetlab/builds/${buildId}/status`)
       
-      if (response.ok && data.success) {
+      if (data.success) {
         // Update the specific build in the builds array
         setBuilds(prevBuilds => 
           prevBuilds.map(build => 

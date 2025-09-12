@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './TopologyControls.css'
+import { getApiBase, api } from '../../utils/api'
 
 function TopologyControls({ 
   topology, 
@@ -16,13 +17,6 @@ function TopologyControls({
   const [savedTopologies, setSavedTopologies] = useState([])
   const [loading, setLoading] = useState(false)
 
-  const getApiBase = () => {
-    const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
-    return window.location.hostname.includes('replit.dev') 
-      ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
-      : `${window.location.protocol}//${window.location.hostname}:8000`
-  }
-  const apiBase = getApiBase()
 
   const handleSave = async () => {
     if (!saveName.trim()) {
@@ -59,11 +53,8 @@ function TopologyControls({
 
   const loadSavedTopologies = async () => {
     try {
-      const response = await fetch(`${apiBase}/api/lab-builder/saved`)
-      if (response.ok) {
-        const data = await response.json()
-        setSavedTopologies(data.topologies || [])
-      }
+      const data = await api.get('/api/lab-builder/saved')
+      setSavedTopologies(data.topologies || [])
     } catch (error) {
       console.error('Error loading saved topologies:', error)
     }
@@ -73,15 +64,8 @@ function TopologyControls({
     if (!confirm('Are you sure you want to delete this topology?')) return
     
     try {
-      const response = await fetch(`${apiBase}/api/lab-builder/saved/${topologyId}`, {
-        method: 'DELETE'
-      })
-      
-      if (response.ok) {
-        loadSavedTopologies() // Refresh the list
-      } else {
-        alert('Failed to delete topology')
-      }
+      await api.delete(`/api/lab-builder/saved/${topologyId}`)
+      loadSavedTopologies() // Refresh the list
     } catch (error) {
       console.error('Error deleting topology:', error)
       alert('Failed to delete topology')

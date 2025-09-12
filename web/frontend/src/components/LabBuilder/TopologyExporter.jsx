@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import './TopologyExporter.css'
+import { getApiBase, api } from '../../utils/api'
 
 function TopologyExporter({ topology, onClose, onExport, onGitHubExport }) {
   const [exportFormat, setExportFormat] = useState('clab')
@@ -159,28 +160,13 @@ function TopologyExporter({ topology, onClose, onExport, onGitHubExport }) {
       await onExport(`${topology.name}-${Date.now()}`)
       
       // Then attempt to launch it
-      const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
-      const apiBase = window.location.hostname.includes('replit.dev') 
-        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
-        : `${window.location.protocol}//${window.location.hostname}:8000`
-      const response = await fetch(`${apiBase}/api/lab-builder/launch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          topology: generateContainerlabYAML(),
-          name: topology.name
-        })
+      const data = await api.post('/api/lab-builder/launch', {
+        topology: generateContainerlabYAML(),
+        name: topology.name
       })
       
-      if (response.ok) {
-        alert('Topology exported and launched successfully!')
-        onClose()
-      } else {
-        const error = await response.json()
-        alert(`Failed to launch topology: ${error.message}`)
-      }
+      alert('Topology exported and launched successfully!')
+      onClose()
     } catch (error) {
       console.error('Error saving and launching:', error)
       alert('Failed to save and launch topology')

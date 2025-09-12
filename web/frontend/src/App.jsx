@@ -5,6 +5,7 @@ import LabBuilder from './components/LabBuilder'
 import CodespacesDeployment from './components/CodespacesDeployment'
 import ErrorBoundary from './components/ErrorBoundary'
 import './components/ErrorBoundary.css'
+import { getApiBase, api } from './utils/api'
 
 function App() {
   const [labs, setLabs] = useState([])
@@ -19,19 +20,11 @@ function App() {
 
   const fetchData = async () => {
     try {
-      // API base - determine correct endpoint for Replit environment
-      // Use internal network IP for API calls in Replit environment
-      const apiBase = 'http://172.31.93.98:8000'
-      
-      const [labsRes, containersRes, activeLabsRes] = await Promise.all([
-        fetch(`${apiBase}/api/labs?include_github=true&include_repositories=true`),
-        fetch(`${apiBase}/api/containers`),
-        fetch(`${apiBase}/api/labs/active`)
+      const [labsData, containersData, activeLabsData] = await Promise.all([
+        api.getWithParams('/api/labs', { include_github: true, include_repositories: true }),
+        api.get('/api/containers'),
+        api.get('/api/labs/active')
       ])
-      
-      const labsData = await labsRes.json()
-      const containersData = await containersRes.json()
-      const activeLabsData = await activeLabsRes.json()
       
       setLabs(labsData)
       setContainers(containersData)
@@ -113,12 +106,7 @@ function App() {
   const refreshContainers = async () => {
     setLoading(true)
     try {
-      // Use internal network IP for API calls in Replit environment
-      const apiBase = 'http://172.31.93.98:8000'
-      const response = await fetch(`${apiBase}/api/containers/refresh`, {
-        method: 'POST'
-      })
-      const data = await response.json()
+      const data = await api.post('/api/containers/refresh', {})
       setContainers(data.containers)
     } catch (error) {
       console.error('Error refreshing containers:', error)
@@ -130,15 +118,9 @@ function App() {
   const scanGitHubLabs = async () => {
     setLoading(true)
     try {
-      // Use internal network IP for API calls in Replit environment
-      const apiBase = 'http://172.31.93.98:8000'
-      const response = await fetch(`${apiBase}/api/labs/scan`, {
-        method: 'POST'
-      })
-      const data = await response.json()
+      await api.post('/api/labs/scan', {})
       // Refresh labs after scanning
-      const labsRes = await fetch(`${apiBase}/api/labs?include_github=true`)
-      const labsData = await labsRes.json()
+      const labsData = await api.getWithParams('/api/labs', { include_github: true })
       setLabs(labsData)
     } catch (error) {
       console.error('Error scanning GitHub labs:', error)
@@ -158,27 +140,12 @@ function App() {
         return
       }
       
-      // Use internal network IP for API calls in Replit environment
-      const apiBase = 'http://172.31.93.98:8000'
-      const response = await fetch(`${apiBase}/api/labs/launch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ lab_file_path: labFilePath })
-      })
+      const data = await api.post('/api/labs/launch', { lab_file_path: labFilePath })
+      alert(`Lab "${data.lab_name}" launched successfully!`)
       
-      if (response.ok) {
-        const data = await response.json()
-        alert(`Lab "${data.lab_name}" launched successfully!`)
-        // Refresh active labs
-        const activeLabsRes = await fetch(`${apiBase}/api/labs/active`)
-        const activeLabsData = await activeLabsRes.json()
-        setActiveLabs(activeLabsData.active_labs || [])
-      } else {
-        const error = await response.json()
-        alert(`Failed to launch lab: ${error.detail?.message || error.message || 'Unknown error'}`)
-      }
+      // Refresh active labs
+      const activeLabsData = await api.get('/api/labs/active')
+      setActiveLabs(activeLabsData.active_labs || [])
     } catch (error) {
       console.error('Error launching lab:', error)
       alert('Error launching lab. Please check if containerlab is installed.')
@@ -190,23 +157,12 @@ function App() {
   const stopLab = async (labId) => {
     setLoading(true)
     try {
-      // Use internal network IP for API calls in Replit environment
-      const apiBase = 'http://172.31.93.98:8000'
-      const response = await fetch(`${apiBase}/api/labs/${labId}/stop`, {
-        method: 'POST'
-      })
+      const data = await api.post(`/api/labs/${labId}/stop`, {})
+      alert(data.message)
       
-      if (response.ok) {
-        const data = await response.json()
-        alert(data.message)
-        // Refresh active labs
-        const activeLabsRes = await fetch(`${apiBase}/api/labs/active`)
-        const activeLabsData = await activeLabsRes.json()
-        setActiveLabs(activeLabsData.active_labs || [])
-      } else {
-        const error = await response.json()
-        alert(`Failed to stop lab: ${error.detail?.message || 'Unknown error'}`)
-      }
+      // Refresh active labs
+      const activeLabsData = await api.get('/api/labs/active')
+      setActiveLabs(activeLabsData.active_labs || [])
     } catch (error) {
       console.error('Error stopping lab:', error)
       alert('Error stopping lab')

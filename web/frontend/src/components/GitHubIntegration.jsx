@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './GitHubIntegration.css'
+import { getApiBase, api } from '../utils/api'
 
 function GitHubIntegration({ topology, onClose }) {
   const [repositories, setRepositories] = useState([])
@@ -9,13 +10,6 @@ function GitHubIntegration({ topology, onClose }) {
   const [newRepoName, setNewRepoName] = useState('')
   const [createNew, setCreateNew] = useState(false)
 
-  let apiBase = 'http://localhost:8000'
-  if (window.location.hostname.includes('replit.dev')) {
-    const hostname = window.location.hostname
-    const replitBase = hostname.split('.')[0]
-    const replitDomain = hostname.split('.').slice(1).join('.')
-    apiBase = `${window.location.protocol}//${replitBase.replace(/(-\d+-|-00-)/, '-8000-')}.${replitDomain}`
-  }
 
   useEffect(() => {
     fetchUserRepositories()
@@ -24,15 +18,8 @@ function GitHubIntegration({ topology, onClose }) {
   const fetchUserRepositories = async () => {
     try {
       setLoading(true)
-      const apiBase = getApiBase()
-      const response = await fetch(`${apiBase}/api/github/repositories`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        setRepositories(data.repositories || [])
-      } else {
-        setExportStatus('Failed to fetch GitHub repositories. Please ensure GitHub is connected.')
-      }
+      const data = await api.get('/api/github/repositories')
+      setRepositories(data.repositories || [])
     } catch (error) {
       console.error('Error fetching repositories:', error)
       setExportStatus('Error connecting to GitHub API')
@@ -55,32 +42,20 @@ function GitHubIntegration({ topology, onClose }) {
         ? [repositories[0]?.owner?.login || 'user', newRepoName]
         : selectedRepo.split('/')
 
-      const response = await fetch(`${apiBase}/api/github/export-to-codespaces`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          topology: topology,
-          repo_owner: repoOwner,
-          repo_name: repoName
-        })
+      const data = await api.post('/api/github/export-to-codespaces', {
+        topology: topology,
+        repo_owner: repoOwner,
+        repo_name: repoName
       })
-
-      if (response.ok) {
-        const data = await response.json()
-        setExportStatus(
-          <div>
-            <p>✅ Lab exported successfully!</p>
-            <p><strong>Repository:</strong> <a href={data.repository_url} target="_blank" rel="noopener noreferrer">{data.repository_url}</a></p>
-            <p><strong>Open in Codespaces:</strong> <a href={data.codespaces_url} target="_blank" rel="noopener noreferrer">Launch Codespace</a></p>
-            <p><strong>Files created:</strong> {data.files_created.join(', ')}</p>
-          </div>
-        )
-      } else {
-        const error = await response.json()
-        setExportStatus(`Export failed: ${error.detail?.message || error.message || 'Unknown error'}`)
-      }
+      
+      setExportStatus(
+        <div>
+          <p>✅ Lab exported successfully!</p>
+          <p><strong>Repository:</strong> <a href={data.repository_url} target="_blank" rel="noopener noreferrer">{data.repository_url}</a></p>
+          <p><strong>Open in Codespaces:</strong> <a href={data.codespaces_url} target="_blank" rel="noopener noreferrer">Launch Codespace</a></p>
+          <p><strong>Files created:</strong> {data.files_created.join(', ')}</p>
+        </div>
+      )
     } catch (error) {
       console.error('Error exporting to Codespaces:', error)
       setExportStatus('Failed to export lab to GitHub Codespaces')
