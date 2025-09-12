@@ -10,6 +10,16 @@ The system is designed to run in GitHub Codespaces with full containerlab suppor
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**December 12, 2025:**
+- ✅ **Complete GitHub Codespaces Integration**: Full export functionality for labs to GitHub Codespaces with devcontainer configuration, containerlab extension, and VSCode workspace setup
+- ✅ **NetLab Automation System**: Integrated netlab for template-based lab generation with async subprocess handling
+- ✅ **Security Enhancements**: Added authentication guards for sensitive endpoints and production safeguards
+- ✅ **GitHub Actions Workflow**: Comprehensive CI/CD pipeline for lab validation, deployment, and health monitoring
+- ✅ **Enhanced Lab Builder**: Visual drag-and-drop topology designer with real-time validation and multi-format export
+- ✅ **Fixed Frontend Environment**: Converted all process.env references to import.meta.env for Vite compatibility
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -17,6 +27,7 @@ The frontend is built as a React application using Vite as the build tool. It pr
 - **React 19.1.1** with modern hooks and functional components
 - **Vite 7.1.5** for fast development and optimized builds
 - **Component-based architecture** for lab builders, container catalogs, and topology management
+- **GitHub Codespaces Export**: Direct export to GitHub with complete development environment setup
 - **Responsive design** optimized for both development and production environments
 
 ### Backend Architecture
