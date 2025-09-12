@@ -49,9 +49,9 @@ app = FastAPI(title="LabDabbler - Master Lab Repository", version="1.0.0", lifes
 # Configure CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5000", "https://*.replit.dev"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -288,14 +288,14 @@ async def validate_container_compatibility(
 @app.get("/api/containers/recommendations/{lab_type}")
 async def get_recommended_containers(
     lab_type: str,
-    lab_description: str = None,
-    protocols: str = None,  # Comma-separated list
+    lab_description: str | None = None,
+    protocols: str | None = None,  # Comma-separated list
     limit: int = 10
 ):
     """Get recommended containers for a specific lab type"""
-    protocol_list = protocols.split(",") if protocols else None
+    protocol_list = protocols.split(",") if protocols else []
     recommendations = await container_service.get_recommended_containers_for_lab(
-        lab_type, lab_description, protocol_list, limit
+        lab_type, lab_description or "", protocol_list, limit
     )
     return recommendations
 
