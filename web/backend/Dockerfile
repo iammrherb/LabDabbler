@@ -71,10 +71,11 @@ EXPOSE 8000
 # Switch to non-root user
 USER labdabbler
 
-# Set environment variables
+# Set environment variables  
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 ENV ENVIRONMENT=production
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Start the application (ensure we're in the correct directory)
 CMD ["sh", "-c", "cd /app && python -m uvicorn app:app --host 0.0.0.0 --port 8000 --workers 4 --access-log --log-level info"]
