@@ -159,7 +159,10 @@ function TopologyExporter({ topology, onClose, onExport }) {
       await onExport(`${topology.name}-${Date.now()}`)
       
       // Then attempt to launch it
-      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const apiBase = window.location.hostname.includes('replit.dev') 
+        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+        : `${window.location.protocol}//${window.location.hostname}:8000`
       const response = await fetch(`${apiBase}/api/lab-builder/launch`, {
         method: 'POST',
         headers: {
