@@ -76,5 +76,5 @@ ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 ENV ENVIRONMENT=production
 
-# Start the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--access-log", "--log-level", "info"]
+# Start the application (ensure we're in the correct directory)
+CMD ["sh", "-c", "cd /app && python -m uvicorn app:app --host 0.0.0.0 --port 8000 --workers 4 --access-log --log-level info"]
