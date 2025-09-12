@@ -17,10 +17,9 @@ function RepositoryManager() {
   })
 
   const getApiBase = () => {
-    const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
     return window.location.hostname.includes('replit.dev') 
-      ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
-      : `${window.location.protocol}//${window.location.hostname}:8000`
+      ? `${window.location.protocol}//${window.location.hostname.replace('-00-', '-8000-')}`
+      : 'http://localhost:8000'
   }
 
   useEffect(() => {
