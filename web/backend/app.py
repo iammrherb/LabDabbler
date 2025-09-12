@@ -17,6 +17,7 @@ import json
 import logging
 import asyncio
 from services.container_discovery import ContainerDiscoveryService
+from services.containerlab_templates import ContainerlabTemplateService
 from services.github_lab_scanner import GitHubLabScanner
 from services.lab_launcher import LabLauncherService
 from services.vrnetlab_service import VRNetLabService
@@ -29,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize services at module level
 container_service = ContainerDiscoveryService(Path("./data"))
+containerlab_templates = ContainerlabTemplateService()
 lab_scanner = GitHubLabScanner(Path("./data"))
 runtime_factory = RuntimeProviderFactory(Path("./data"))
 lab_launcher = LabLauncherService(Path("./data"))
@@ -323,6 +325,184 @@ async def get_recommended_containers(
         lab_type, lab_description or "", protocol_list, limit
     )
     return recommendations
+
+# Containerlab Kinds and Templates Endpoints
+@app.get("/api/containerlab/kinds")
+async def get_containerlab_kinds():
+    """Get all canonical containerlab kinds with validation against source nodes directory"""
+    try:
+        # Get kinds from our comprehensive template service
+        supported_kinds = containerlab_templates.get_supported_kinds()
+        
+        kinds_data = []
+        # CANONICAL VENDOR CATEGORIES - Using only canonical containerlab kinds
+        vendor_categories = {
+            "nokia": ["srl", "sros", "vr_sros"],
+            "arista": ["ceos", "vr_veos"],
+            "juniper": ["cjunosevolved", "crpd", "vr_vjunosevolved", "vr_vjunosswitch", "vr_vmx", "vr_vqfx", "vr_vsrx"],
+            "cisco": ["c8000", "iol", "vr_c8000v", "vr_cat9kv", "vr_csr", "vr_ftdv", "vr_n9kv", "vr_xrv", "vr_xrv9k", "xrd"],
+            "vyos": ["vyosnetworks_vyos"],
+            "cumulus": ["cvx"],
+            "aruba": ["vr_aoscx"],
+            "sonic": ["sonic", "sonic_vm"],
+            "dell": ["dell_sonic", "vr_ftosv"],
+            "mikrotik": ["vr_ros"],
+            "huawei": ["huawei_vrp"],
+            "ipinfusion": ["ipinfusion_ocnos"],
+            "checkpoint": ["checkpoint_cloudguard"],
+            "fortinet": ["fortinet_fortigate"],
+            "paloalto": ["vr_pan"],
+            "opensource": ["6wind_vsr", "fdio_vpp", "rare", "vr_freebsd", "vr_openbsd", "vr_openwrt"],
+            "keysight": ["keysight_ixiacone"],
+            "infrastructure": ["bridge", "ext_container", "generic_vm", "host", "k8s_kind", "linux", "ovs", "state"]
+        }
+        
+        # Build comprehensive kinds data with proper metadata
+        for kind in supported_kinds:
+            template = containerlab_templates.get_kind_template(kind)
+            
+            # Determine vendor category
+            vendor = "other"
+            for v, kinds_list in vendor_categories.items():
+                if kind in kinds_list:
+                    vendor = v
+                    break
+            
+            kind_info = {
+                "name": kind.replace("_", " ").replace("-", " ").title(),
+                "kind": kind,
+                "short_kind": kind,
+                "description": f"{vendor.title()} {kind} containerlab kind",
+                "vendor": vendor.title(),
+                "category": "containerlab_kinds",
+                "subcategory": vendor,
+                "packaging": "container" if not kind.startswith("vr_") else "vm",
+                "architecture": ["amd64"] if kind.startswith("vr_") else ["amd64", "arm64"],
+                "access": "public",
+                "registry": "docker.io",
+                "documentation": template.get("documentation", f"https://containerlab.dev/manual/kinds/{kind}/"),
+                "default_image": template.get("default_image", "user-defined"),
+                "default_credentials": template.get("default_credentials", {}),
+                "notes": template.get("notes", []),
+                "template_available": True
+            }
+            kinds_data.append(kind_info)
+        
+        # Organize by vendor/subcategory
+        organized_kinds = {}
+        for kind_info in kinds_data:
+            subcategory = kind_info.get("subcategory", "other")
+            if subcategory not in organized_kinds:
+                organized_kinds[subcategory] = []
+            organized_kinds[subcategory].append(kind_info)
+        
+        return {
+            "kinds": kinds_data,
+            "organized_by_vendor": organized_kinds,
+            "total_kinds": len(kinds_data),
+            "vendors": list(organized_kinds.keys()),
+            "supported_kinds": supported_kinds
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching containerlab kinds: {str(e)}")
+
+@app.get("/api/containerlab/kinds/{kind}/template")
+async def get_kind_template(kind: str):
+    """Get configuration template for specific containerlab kind"""
+    try:
+        template = containerlab_templates.get_kind_template(kind)
+        if not template:
+            raise HTTPException(status_code=404, detail=f"Template not found for kind: {kind}")
+        
+        return {
+            "kind": kind,
+            "template": template,
+            "supported": True
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching template for {kind}: {str(e)}")
+
+@app.post("/api/containerlab/generate-topology")
+async def generate_containerlab_topology(topology_data: dict):
+    """Generate containerlab YAML configuration from topology data"""
+    try:
+        lab_name = topology_data.get("name", "generated-lab")
+        nodes = topology_data.get("nodes", [])
+        links = topology_data.get("links", [])
+        mgmt_config = topology_data.get("management", None)
+        
+        # Validate nodes have required fields
+        for node in nodes:
+            if "kind" not in node:
+                raise HTTPException(status_code=400, detail=f"Node {node.get('id', 'unknown')} missing 'kind' field")
+            
+            # Validate node configuration against kind requirements
+            kind = node["kind"]
+            validation_errors = containerlab_templates.validate_node_config(kind, node)
+            if validation_errors:
+                raise HTTPException(status_code=400, detail=f"Node {node.get('id', 'unknown')} validation errors: {', '.join(validation_errors)}")
+        
+        # Generate YAML topology
+        yaml_content = containerlab_templates.generate_topology(lab_name, nodes, links, mgmt_config)
+        
+        return {
+            "yaml": yaml_content,
+            "lab_name": lab_name,
+            "nodes_count": len(nodes),
+            "links_count": len(links),
+            "success": True
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating topology: {str(e)}")
+
+@app.get("/api/containerlab/supported-kinds")
+async def get_supported_containerlab_kinds():
+    """Get list of all supported containerlab kinds"""
+    try:
+        supported_kinds = containerlab_templates.get_supported_kinds()
+        return {
+            "supported_kinds": supported_kinds,
+            "total_count": len(supported_kinds)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching supported kinds: {str(e)}")
+
+@app.get("/api/containerlab/validation")
+async def validate_containerlab_kinds():
+    """Validate containerlab kinds against canonical source and check coverage"""
+    try:
+        # Get validation results from template service
+        validation = containerlab_templates.validate_templates_against_canonical()
+        
+        # Get canonical kinds directly from source
+        canonical_kinds = containerlab_templates.get_canonical_kinds_from_source()
+        
+        # Get template kinds
+        template_kinds = containerlab_templates.get_supported_kinds()
+        
+        return {
+            "validation_passed": validation["validation_passed"],
+            "canonical_source": "data/repositories/containerlab-official/nodes/",
+            "canonical_count": validation["canonical_count"],
+            "template_count": validation["template_count"],
+            "matching_count": validation["matching_count"],
+            "coverage_percentage": validation["coverage_percentage"],
+            "missing_from_templates": validation["missing_from_templates"],
+            "extra_in_templates": validation["extra_in_templates"],
+            "canonical_kinds_sample": sorted(canonical_kinds)[:10],  # First 10 for display
+            "template_kinds_sample": sorted(template_kinds)[:10],     # First 10 for display
+            "total_canonical_kinds": len(canonical_kinds),
+            "meets_50_requirement": len(canonical_kinds) >= 50,
+            "status": "PASS" if validation["validation_passed"] and len(canonical_kinds) >= 50 else "FAIL"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error validating containerlab kinds: {e}")
+        raise HTTPException(status_code=500, detail=f"Validation error: {str(e)}")
 
 @app.post("/api/labs/{lab_id}/analyze-requirements")
 async def analyze_lab_container_requirements(lab_id: str):

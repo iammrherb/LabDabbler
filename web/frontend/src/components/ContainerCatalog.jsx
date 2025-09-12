@@ -8,6 +8,7 @@ function ContainerCatalog() {
   const [vendors, setVendors] = useState([])
   const [architectures, setArchitectures] = useState([])
   const [stats, setStats] = useState({})
+  const [containerlabKinds, setContainerlabKinds] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -38,17 +39,19 @@ function ContainerCatalog() {
   const fetchInitialData = async () => {
     try {
       setLoading(true)
-      const [categoriesData, vendorsData, architecturesData, statsData] = await Promise.all([
+      const [categoriesData, vendorsData, architecturesData, statsData, containerlabData] = await Promise.all([
         api.get('/api/containers/categories'),
         api.get('/api/containers/vendors'),
         api.get('/api/containers/architectures'),
-        api.get('/api/containers/stats')
+        api.get('/api/containers/stats'),
+        api.get('/api/containerlab/kinds')
       ])
 
       setCategories(categoriesData.categories)
       setVendors(vendorsData.vendors)
       setArchitectures(architecturesData.architectures)
       setStats(statsData)
+      setContainerlabKinds(containerlabData)
 
       // Trigger initial search
       searchContainers()
@@ -190,6 +193,10 @@ function ContainerCatalog() {
           <div className="stat-card">
             <span className="stat-number">{stats.total_containers || 0}</span>
             <span className="stat-label">Containers</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-number">{containerlabKinds.total_kinds || 0}</span>
+            <span className="stat-label">Containerlab Kinds</span>
           </div>
           <div className="stat-card">
             <span className="stat-number">{stats.total_categories || 0}</span>
@@ -342,6 +349,55 @@ function ContainerCatalog() {
 
         {viewMode === 'categories' && (
           <div className="category-view">
+            {/* Containerlab Kinds Section */}
+            {containerlabKinds.organized_by_vendor && (
+              <div className="category-section containerlab-kinds">
+                <div className="category-header">
+                  <h3>
+                    <span className="category-icon">🏗️</span>
+                    Containerlab Network Kinds
+                    <span className="category-count">({containerlabKinds.total_kinds || 0})</span>
+                  </h3>
+                  <p className="category-description">Official containerlab network device kinds organized by vendor</p>
+                </div>
+                <div className="containerlab-vendors">
+                  {Object.entries(containerlabKinds.organized_by_vendor).map(([vendor, kinds]) => (
+                    <div key={vendor} className="vendor-section">
+                      <h4 className="vendor-name">{vendor.charAt(0).toUpperCase() + vendor.slice(1)}</h4>
+                      <div className="vendor-kinds">
+                        {kinds.slice(0, 6).map((kind, index) => (
+                          <div key={index} className="kind-card">
+                            <div className="kind-header">
+                              <h5>{kind.name}</h5>
+                              <span className="kind-type">{kind.packaging}</span>
+                            </div>
+                            <p className="kind-description">{kind.description}</p>
+                            <div className="kind-meta">
+                              <span className="kind-vendor">{kind.vendor}</span>
+                              <span className="kind-access">{kind.access}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {kinds.length > 6 && (
+                          <button 
+                            className="show-more-btn"
+                            onClick={() => {
+                              setSelectedCategory('containerlab_kinds')
+                              setSelectedVendor(vendor)
+                              setViewMode('grid')
+                            }}
+                          >
+                            +{kinds.length - 6} more {vendor} kinds
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Regular Categories */}
             {Object.entries(categories).map(([categoryId, category]) => (
               <div key={categoryId} className="category-section">
                 <div className="category-header">

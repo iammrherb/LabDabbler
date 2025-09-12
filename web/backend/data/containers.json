@@ -1,4 +1,1053 @@
 {
+  "containerlab_kinds": [
+    {
+      "name": "Nokia SR Linux",
+      "image": "ghcr.io/nokia/srlinux:latest",
+      "kind": "nokia_srlinux",
+      "short_kind": "srl",
+      "description": "Nokia SR Linux Network OS - Containerized",
+      "vendor": "Nokia",
+      "category": "containerlab_kinds",
+      "subcategory": "nokia",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "ghcr.io",
+      "documentation": "https://learn.srlinux.dev/",
+      "config_template": {
+        "type": "ixr-d2l",
+        "env": {
+          "TINI_SUBREAPER": "1"
+        },
+        "syscalls": [
+          "sys_admin",
+          "sys_ptrace"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN"
+        ]
+      },
+      "supported_versions": [
+        "latest",
+        "24.10.1",
+        "24.7.2",
+        "24.3.3"
+      ],
+      "default_credentials": {
+        "username": "admin",
+        "password": "NokiaSrl1!"
+      }
+    },
+    {
+      "name": "Nokia SR OS",
+      "image": "vrnetlab/vr-sros:latest",
+      "kind": "nokia_sros",
+      "short_kind": "vr-sros",
+      "description": "Nokia SR OS - VM-based",
+      "vendor": "Nokia",
+      "category": "containerlab_kinds",
+      "subcategory": "nokia",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-sros/",
+      "config_template": {
+        "license": "/path/to/license.txt",
+        "env": {
+          "CONNECTION_MODE": "vrnetlab"
+        },
+        "syscalls": [
+          "sys_admin",
+          "sys_resource"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_RESOURCE"
+        ]
+      },
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Nokia SR SIM",
+      "image": "nokia/srsim:latest",
+      "kind": "nokia_srsim",
+      "short_kind": "srsim",
+      "description": "Nokia SR OS Simulator - Containerized",
+      "vendor": "Nokia",
+      "category": "containerlab_kinds",
+      "subcategory": "nokia",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build from Nokia sources",
+      "documentation": "https://containerlab.dev/manual/kinds/sros/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Arista cEOS",
+      "image": "ceos:latest",
+      "kind": "arista_ceos",
+      "short_kind": "ceos",
+      "description": "Arista Container EOS - Native Container",
+      "vendor": "Arista",
+      "category": "containerlab_kinds",
+      "subcategory": "arista",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "registration_required",
+      "registry": "arista.com (manual download)",
+      "documentation": "https://containerlab.dev/manual/kinds/ceos/",
+      "download_url": "https://www.arista.com/en/support/software-download",
+      "config_template": {
+        "env": {
+          "CEOS": "1",
+          "EOS_PLATFORM": "ceossim",
+          "container": "docker"
+        },
+        "syscalls": [
+          "sys_admin"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_NICE",
+          "NET_BROADCAST",
+          "SYS_PTRACE"
+        ]
+      },
+      "supported_versions": [
+        "latest",
+        "4.32.0F",
+        "4.31.2F",
+        "4.30.5M"
+      ],
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Arista vEOS",
+      "image": "vrnetlab/vr-veos:latest",
+      "kind": "arista_veos",
+      "short_kind": "vr-veos",
+      "description": "Arista vEOS Switch - VM-based",
+      "vendor": "Arista",
+      "category": "containerlab_kinds",
+      "subcategory": "arista",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-veos/",
+      "config_template": {
+        "env": {
+          "CONNECTION_MODE": "vrnetlab"
+        },
+        "syscalls": [
+          "sys_admin",
+          "sys_resource"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_RESOURCE"
+        ]
+      },
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper cRPD",
+      "image": "crpd:latest",
+      "kind": "juniper_crpd",
+      "short_kind": "crpd",
+      "description": "Juniper Containerized Routing Protocol Daemon",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "registration_required",
+      "registry": "enterprise-hub.juniper.net",
+      "documentation": "https://containerlab.dev/manual/kinds/crpd/",
+      "config_template": {
+        "env": {
+          "CRPD": "1"
+        },
+        "syscalls": [
+          "sys_admin"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_PTRACE"
+        ]
+      },
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper vMX",
+      "image": "vrnetlab/vr-vmx:latest",
+      "kind": "juniper_vmx",
+      "short_kind": "vr-vmx",
+      "description": "Juniper vMX Router - VM-based",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-vmx/",
+      "config_template": {
+        "env": {
+          "CONNECTION_MODE": "vrnetlab"
+        },
+        "syscalls": [
+          "sys_admin",
+          "sys_resource"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_RESOURCE"
+        ]
+      },
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper vQFX",
+      "image": "vrnetlab/vr-vqfx:latest",
+      "kind": "juniper_vqfx",
+      "short_kind": "vr-vqfx",
+      "description": "Juniper vQFX Switch - VM-based",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-vqfx/",
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper vSRX",
+      "image": "vrnetlab/vr-vsrx:latest",
+      "kind": "juniper_vsrx",
+      "short_kind": "vr-vsrx",
+      "description": "Juniper vSRX Firewall - VM-based",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-vsrx/",
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper vJunos Router",
+      "image": "vrnetlab/vr-vjunosrouter:latest",
+      "kind": "juniper_vjunosrouter",
+      "short_kind": "vr-vjunosrouter",
+      "description": "Juniper vJunos Router - VM-based",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-vjunosrouter/",
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper vJunos Switch",
+      "image": "vrnetlab/vr-vjunosswitch:latest",
+      "kind": "juniper_vjunosswitch",
+      "short_kind": "vr-vjunosswitch",
+      "description": "Juniper vJunos Switch - VM-based",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-vjunosswitch/",
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Juniper vJunos Evolved",
+      "image": "vrnetlab/vr-vjunosevolved:latest",
+      "kind": "juniper_vjunosevolved",
+      "short_kind": "vr-vjunosevolved",
+      "description": "Juniper vJunos Evolved - VM-based",
+      "vendor": "Juniper",
+      "category": "containerlab_kinds",
+      "subcategory": "juniper",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-vjunosevolved/",
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Cisco XRd",
+      "image": "localhost/ios-xr:latest",
+      "kind": "cisco_xrd",
+      "short_kind": "xrd",
+      "description": "Cisco XRd Container Router",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "cco_required",
+      "registry": "software.cisco.com (manual download)",
+      "documentation": "https://containerlab.dev/manual/kinds/xrd/",
+      "config_template": {
+        "env": {
+          "XR_FIRST_BOOT_CONFIG": "/etc/xrd/startup.cfg"
+        },
+        "syscalls": [
+          "sys_admin"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_PTRACE",
+          "NET_RAW"
+        ]
+      },
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco XRv9k",
+      "image": "vrnetlab/vr-xrv9k:latest",
+      "kind": "cisco_xrv9k",
+      "short_kind": "vr-xrv9k",
+      "description": "Cisco IOS XRv9000 - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-xrv9k/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco XRv",
+      "image": "vrnetlab/vr-xrv:latest",
+      "kind": "cisco_xrv",
+      "short_kind": "vr-xrv",
+      "description": "Cisco IOS XRv Router - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-xrv/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco CSR 1000v",
+      "image": "vrnetlab/vr-csr:latest",
+      "kind": "cisco_csr1000v",
+      "short_kind": "vr-csr",
+      "description": "Cisco CSR 1000v Router - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-csr/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco Nexus 9000v",
+      "image": "vrnetlab/vr-n9kv:latest",
+      "kind": "cisco_n9kv",
+      "short_kind": "vr-n9kv",
+      "description": "Cisco Nexus 9000v Switch - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-n9kv/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco Catalyst 8000v",
+      "image": "vrnetlab/vr-c8000v:latest",
+      "kind": "cisco_c8000",
+      "short_kind": "c8000",
+      "description": "Cisco Catalyst 8000v Router - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM+",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/c8000/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco Catalyst 9000v",
+      "image": "vrnetlab/vr-cat9kv:latest",
+      "kind": "cisco_cat9kv",
+      "short_kind": "vr-cat9kv",
+      "description": "Cisco Catalyst 9000v Switch - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-cat9kv/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco IOL",
+      "image": "vrnetlab/cisco_iol:latest",
+      "kind": "cisco_iol",
+      "short_kind": "iol",
+      "description": "Cisco IOS on Linux - Container-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "container",
+      "architecture": [
+        "i386"
+      ],
+      "access": "build_required",
+      "registry": "Build with cisco/cisco_iol",
+      "documentation": "https://containerlab.dev/manual/kinds/cisco_iol/",
+      "default_credentials": {
+        "username": "clab",
+        "password": "clab@123"
+      }
+    },
+    {
+      "name": "Cisco FTDv",
+      "image": "vrnetlab/vr-ftdv:latest",
+      "kind": "cisco_ftdv",
+      "short_kind": "vr-ftdv",
+      "description": "Cisco Firepower Threat Defense Virtual - VM-based",
+      "vendor": "Cisco",
+      "category": "containerlab_kinds",
+      "subcategory": "cisco",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-ftdv/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "Admin123"
+      }
+    },
+    {
+      "name": "Cumulus VX",
+      "image": "cumulus-vx:latest",
+      "kind": "cumulus_cvx",
+      "short_kind": "cvx",
+      "description": "Cumulus VX Switch - Container-based",
+      "vendor": "Cumulus Networks",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "registration_required",
+      "registry": "NVIDIA Cumulus (manual download)",
+      "documentation": "https://containerlab.dev/manual/kinds/cvx/",
+      "default_credentials": {
+        "username": "cumulus",
+        "password": "cumulus"
+      }
+    },
+    {
+      "name": "Aruba ArubaOS-CX",
+      "image": "vrnetlab/vr-aoscx:latest",
+      "kind": "aruba_aoscx",
+      "short_kind": "vr-aoscx",
+      "description": "Aruba ArubaOS-CX Switch - VM-based",
+      "vendor": "Aruba Networks",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-aoscx/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "SONiC",
+      "image": "docker-sonic-vs:latest",
+      "kind": "sonic",
+      "short_kind": "sonic-vs",
+      "description": "Microsoft SONiC Virtual Switch",
+      "vendor": "Microsoft/SONiC",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "build_required",
+      "registry": "Build from Azure Pipeline",
+      "documentation": "https://containerlab.dev/manual/kinds/sonic-vs/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "SONiC VM",
+      "image": "vrnetlab/sonic-vm:latest",
+      "kind": "sonic_vm",
+      "short_kind": "sonic-vm",
+      "description": "Microsoft SONiC Virtual Machine",
+      "vendor": "Microsoft/SONiC",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/sonic-vm/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Dell FTOS",
+      "image": "vrnetlab/vr-ftosv:latest",
+      "kind": "dell_ftos",
+      "short_kind": "vr-ftosv",
+      "description": "Dell FTOS10v Switch - VM-based",
+      "vendor": "Dell Technologies",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-ftosv/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Dell SONiC",
+      "image": "vrnetlab/dell_sonic:latest",
+      "kind": "dell_sonic",
+      "short_kind": "dell-sonic",
+      "description": "Dell SONiC Switch - VM-based",
+      "vendor": "Dell Technologies",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/dell_sonic/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "MikroTik RouterOS",
+      "image": "vrnetlab/vr-ros:latest",
+      "kind": "mikrotik_ros",
+      "short_kind": "vr-ros",
+      "description": "MikroTik RouterOS - VM-based",
+      "vendor": "MikroTik",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-ros/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Huawei VRP",
+      "image": "vrnetlab/huawei_vrp:latest",
+      "kind": "huawei_vrp",
+      "short_kind": "huawei-vrp",
+      "description": "Huawei VRP Router - VM-based",
+      "vendor": "Huawei",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/huawei_vrp/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "IPInfusion OcNOS",
+      "image": "vrnetlab/ipinfusion-ocnos:latest",
+      "kind": "ipinfusion_ocnos",
+      "short_kind": "ipinfusion-ocnos",
+      "description": "IPInfusion OcNOS Switch - VM-based",
+      "vendor": "IPInfusion",
+      "category": "containerlab_kinds",
+      "subcategory": "other_vendors",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/ipinfusion-ocnos/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Check Point CloudGuard",
+      "image": "vrnetlab/checkpoint_cloudguard:latest",
+      "kind": "checkpoint_cloudguard",
+      "short_kind": "checkpoint-cloudguard",
+      "description": "Check Point CloudGuard Firewall - VM-based",
+      "vendor": "Check Point",
+      "category": "containerlab_kinds",
+      "subcategory": "security",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/checkpoint_cloudguard/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Fortinet FortiGate",
+      "image": "vrnetlab/fortinet_fortigate:latest",
+      "kind": "fortinet_fortigate",
+      "short_kind": "fortinet-fortigate",
+      "description": "Fortinet FortiGate Firewall - VM-based",
+      "vendor": "Fortinet",
+      "category": "containerlab_kinds",
+      "subcategory": "security",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/fortinet_fortigate/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Palo Alto PAN-OS",
+      "image": "vrnetlab/vr-pan:latest",
+      "kind": "paloalto_panos",
+      "short_kind": "vr-pan",
+      "description": "Palo Alto PAN-OS Firewall - VM-based",
+      "vendor": "Palo Alto Networks",
+      "category": "containerlab_kinds",
+      "subcategory": "security",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-pan/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "FD.io VPP",
+      "image": "ligato/vpp-base:latest",
+      "kind": "fdio_vpp",
+      "short_kind": "vpp",
+      "description": "FD.io Vector Packet Processing - Container-based",
+      "vendor": "FD.io Project",
+      "category": "containerlab_kinds",
+      "subcategory": "opensource",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io/ligato",
+      "documentation": "https://containerlab.dev/manual/kinds/fdio_vpp/",
+      "default_credentials": {
+        "username": "root",
+        "password": "root"
+      }
+    },
+    {
+      "name": "6WIND VSR",
+      "image": "6wind/6wind-vsr:latest",
+      "kind": "6wind_vsr",
+      "short_kind": "6wind-vsr",
+      "description": "6WIND Virtual Service Router - Container-based",
+      "vendor": "6WIND",
+      "category": "containerlab_kinds",
+      "subcategory": "opensource",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "registration_required",
+      "registry": "6WIND Registry",
+      "documentation": "https://containerlab.dev/manual/kinds/6wind_vsr/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "RARE/freeRtr",
+      "image": "rare/freeRtr:latest",
+      "kind": "rare",
+      "short_kind": "rare",
+      "description": "RARE/freeRtr Router - Container-based",
+      "vendor": "RARE Project",
+      "category": "containerlab_kinds",
+      "subcategory": "opensource",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io/rare",
+      "documentation": "https://containerlab.dev/manual/kinds/rare-freertr/",
+      "default_credentials": {
+        "username": "rare",
+        "password": "rare"
+      }
+    },
+    {
+      "name": "Keysight ixia-c-one",
+      "image": "ghcr.io/open-traffic-generator/ixia-c-one:latest",
+      "kind": "keysight_ixia-c-one",
+      "short_kind": "ixia-c-one",
+      "description": "Keysight Ixia-c-One Traffic Generator",
+      "vendor": "Keysight Technologies",
+      "category": "containerlab_kinds",
+      "subcategory": "specialized",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "ghcr.io/open-traffic-generator",
+      "documentation": "https://containerlab.dev/manual/kinds/keysight_ixia-c-one/",
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "OpenBSD",
+      "image": "vrnetlab/openbsd:latest",
+      "kind": "openbsd",
+      "short_kind": "openbsd",
+      "description": "OpenBSD Operating System - VM-based",
+      "vendor": "OpenBSD Project",
+      "category": "containerlab_kinds",
+      "subcategory": "opensource",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "build_required",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/openbsd/",
+      "default_credentials": {
+        "username": "root",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Linux Container",
+      "image": "alpine:latest",
+      "kind": "linux",
+      "short_kind": "linux",
+      "description": "Generic Linux Container",
+      "vendor": "Linux Foundation",
+      "category": "containerlab_kinds",
+      "subcategory": "infrastructure",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io",
+      "documentation": "https://containerlab.dev/manual/kinds/linux/",
+      "config_template": {
+        "env": {
+          "CONTAINER_TYPE": "linux"
+        },
+        "capabilities": [
+          "NET_ADMIN"
+        ]
+      },
+      "default_credentials": {
+        "username": "root",
+        "password": "root"
+      }
+    },
+    {
+      "name": "Linux Bridge",
+      "image": "busybox:latest",
+      "kind": "bridge",
+      "short_kind": "bridge",
+      "description": "Linux Bridge - Software Bridge",
+      "vendor": "Linux Kernel",
+      "category": "containerlab_kinds",
+      "subcategory": "infrastructure",
+      "packaging": "N/A",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io",
+      "documentation": "https://containerlab.dev/manual/kinds/bridge/",
+      "config_template": {
+        "capabilities": [
+          "NET_ADMIN"
+        ]
+      }
+    },
+    {
+      "name": "OVS Bridge",
+      "image": "openvswitch/ovs:latest",
+      "kind": "ovs-bridge",
+      "short_kind": "ovs-bridge",
+      "description": "OpenVSwitch Bridge - Software Switch",
+      "vendor": "Open vSwitch",
+      "category": "containerlab_kinds",
+      "subcategory": "infrastructure",
+      "packaging": "N/A",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "public",
+      "registry": "docker.io/openvswitch",
+      "documentation": "https://containerlab.dev/manual/kinds/ovs-bridge/",
+      "config_template": {
+        "capabilities": [
+          "NET_ADMIN",
+          "SYS_ADMIN"
+        ]
+      }
+    },
+    {
+      "name": "External Container",
+      "image": "any:latest",
+      "kind": "ext-container",
+      "short_kind": "ext-container",
+      "description": "External Container - Use existing container",
+      "vendor": "User-defined",
+      "category": "containerlab_kinds",
+      "subcategory": "infrastructure",
+      "packaging": "container",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "user_defined",
+      "registry": "User-defined",
+      "documentation": "https://containerlab.dev/manual/kinds/ext-container/"
+    },
+    {
+      "name": "Host",
+      "image": "N/A",
+      "kind": "host",
+      "short_kind": "host",
+      "description": "Host System - Connect to host network",
+      "vendor": "Host System",
+      "category": "containerlab_kinds",
+      "subcategory": "infrastructure",
+      "packaging": "N/A",
+      "architecture": [
+        "amd64",
+        "arm64"
+      ],
+      "access": "host_system",
+      "registry": "N/A",
+      "documentation": "https://containerlab.dev/manual/kinds/host/"
+    },
+    {
+      "name": "Generic VM",
+      "image": "any-vm:latest",
+      "kind": "generic_vm",
+      "short_kind": "generic-vm",
+      "description": "Generic Virtual Machine - User-defined VM",
+      "vendor": "User-defined",
+      "category": "containerlab_kinds",
+      "subcategory": "infrastructure",
+      "packaging": "VM",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "user_defined",
+      "registry": "Build with hellt/vrnetlab",
+      "documentation": "https://containerlab.dev/manual/kinds/generic_vm/"
+    }
+  ],
   "portnox": [
     {
       "name": "portnox-tacacs",
@@ -3614,5 +4663,5 @@
       "use_case": "Feature-rich RSS feed aggregator"
     }
   ],
-  "last_updated": "100404.611801752"
+  "last_updated": "113409.287455656"
 }

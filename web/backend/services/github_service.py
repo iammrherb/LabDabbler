@@ -516,3 +516,182 @@ cd web/backend && python app.py &
                 "success": False,
                 "error": str(e)
             }
+    
+    async def deploy_to_codespaces(self, lab_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Deploy lab data to GitHub Codespaces"""
+        try:
+            # Extract topology information
+            topology = lab_data.get("topology", {})
+            repo_owner = lab_data.get("repo_owner", "")
+            repo_name = lab_data.get("repo_name", "")
+            
+            if not repo_owner or not repo_name:
+                return {
+                    "success": False,
+                    "error": "Repository owner and name are required"
+                }
+            
+            # Create lab package with Codespaces configuration
+            lab_package = await self.create_lab_package(topology, {})
+            if not lab_package["success"]:
+                return lab_package
+                
+            # Push to GitHub repository
+            result = await self.push_lab_to_github(repo_owner, repo_name, lab_package)
+            
+            if result["success"]:
+                result["codespaces_url"] = f"https://github.com/codespaces/new?repo={repo_owner}/{repo_name}"
+                result["message"] = f"Lab deployed to GitHub Codespaces: {repo_owner}/{repo_name}"
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Failed to deploy to Codespaces: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": "Failed to deploy lab to GitHub Codespaces"
+            }
+    
+    async def export_to_github_repo(self, lab_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Export lab data to a GitHub repository"""
+        try:
+            # Extract topology information
+            topology = lab_data.get("topology", {})
+            repo_owner = lab_data.get("repo_owner", "")
+            repo_name = lab_data.get("repo_name", "")
+            
+            if not repo_owner or not repo_name:
+                return {
+                    "success": False,
+                    "error": "Repository owner and name are required"
+                }
+            
+            # Create lab package
+            lab_package = await self.create_lab_package(topology, {})
+            if not lab_package["success"]:
+                return lab_package
+                
+            # Push to GitHub repository
+            result = await self.push_lab_to_github(repo_owner, repo_name, lab_package)
+            
+            if result["success"]:
+                result["message"] = f"Lab exported to GitHub repository: {repo_owner}/{repo_name}"
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Failed to export to GitHub repo: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": "Failed to export lab to GitHub repository"
+            }
+    
+    def get_popular_lab_repositories(self) -> List[Dict[str, Any]]:
+        """Get list of popular containerlab repositories for quick deployment"""
+        try:
+            # Popular containerlab repositories for learning and templates
+            popular_repos = [
+                {
+                    "name": "srl-labs/containerlab",
+                    "description": "Official Containerlab repository with examples and documentation",
+                    "url": "https://github.com/srl-labs/containerlab",
+                    "stars": "2.8k",
+                    "category": "Official",
+                    "tags": ["containerlab", "networking", "labs"]
+                },
+                {
+                    "name": "hellt/containerlab-labs",
+                    "description": "Collection of containerlab topologies and examples",
+                    "url": "https://github.com/hellt/containerlab-labs",
+                    "stars": "300+",
+                    "category": "Community",
+                    "tags": ["labs", "examples", "networking"]
+                },
+                {
+                    "name": "learn-srlinux/learn-srlinux",
+                    "description": "Nokia SR Linux learning labs using containerlab",
+                    "url": "https://github.com/learn-srlinux/learn-srlinux",
+                    "stars": "200+",
+                    "category": "Vendor",
+                    "tags": ["srlinux", "nokia", "tutorials"]
+                },
+                {
+                    "name": "packetanglers/containerlab-topologies",
+                    "description": "Various network topologies for containerlab",
+                    "url": "https://github.com/packetanglers/containerlab-topologies",
+                    "stars": "150+",
+                    "category": "Community",
+                    "tags": ["topologies", "network-design", "labs"]
+                },
+                {
+                    "name": "aristanetworks/avd-containerlab",
+                    "description": "Arista AVD with containerlab integration",
+                    "url": "https://github.com/aristanetworks/avd-containerlab",
+                    "stars": "100+",
+                    "category": "Vendor",
+                    "tags": ["arista", "avd", "automation"]
+                }
+            ]
+            
+            return popular_repos
+            
+        except Exception as e:
+            logger.error(f"Failed to get popular repositories: {e}")
+            return []
+    
+    async def get_repository_info(self, repo_full_name: str) -> Dict[str, Any]:
+        """Get information about a specific GitHub repository"""
+        try:
+            headers = await self.get_authenticated_headers()
+            
+            async with aiohttp.ClientSession() as session:
+                # Get repository information
+                repo_url = f"{self.github_api_base}/repos/{repo_full_name}"
+                async with session.get(repo_url, headers=headers) as response:
+                    if response.status != 200:
+                        return {
+                            "success": False,
+                            "error": f"Repository {repo_full_name} not found or inaccessible"
+                        }
+                    
+                    repo_data = await response.json()
+                
+                # Search for containerlab files
+                owner, name = repo_full_name.split("/", 1)
+                lab_files = await self.search_containerlab_files(owner, name)
+                
+                # Get contents of root directory
+                contents = await self.get_repository_contents(owner, name)
+                
+                return {
+                    "success": True,
+                    "repository": {
+                        "name": repo_data.get("name"),
+                        "full_name": repo_data.get("full_name"),
+                        "description": repo_data.get("description"),
+                        "html_url": repo_data.get("html_url"),
+                        "clone_url": repo_data.get("clone_url"),
+                        "ssh_url": repo_data.get("ssh_url"),
+                        "stars": repo_data.get("stargazers_count", 0),
+                        "forks": repo_data.get("forks_count", 0),
+                        "language": repo_data.get("language"),
+                        "created_at": repo_data.get("created_at"),
+                        "updated_at": repo_data.get("updated_at"),
+                        "private": repo_data.get("private", False),
+                        "archived": repo_data.get("archived", False)
+                    },
+                    "lab_files": lab_files,
+                    "contents": contents,
+                    "lab_count": len(lab_files),
+                    "has_containerlab": len(lab_files) > 0
+                }
+                
+        except Exception as e:
+            logger.error(f"Failed to get repository info for {repo_full_name}: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"Failed to get information for repository {repo_full_name}"
+            }
