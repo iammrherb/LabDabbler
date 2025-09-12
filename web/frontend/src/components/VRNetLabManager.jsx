@@ -27,7 +27,13 @@ function VRNetLabManager() {
   })
 
   // Get API base URL
-  const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+  const getApiBase = () => {
+    const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+    return window.location.hostname.includes('replit.dev') 
+      ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+      : `${window.location.protocol}//${window.location.hostname}:8000`
+  }
+  const apiBase = getApiBase()
 
   useEffect(() => {
     fetchAllData()

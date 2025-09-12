@@ -20,8 +20,11 @@ function App() {
 
   const fetchData = async () => {
     try {
-      // Use backend API via port 8000
-      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      // Use backend API - in Replit, use the same domain but different port mapping
+      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const apiBase = window.location.hostname.includes('replit.dev') 
+        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+        : `${window.location.protocol}//${window.location.hostname}:8000`
       const [labsRes, containersRes, activeLabsRes] = await Promise.all([
         fetch(`${apiBase}/api/labs?include_github=true&include_repositories=true`),
         fetch(`${apiBase}/api/containers`),
@@ -45,7 +48,10 @@ function App() {
   const refreshContainers = async () => {
     setLoading(true)
     try {
-      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const apiBase = window.location.hostname.includes('replit.dev') 
+        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+        : `${window.location.protocol}//${window.location.hostname}:8000`
       const response = await fetch(`${apiBase}/api/containers/refresh`, {
         method: 'POST'
       })
@@ -61,7 +67,10 @@ function App() {
   const scanGitHubLabs = async () => {
     setLoading(true)
     try {
-      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const apiBase = window.location.hostname.includes('replit.dev') 
+        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+        : `${window.location.protocol}//${window.location.hostname}:8000`
       const response = await fetch(`${apiBase}/api/labs/scan`, {
         method: 'POST'
       })
@@ -88,7 +97,10 @@ function App() {
         return
       }
       
-      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const apiBase = window.location.hostname.includes('replit.dev') 
+        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+        : `${window.location.protocol}//${window.location.hostname}:8000`
       const response = await fetch(`${apiBase}/api/labs/launch`, {
         method: 'POST',
         headers: {
@@ -119,7 +131,10 @@ function App() {
   const stopLab = async (labId) => {
     setLoading(true)
     try {
-      const apiBase = window.location.protocol + '//' + window.location.hostname + ':8000'
+      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const apiBase = window.location.hostname.includes('replit.dev') 
+        ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
+        : `${window.location.protocol}//${window.location.hostname}:8000`
       const response = await fetch(`${apiBase}/api/labs/${labId}/stop`, {
         method: 'POST'
       })

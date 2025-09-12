@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set, Any, Union
 from pathlib import Path
 import logging
 
@@ -1901,7 +1901,7 @@ class ContainerDiscoveryService:
                     
         return sorted(list(architectures))
         
-    async def validate_container_compatibility(self, container: Dict, lab_type: str, protocols: List[str] = None) -> Dict:
+    async def validate_container_compatibility(self, container: Dict, lab_type: str, protocols: Optional[List[str]] = None) -> Dict:
         """Validate if a container is compatible with a specific lab type"""
         compatibility_score = 0
         recommendations = []
@@ -1973,7 +1973,7 @@ class ContainerDiscoveryService:
             "warnings": warnings
         }
         
-    async def get_recommended_containers_for_lab(self, lab_type: str, lab_description: str = None, protocols: List[str] = None, limit: int = 10) -> Dict:
+    async def get_recommended_containers_for_lab(self, lab_type: str, lab_description: Optional[str] = None, protocols: Optional[List[str]] = None, limit: int = 10) -> Dict:
         """Get recommended containers for a specific lab type"""
         all_containers = await self.discover_all_containers()
         recommendations = []
@@ -1998,11 +1998,14 @@ class ContainerDiscoveryService:
         
     async def analyze_lab_container_requirements(self, lab_config: Dict) -> Dict:
         """Analyze a lab configuration and suggest required containers"""
-        suggestions = {
+        suggestions: Dict[str, Any] = {
             "required_containers": [],
             "optional_containers": [],
             "missing_categories": [],
-            "analysis": []
+            "analysis": [],
+            "lab_type": "",
+            "node_count": 0,
+            "detected_kinds": []
         }
         
         # Extract information from lab config
