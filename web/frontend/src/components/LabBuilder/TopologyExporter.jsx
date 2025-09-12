@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import './TopologyExporter.css'
 import { getApiBase, api } from '../../utils/api'
 
@@ -123,14 +123,32 @@ function TopologyExporter({ topology, onClose, onExport, onGitHubExport }) {
     return yamlLines.join('\n')
   }
 
-  const exportContent = useMemo(() => {
-    if (exportFormat === 'clab') {
-      const labConfig = generateContainerlabYAML()
-      return generateYAMLString(labConfig)
-    } else if (exportFormat === 'json') {
-      return JSON.stringify(topology, null, 2)
+  const [exportContent, setExportContent] = useState('')
+  const [generatingContent, setGeneratingContent] = useState(false)
+  
+  // Generate export content using backend when possible
+  useEffect(() => {
+    const generateContent = async () => {
+      if (exportFormat === 'clab') {
+        setGeneratingContent(true)
+        try {
+          const backendContent = await generateTopologyWithBackend()
+          setExportContent(backendContent)
+        } catch (error) {
+          console.error('Backend generation failed, using fallback:', error)
+          const labConfig = generateContainerlabYAML()
+          setExportContent(generateYAMLString(labConfig))
+        } finally {
+          setGeneratingContent(false)
+        }
+      } else if (exportFormat === 'json') {
+        setExportContent(JSON.stringify(topology, null, 2))
+      } else {
+        setExportContent('')
+      }
     }
-    return ''
+    
+    generateContent()
   }, [topology, exportFormat, containerPrefix, includeManagement, managementNetwork])
 
   const downloadFile = () => {
@@ -154,14 +172,63 @@ function TopologyExporter({ topology, onClose, onExport, onGitHubExport }) {
     alert('Content copied to clipboard!')
   }
 
+  const generateTopologyWithBackend = async () => {
+    try {
+      // Use backend endpoint to generate proper containerlab YAML
+      const nodes = Object.values(topology.nodes).map(node => ({
+        id: node.name,
+        kind: node.kind,
+        image: node.image,
+        type: node.type,
+        env: node.env || {},
+        ports: node.ports || [],
+        binds: node.binds || [],
+        volumes: node.volumes || [],
+        startup_config: node.startup_config,
+        license: node.license,
+        sysctls: node.sysctls || {},
+        capabilities: node.capabilities || [],
+        privileged: node.privileged
+      }))
+      
+      const links = topology.links.map(link => ({
+        endpoints: [
+          `${topology.nodes[link.endpoints[0].node].name}:${link.endpoints[0].interface}`,
+          `${topology.nodes[link.endpoints[1].node].name}:${link.endpoints[1].interface}`
+        ]
+      }))
+      
+      const mgmtConfig = includeManagement ? {
+        network: managementNetwork,
+        ipv4_subnet: '172.20.20.0/24'
+      } : undefined
+      
+      const response = await api.post('/api/containerlab/generate-topology', {
+        lab_name: topology.name,
+        nodes: nodes,
+        links: links,
+        mgmt_config: mgmtConfig
+      })
+      
+      return response.yaml
+    } catch (error) {
+      console.error('Error generating topology with backend:', error)
+      // Fallback to client-side generation
+      return generateYAMLString(generateContainerlabYAML())
+    }
+  }
+  
   const saveAndLaunch = async () => {
     try {
       // First save the topology
       await onExport(`${topology.name}-${Date.now()}`)
       
+      // Generate YAML using backend
+      const yamlContent = await generateTopologyWithBackend()
+      
       // Then attempt to launch it
       const data = await api.post('/api/lab-builder/launch', {
-        topology: generateContainerlabYAML(),
+        topology_yaml: yamlContent,
         name: topology.name
       })
       
@@ -317,10 +384,11 @@ function TopologyExporter({ topology, onClose, onExport, onGitHubExport }) {
                   <span>{Object.keys(topology.nodes).length} nodes</span>
                   <span>{topology.links.length} links</span>
                   <span>{exportContent.split('\n').length} lines</span>
+                  {generatingContent && <span>⏳ Generating...</span>}
                 </div>
               </div>
               <pre className="preview-content">
-                {exportContent}
+                {generatingContent ? 'Generating topology YAML...' : exportContent}
               </pre>
             </div>
           </div>

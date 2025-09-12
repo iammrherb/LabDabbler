@@ -57,7 +57,12 @@ const getCategoryDisplayName = (category) => {
 }
 
 const getContainerKind = (container) => {
-  // Determine containerlab kind based on container info
+  // If it's a containerlab kind, use the exact kind
+  if (container.isContainerlabKind && container.kind) {
+    return container.kind
+  }
+  
+  // Determine containerlab kind based on container info for regular containers
   if (container.kind) return container.kind
   
   const image = container.image || ''
@@ -65,15 +70,15 @@ const getContainerKind = (container) => {
   const name = (container.name || '').toLowerCase()
   
   // Network OS specific kinds
-  if (image.includes('srlinux')) return 'nokia_srlinux'
-  if (image.includes('ceos')) return 'arista_ceos'
-  if (image.includes('sros')) return 'nokia_sros'
-  if (image.includes('juniper')) return 'juniper'
-  if (image.includes('cisco')) return 'cisco'
-  if (vendor.includes('nokia')) return 'nokia_srlinux'
-  if (vendor.includes('arista')) return 'arista_ceos'
-  if (vendor.includes('juniper')) return 'juniper'
-  if (vendor.includes('cisco')) return 'cisco'
+  if (image.includes('srlinux')) return 'srl'
+  if (image.includes('ceos')) return 'ceos'
+  if (image.includes('sros')) return 'sros'
+  if (image.includes('juniper')) return 'vr_vmx'
+  if (image.includes('cisco')) return 'vr_csr'
+  if (vendor.includes('nokia')) return 'srl'
+  if (vendor.includes('arista')) return 'ceos'
+  if (vendor.includes('juniper')) return 'vr_vmx'
+  if (vendor.includes('cisco')) return 'vr_csr'
   
   // Default to linux for most containers
   return 'linux'

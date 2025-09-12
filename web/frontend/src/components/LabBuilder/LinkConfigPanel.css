@@ -1,0 +1,573 @@
+/* Link Configuration Panel Styles */
+.link-config-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: white;
+  border-left: 1px solid #ddd;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.link-config-panel .config-header {
+  background: #2c3e50;
+  color: white;
+  padding: 1rem;
+  border-bottom: 1px solid #34495e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.link-config-panel .config-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.link-config-panel .header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-config-panel .delete-button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.link-config-panel .delete-button:hover {
+  background: #c0392b;
+}
+
+.link-config-panel .close-button {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  line-height: 1;
+}
+
+.link-config-panel .close-button:hover {
+  color: #ecf0f1;
+}
+
+.link-config-panel .config-tabs {
+  display: flex;
+  background: #ecf0f1;
+  border-bottom: 1px solid #bdc3c7;
+  overflow-x: auto;
+}
+
+.link-config-panel .tab {
+  background: transparent;
+  border: none;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #7f8c8d;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.link-config-panel .tab:hover {
+  background: #d5dbdb;
+  color: #2c3e50;
+}
+
+.link-config-panel .tab.active {
+  color: #2c3e50;
+  border-bottom-color: #3498db;
+  background: white;
+}
+
+.link-config-panel .config-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.link-config-panel .tab-content {
+  padding: 1.2rem;
+  height: 100%;
+}
+
+.link-config-panel .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.link-config-panel .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.link-config-panel .form-group input,
+.link-config-panel .form-group select,
+.link-config-panel .form-group textarea {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.link-config-panel .form-group input:focus,
+.link-config-panel .form-group select:focus,
+.link-config-panel .form-group textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.link-config-panel .form-group small {
+  display: block;
+  margin-top: 0.3rem;
+  color: #7f8c8d;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+/* Link Type Info */
+.link-type-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #3498db;
+}
+
+.link-type-info .type-icon {
+  font-size: 1.2rem;
+}
+
+.link-type-info .type-description {
+  font-weight: 500;
+  color: #2c3e50;
+  flex: 1;
+}
+
+/* Connection Display */
+.link-summary {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.link-summary h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.connection-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.connection-display .endpoint {
+  flex: 1;
+  padding: 0.8rem;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.connection-display .endpoint strong {
+  display: block;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+
+.connection-display .endpoint small {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.connection-display .link-arrow {
+  padding: 0 1rem;
+  font-size: 1.2rem;
+  color: #3498db;
+}
+
+/* Endpoint Configuration */
+.endpoint-config {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+}
+
+.endpoint-config h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.endpoint-config .form-group {
+  margin-bottom: 1rem;
+}
+
+/* Input Rows */
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.input-row input,
+.input-row select {
+  flex: 1;
+}
+
+.input-row button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.input-row button:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.input-row button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* List Items */
+.sysctl-list,
+.capability-list {
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sysctl-item,
+.capability-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 0.3rem;
+}
+
+.sysctl-key,
+.capability-name {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.8rem;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.sysctl-value {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.8rem;
+  color: #27ae60;
+  min-width: 60px;
+  text-align: right;
+}
+
+.sysctl-item button,
+.capability-item button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s;
+}
+
+.sysctl-item button:hover,
+.capability-item button:hover {
+  background: #c0392b;
+}
+
+/* Suggestions */
+.suggestions {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #e8f4fd;
+  border-radius: 4px;
+  border-left: 3px solid #3498db;
+}
+
+.suggestions small {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.suggested-sysctl,
+.suggested-capability {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+.suggested-sysctl code,
+.suggested-capability code {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.8rem;
+  background: white;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  border: 1px solid #bdc3c7;
+}
+
+.add-suggested {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s;
+}
+
+.add-suggested:hover {
+  background: #219a52;
+}
+
+/* Checkbox Labels */
+.form-group label input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* Advanced Info */
+.advanced-info {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #9b59b6;
+}
+
+.advanced-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.advanced-info p {
+  margin: 0 0 0.5rem 0;
+  color: #5d6d7e;
+  font-size: 0.9rem;
+}
+
+.advanced-info ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.advanced-info li {
+  margin-bottom: 0.3rem;
+  color: #5d6d7e;
+  font-size: 0.85rem;
+}
+
+/* Validation Issues */
+.validation-issues {
+  margin: 1rem;
+  padding: 1rem;
+  background: #fdf2f2;
+  border: 1px solid #f1948a;
+  border-radius: 4px;
+}
+
+.validation-issues h4 {
+  margin: 0 0 0.5rem 0;
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
+.validation-issues ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.validation-issues li {
+  margin-bottom: 0.3rem;
+  color: #c0392b;
+  font-size: 0.8rem;
+}
+
+/* Footer */
+.config-footer {
+  border-top: 1px solid #ecf0f1;
+  padding: 1rem;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-summary small {
+  color: #7f8c8d;
+  font-size: 0.8rem;
+}
+
+.config-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.validate-btn {
+  background: #f39c12;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+.validate-btn:hover {
+  background: #e67e22;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .link-config-panel {
+    width: 100%;
+    right: 0;
+  }
+  
+  .config-tabs {
+    font-size: 0.8rem;
+  }
+  
+  .tab-content {
+    padding: 1rem;
+  }
+  
+  .connection-display {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .connection-display .link-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .link-config-panel {
+    background: #2c3e50;
+    border-left-color: #34495e;
+  }
+  
+  .link-config-panel .config-header {
+    background: #1a252f;
+    border-bottom-color: #34495e;
+  }
+  
+  .link-config-panel .config-tabs {
+    background: #34495e;
+    border-bottom-color: #4a6741;
+  }
+  
+  .link-config-panel .tab {
+    color: #bdc3c7;
+  }
+  
+  .link-config-panel .tab.active {
+    background: #2c3e50;
+    color: #ecf0f1;
+  }
+  
+  .link-config-panel .tab-content {
+    background: #2c3e50;
+  }
+  
+  .link-config-panel .form-group label {
+    color: #ecf0f1;
+  }
+  
+  .link-config-panel .form-group input,
+  .link-config-panel .form-group select,
+  .link-config-panel .form-group textarea {
+    background: #34495e;
+    border-color: #4a6741;
+    color: #ecf0f1;
+  }
+  
+  .link-summary,
+  .endpoint-config,
+  .advanced-info {
+    background: #34495e;
+    border-color: #4a6741;
+  }
+  
+  .connection-display .endpoint {
+    background: #2c3e50;
+    border-color: #4a6741;
+  }
+  
+  .sysctl-item,
+  .capability-item {
+    background: #34495e;
+    border-color: #4a6741;
+  }
+  
+  .suggestions {
+    background: #1f3a5f;
+    border-left-color: #3498db;
+  }
+  
+  .config-footer {
+    background: #34495e;
+    border-top-color: #4a6741;
+  }
+}

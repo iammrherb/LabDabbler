@@ -3,7 +3,7 @@
     {
       "name": "Nokia SR Linux",
       "image": "ghcr.io/nokia/srlinux:latest",
-      "kind": "nokia_srlinux",
+      "kind": "srl",
       "short_kind": "srl",
       "description": "Nokia SR Linux Network OS - Containerized",
       "vendor": "Nokia",
@@ -44,10 +44,54 @@
     },
     {
       "name": "Nokia SR OS",
+      "image": "nokia/sros:latest",
+      "kind": "sros",
+      "short_kind": "sros",
+      "description": "Nokia SR OS - Container-based SR-SIM",
+      "vendor": "Nokia",
+      "category": "containerlab_kinds",
+      "subcategory": "nokia",
+      "packaging": "container",
+      "architecture": [
+        "amd64"
+      ],
+      "access": "public",
+      "registry": "nokia (manual download)",
+      "documentation": "https://containerlab.dev/manual/kinds/sros/",
+      "config_template": {
+        "type": "SR-1",
+        "env": {
+          "SRSIM": "1",
+          "NOKIA_SROS_CHASSIS": "SR-1",
+          "NOKIA_SROS_SYSTEM_BASE_MAC": "fa:ac:ff:ff:10:00",
+          "NOKIA_SROS_SLOT": "A"
+        },
+        "syscalls": [
+          "sys_admin"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_PTRACE"
+        ]
+      },
+      "supported_versions": [
+        "latest",
+        "23.10.1",
+        "23.7.1",
+        "23.3.1"
+      ],
+      "default_credentials": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "name": "Nokia SR OS (vr-sros)",
       "image": "vrnetlab/vr-sros:latest",
-      "kind": "nokia_sros",
-      "short_kind": "vr-sros",
-      "description": "Nokia SR OS - VM-based",
+      "kind": "vr_sros",
+      "short_kind": "vr_sros",
+      "description": "Nokia SR OS - VM-based using vrnetlab",
       "vendor": "Nokia",
       "category": "containerlab_kinds",
       "subcategory": "nokia",
@@ -79,30 +123,9 @@
       }
     },
     {
-      "name": "Nokia SR SIM",
-      "image": "nokia/srsim:latest",
-      "kind": "nokia_srsim",
-      "short_kind": "srsim",
-      "description": "Nokia SR OS Simulator - Containerized",
-      "vendor": "Nokia",
-      "category": "containerlab_kinds",
-      "subcategory": "nokia",
-      "packaging": "container",
-      "architecture": [
-        "amd64"
-      ],
-      "access": "build_required",
-      "registry": "Build from Nokia sources",
-      "documentation": "https://containerlab.dev/manual/kinds/sros/",
-      "default_credentials": {
-        "username": "admin",
-        "password": "admin"
-      }
-    },
-    {
       "name": "Arista cEOS",
       "image": "ceos:latest",
-      "kind": "arista_ceos",
+      "kind": "ceos",
       "short_kind": "ceos",
       "description": "Arista Container EOS - Native Container",
       "vendor": "Arista",
@@ -147,8 +170,8 @@
     {
       "name": "Arista vEOS",
       "image": "vrnetlab/vr-veos:latest",
-      "kind": "arista_veos",
-      "short_kind": "vr-veos",
+      "kind": "vr_veos",
+      "short_kind": "vr_veos",
       "description": "Arista vEOS Switch - VM-based",
       "vendor": "Arista",
       "category": "containerlab_kinds",
@@ -182,7 +205,7 @@
     {
       "name": "Juniper cRPD",
       "image": "crpd:latest",
-      "kind": "juniper_crpd",
+      "kind": "crpd",
       "short_kind": "crpd",
       "description": "Juniper Containerized Routing Protocol Daemon",
       "vendor": "Juniper",
@@ -217,8 +240,8 @@
     {
       "name": "Juniper vMX",
       "image": "vrnetlab/vr-vmx:latest",
-      "kind": "juniper_vmx",
-      "short_kind": "vr-vmx",
+      "kind": "vr_vmx",
+      "short_kind": "vr_vmx",
       "description": "Juniper vMX Router - VM-based",
       "vendor": "Juniper",
       "category": "containerlab_kinds",
@@ -252,8 +275,8 @@
     {
       "name": "Juniper vQFX",
       "image": "vrnetlab/vr-vqfx:latest",
-      "kind": "juniper_vqfx",
-      "short_kind": "vr-vqfx",
+      "kind": "vr_vqfx",
+      "short_kind": "vr_vqfx",
       "description": "Juniper vQFX Switch - VM-based",
       "vendor": "Juniper",
       "category": "containerlab_kinds",
@@ -273,8 +296,8 @@
     {
       "name": "Juniper vSRX",
       "image": "vrnetlab/vr-vsrx:latest",
-      "kind": "juniper_vsrx",
-      "short_kind": "vr-vsrx",
+      "kind": "vr_vsrx",
+      "short_kind": "vr_vsrx",
       "description": "Juniper vSRX Firewall - VM-based",
       "vendor": "Juniper",
       "category": "containerlab_kinds",
@@ -292,31 +315,10 @@
       }
     },
     {
-      "name": "Juniper vJunos Router",
-      "image": "vrnetlab/vr-vjunosrouter:latest",
-      "kind": "juniper_vjunosrouter",
-      "short_kind": "vr-vjunosrouter",
-      "description": "Juniper vJunos Router - VM-based",
-      "vendor": "Juniper",
-      "category": "containerlab_kinds",
-      "subcategory": "juniper",
-      "packaging": "VM",
-      "architecture": [
-        "amd64"
-      ],
-      "access": "build_required",
-      "registry": "Build with hellt/vrnetlab",
-      "documentation": "https://containerlab.dev/manual/kinds/vr-vjunosrouter/",
-      "default_credentials": {
-        "username": "root",
-        "password": "admin"
-      }
-    },
-    {
       "name": "Juniper vJunos Switch",
       "image": "vrnetlab/vr-vjunosswitch:latest",
-      "kind": "juniper_vjunosswitch",
-      "short_kind": "vr-vjunosswitch",
+      "kind": "vr_vjunosswitch",
+      "short_kind": "vr_vjunosswitch",
       "description": "Juniper vJunos Switch - VM-based",
       "vendor": "Juniper",
       "category": "containerlab_kinds",
@@ -336,8 +338,8 @@
     {
       "name": "Juniper vJunos Evolved",
       "image": "vrnetlab/vr-vjunosevolved:latest",
-      "kind": "juniper_vjunosevolved",
-      "short_kind": "vr-vjunosevolved",
+      "kind": "vr_vjunosevolved",
+      "short_kind": "vr_vjunosevolved",
       "description": "Juniper vJunos Evolved - VM-based",
       "vendor": "Juniper",
       "category": "containerlab_kinds",
@@ -357,7 +359,7 @@
     {
       "name": "Cisco XRd",
       "image": "localhost/ios-xr:latest",
-      "kind": "cisco_xrd",
+      "kind": "xrd",
       "short_kind": "xrd",
       "description": "Cisco XRd Container Router",
       "vendor": "Cisco",
@@ -392,8 +394,8 @@
     {
       "name": "Cisco XRv9k",
       "image": "vrnetlab/vr-xrv9k:latest",
-      "kind": "cisco_xrv9k",
-      "short_kind": "vr-xrv9k",
+      "kind": "vr_xrv9k",
+      "short_kind": "vr_xrv9k",
       "description": "Cisco IOS XRv9000 - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
@@ -413,8 +415,8 @@
     {
       "name": "Cisco XRv",
       "image": "vrnetlab/vr-xrv:latest",
-      "kind": "cisco_xrv",
-      "short_kind": "vr-xrv",
+      "kind": "vr_xrv",
+      "short_kind": "vr_xrv",
       "description": "Cisco IOS XRv Router - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
@@ -434,8 +436,8 @@
     {
       "name": "Cisco CSR 1000v",
       "image": "vrnetlab/vr-csr:latest",
-      "kind": "cisco_csr1000v",
-      "short_kind": "vr-csr",
+      "kind": "vr_csr",
+      "short_kind": "vr_csr",
       "description": "Cisco CSR 1000v Router - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
@@ -455,8 +457,8 @@
     {
       "name": "Cisco Nexus 9000v",
       "image": "vrnetlab/vr-n9kv:latest",
-      "kind": "cisco_n9kv",
-      "short_kind": "vr-n9kv",
+      "kind": "vr_n9kv",
+      "short_kind": "vr_n9kv",
       "description": "Cisco Nexus 9000v Switch - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
@@ -476,19 +478,33 @@
     {
       "name": "Cisco Catalyst 8000v",
       "image": "vrnetlab/vr-c8000v:latest",
-      "kind": "cisco_c8000",
-      "short_kind": "c8000",
+      "kind": "vr_c8000v",
+      "short_kind": "vr_c8000v",
       "description": "Cisco Catalyst 8000v Router - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
       "subcategory": "cisco",
-      "packaging": "VM+",
+      "packaging": "VM",
       "architecture": [
         "amd64"
       ],
       "access": "build_required",
       "registry": "Build with hellt/vrnetlab",
-      "documentation": "https://containerlab.dev/manual/kinds/c8000/",
+      "documentation": "https://containerlab.dev/manual/kinds/vr-c8000v/",
+      "config_template": {
+        "env": {
+          "CONNECTION_MODE": "vrnetlab"
+        },
+        "syscalls": [
+          "sys_admin",
+          "sys_resource"
+        ],
+        "capabilities": [
+          "SYS_ADMIN",
+          "NET_ADMIN",
+          "SYS_RESOURCE"
+        ]
+      },
       "default_credentials": {
         "username": "clab",
         "password": "clab@123"
@@ -497,8 +513,8 @@
     {
       "name": "Cisco Catalyst 9000v",
       "image": "vrnetlab/vr-cat9kv:latest",
-      "kind": "cisco_cat9kv",
-      "short_kind": "vr-cat9kv",
+      "kind": "vr_cat9kv",
+      "short_kind": "vr_cat9kv",
       "description": "Cisco Catalyst 9000v Switch - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
@@ -518,7 +534,7 @@
     {
       "name": "Cisco IOL",
       "image": "vrnetlab/cisco_iol:latest",
-      "kind": "cisco_iol",
+      "kind": "iol",
       "short_kind": "iol",
       "description": "Cisco IOS on Linux - Container-based",
       "vendor": "Cisco",
@@ -539,8 +555,8 @@
     {
       "name": "Cisco FTDv",
       "image": "vrnetlab/vr-ftdv:latest",
-      "kind": "cisco_ftdv",
-      "short_kind": "vr-ftdv",
+      "kind": "vr_ftdv",
+      "short_kind": "vr_ftdv",
       "description": "Cisco Firepower Threat Defense Virtual - VM-based",
       "vendor": "Cisco",
       "category": "containerlab_kinds",
@@ -560,7 +576,7 @@
     {
       "name": "Cumulus VX",
       "image": "cumulus-vx:latest",
-      "kind": "cumulus_cvx",
+      "kind": "cvx",
       "short_kind": "cvx",
       "description": "Cumulus VX Switch - Container-based",
       "vendor": "Cumulus Networks",
@@ -581,8 +597,8 @@
     {
       "name": "Aruba ArubaOS-CX",
       "image": "vrnetlab/vr-aoscx:latest",
-      "kind": "aruba_aoscx",
-      "short_kind": "vr-aoscx",
+      "kind": "vr_aoscx",
+      "short_kind": "vr_aoscx",
       "description": "Aruba ArubaOS-CX Switch - VM-based",
       "vendor": "Aruba Networks",
       "category": "containerlab_kinds",
@@ -603,7 +619,7 @@
       "name": "SONiC",
       "image": "docker-sonic-vs:latest",
       "kind": "sonic",
-      "short_kind": "sonic-vs",
+      "short_kind": "sonic",
       "description": "Microsoft SONiC Virtual Switch",
       "vendor": "Microsoft/SONiC",
       "category": "containerlab_kinds",
@@ -625,7 +641,7 @@
       "name": "SONiC VM",
       "image": "vrnetlab/sonic-vm:latest",
       "kind": "sonic_vm",
-      "short_kind": "sonic-vm",
+      "short_kind": "sonic_vm",
       "description": "Microsoft SONiC Virtual Machine",
       "vendor": "Microsoft/SONiC",
       "category": "containerlab_kinds",
@@ -645,8 +661,8 @@
     {
       "name": "Dell FTOS",
       "image": "vrnetlab/vr-ftosv:latest",
-      "kind": "dell_ftos",
-      "short_kind": "vr-ftosv",
+      "kind": "vr_ftosv",
+      "short_kind": "vr_ftosv",
       "description": "Dell FTOS10v Switch - VM-based",
       "vendor": "Dell Technologies",
       "category": "containerlab_kinds",
@@ -667,7 +683,7 @@
       "name": "Dell SONiC",
       "image": "vrnetlab/dell_sonic:latest",
       "kind": "dell_sonic",
-      "short_kind": "dell-sonic",
+      "short_kind": "dell_sonic",
       "description": "Dell SONiC Switch - VM-based",
       "vendor": "Dell Technologies",
       "category": "containerlab_kinds",
@@ -687,8 +703,8 @@
     {
       "name": "MikroTik RouterOS",
       "image": "vrnetlab/vr-ros:latest",
-      "kind": "mikrotik_ros",
-      "short_kind": "vr-ros",
+      "kind": "vr_ros",
+      "short_kind": "vr_ros",
       "description": "MikroTik RouterOS - VM-based",
       "vendor": "MikroTik",
       "category": "containerlab_kinds",
@@ -709,7 +725,7 @@
       "name": "Huawei VRP",
       "image": "vrnetlab/huawei_vrp:latest",
       "kind": "huawei_vrp",
-      "short_kind": "huawei-vrp",
+      "short_kind": "huawei_vrp",
       "description": "Huawei VRP Router - VM-based",
       "vendor": "Huawei",
       "category": "containerlab_kinds",
@@ -730,7 +746,7 @@
       "name": "IPInfusion OcNOS",
       "image": "vrnetlab/ipinfusion-ocnos:latest",
       "kind": "ipinfusion_ocnos",
-      "short_kind": "ipinfusion-ocnos",
+      "short_kind": "ipinfusion_ocnos",
       "description": "IPInfusion OcNOS Switch - VM-based",
       "vendor": "IPInfusion",
       "category": "containerlab_kinds",
@@ -751,7 +767,7 @@
       "name": "Check Point CloudGuard",
       "image": "vrnetlab/checkpoint_cloudguard:latest",
       "kind": "checkpoint_cloudguard",
-      "short_kind": "checkpoint-cloudguard",
+      "short_kind": "checkpoint_cloudguard",
       "description": "Check Point CloudGuard Firewall - VM-based",
       "vendor": "Check Point",
       "category": "containerlab_kinds",
@@ -772,7 +788,7 @@
       "name": "Fortinet FortiGate",
       "image": "vrnetlab/fortinet_fortigate:latest",
       "kind": "fortinet_fortigate",
-      "short_kind": "fortinet-fortigate",
+      "short_kind": "fortinet_fortigate",
       "description": "Fortinet FortiGate Firewall - VM-based",
       "vendor": "Fortinet",
       "category": "containerlab_kinds",
@@ -792,8 +808,8 @@
     {
       "name": "Palo Alto PAN-OS",
       "image": "vrnetlab/vr-pan:latest",
-      "kind": "paloalto_panos",
-      "short_kind": "vr-pan",
+      "kind": "vr_pan",
+      "short_kind": "vr_pan",
       "description": "Palo Alto PAN-OS Firewall - VM-based",
       "vendor": "Palo Alto Networks",
       "category": "containerlab_kinds",
@@ -836,7 +852,7 @@
       "name": "6WIND VSR",
       "image": "6wind/6wind-vsr:latest",
       "kind": "6wind_vsr",
-      "short_kind": "6wind-vsr",
+      "short_kind": "6wind_vsr",
       "description": "6WIND Virtual Service Router - Container-based",
       "vendor": "6WIND",
       "category": "containerlab_kinds",
@@ -878,8 +894,8 @@
     {
       "name": "Keysight ixia-c-one",
       "image": "ghcr.io/open-traffic-generator/ixia-c-one:latest",
-      "kind": "keysight_ixia-c-one",
-      "short_kind": "ixia-c-one",
+      "kind": "keysight_ixiacone",
+      "short_kind": "keysight_ixiacone",
       "description": "Keysight Ixia-c-One Traffic Generator",
       "vendor": "Keysight Technologies",
       "category": "containerlab_kinds",
@@ -899,7 +915,7 @@
     {
       "name": "OpenBSD",
       "image": "vrnetlab/openbsd:latest",
-      "kind": "openbsd",
+      "kind": "vr_openbsd",
       "short_kind": "openbsd",
       "description": "OpenBSD Operating System - VM-based",
       "vendor": "OpenBSD Project",
@@ -973,8 +989,8 @@
     {
       "name": "OVS Bridge",
       "image": "openvswitch/ovs:latest",
-      "kind": "ovs-bridge",
-      "short_kind": "ovs-bridge",
+      "kind": "ovs",
+      "short_kind": "ovs",
       "description": "OpenVSwitch Bridge - Software Switch",
       "vendor": "Open vSwitch",
       "category": "containerlab_kinds",
@@ -997,8 +1013,8 @@
     {
       "name": "External Container",
       "image": "any:latest",
-      "kind": "ext-container",
-      "short_kind": "ext-container",
+      "kind": "ext_container",
+      "short_kind": "ext_container",
       "description": "External Container - Use existing container",
       "vendor": "User-defined",
       "category": "containerlab_kinds",
@@ -1335,7 +1351,7 @@
     {
       "name": "Nokia SR Linux (Latest)",
       "image": "ghcr.io/nokia/srlinux:latest",
-      "kind": "nokia_srlinux",
+      "kind": "srl",
       "description": "Nokia SR Linux Network OS - Latest Release",
       "vendor": "Nokia",
       "category": "network_os_native",
@@ -1350,7 +1366,7 @@
     {
       "name": "Nokia SR Linux 24.10.1",
       "image": "ghcr.io/nokia/srlinux:24.10.1",
-      "kind": "nokia_srlinux",
+      "kind": "srl",
       "description": "Nokia SR Linux - ARM64 Native with Universal Support",
       "vendor": "Nokia",
       "category": "network_os_native",
@@ -1369,7 +1385,7 @@
     {
       "name": "Nokia SR Linux 24.7.2",
       "image": "ghcr.io/nokia/srlinux:24.7.2",
-      "kind": "nokia_srlinux",
+      "kind": "srl",
       "description": "Nokia SR Linux - Stable Release with NETCONF",
       "vendor": "Nokia",
       "category": "network_os_native",
@@ -1386,7 +1402,7 @@
     {
       "name": "Arista cEOS (Latest)",
       "image": "ceos:latest",
-      "kind": "arista_ceos",
+      "kind": "ceos",
       "description": "Arista Container EOS - Latest Release",
       "vendor": "Arista",
       "category": "network_os_native",
@@ -1402,7 +1418,7 @@
     {
       "name": "Arista cEOS 4.32.0F",
       "image": "ceos:4.32.0F",
-      "kind": "arista_ceos",
+      "kind": "ceos",
       "description": "Arista Container EOS - Stable 4.32.0F",
       "vendor": "Arista",
       "category": "network_os_native",
@@ -1415,7 +1431,7 @@
     {
       "name": "Cisco XRd Control Plane",
       "image": "localhost/ios-xr:latest",
-      "kind": "cisco_xrd",
+      "kind": "xrd",
       "description": "Cisco XRd Control Plane Router",
       "vendor": "Cisco",
       "category": "network_os_native",
@@ -1430,7 +1446,7 @@
     {
       "name": "Cisco XRd vRouter",
       "image": "localhost/xrd-vrouter:latest",
-      "kind": "cisco_xrd",
+      "kind": "xrd",
       "description": "Cisco XRd vRouter with Data Plane",
       "vendor": "Cisco",
       "category": "network_os_native",
@@ -1443,7 +1459,7 @@
     {
       "name": "Juniper cRPD Latest",
       "image": "enterprise-hub.juniper.net:443/crpd-docker-prod/crpd:latest",
-      "kind": "juniper_crpd",
+      "kind": "crpd",
       "description": "Juniper Containerized Routing Protocol Daemon",
       "vendor": "Juniper",
       "category": "network_os_native",
@@ -1463,7 +1479,7 @@
     {
       "name": "Juniper cRPD 24.2R1.14",
       "image": "enterprise-hub.juniper.net:443/crpd-docker-prod/crpd:24.2R1.14",
-      "kind": "juniper_crpd",
+      "kind": "crpd",
       "description": "Juniper cRPD - Stable 24.2R1.14 Release",
       "vendor": "Juniper",
       "category": "network_os_native",
@@ -1477,24 +1493,9 @@
   ],
   "network_os_vm_based": [
     {
-      "name": "Nokia SR-OS (vSIM)",
-      "image": "vrnetlab/vr-sros:latest",
-      "kind": "nokia_sros",
-      "description": "Nokia SR-OS Virtual SIM - VM-based",
-      "vendor": "Nokia",
-      "category": "network_os_vm_based",
-      "architecture": [
-        "amd64"
-      ],
-      "access": "build_required",
-      "registry": "Build with hellt/vrnetlab",
-      "requirements": "Nokia SR-OS qcow2 image required",
-      "build_info": "Use hellt/vrnetlab project to build"
-    },
-    {
       "name": "Juniper vMX",
       "image": "vrnetlab/vr-vmx:latest",
-      "kind": "juniper_vmx",
+      "kind": "vr_vmx",
       "description": "Juniper vMX Router - VM-based",
       "vendor": "Juniper",
       "category": "network_os_vm_based",
@@ -1507,7 +1508,7 @@
     {
       "name": "Juniper vQFX",
       "image": "vrnetlab/vr-vqfx:latest",
-      "kind": "juniper_vqfx",
+      "kind": "vr_vqfx",
       "description": "Juniper vQFX Switch - VM-based",
       "vendor": "Juniper",
       "category": "network_os_vm_based",
@@ -1520,7 +1521,7 @@
     {
       "name": "Juniper vSRX",
       "image": "vrnetlab/vr-vsrx:latest",
-      "kind": "juniper_vsrx",
+      "kind": "vr_vsrx",
       "description": "Juniper vSRX Firewall - VM-based",
       "vendor": "Juniper",
       "category": "network_os_vm_based",
@@ -1533,7 +1534,7 @@
     {
       "name": "Cisco IOS XRv9k",
       "image": "vrnetlab/vr-xrv9k:latest",
-      "kind": "cisco_xrv9k",
+      "kind": "vr_xrv9k",
       "description": "Cisco IOS XRv9000 - VM-based",
       "vendor": "Cisco",
       "category": "network_os_vm_based",
@@ -1546,7 +1547,7 @@
     {
       "name": "Cisco Nexus 9000v",
       "image": "vrnetlab/vr-n9kv:latest",
-      "kind": "cisco_n9kv",
+      "kind": "vr_n9kv",
       "description": "Cisco Nexus 9000v Switch - VM-based",
       "vendor": "Cisco",
       "category": "network_os_vm_based",
@@ -1559,7 +1560,7 @@
     {
       "name": "Cisco CSR 1000v",
       "image": "vrnetlab/vr-csr:latest",
-      "kind": "cisco_csr1000v",
+      "kind": "vr_csr",
       "description": "Cisco CSR 1000v Router - VM-based",
       "vendor": "Cisco",
       "category": "network_os_vm_based",
@@ -1572,7 +1573,7 @@
     {
       "name": "Arista vEOS",
       "image": "vrnetlab/vr-veos:latest",
-      "kind": "arista_veos",
+      "kind": "vr_veos",
       "description": "Arista vEOS Switch - VM-based",
       "vendor": "Arista",
       "category": "network_os_vm_based",
@@ -1585,7 +1586,7 @@
     {
       "name": "MikroTik RouterOS CHR (Stable)",
       "image": "docker.io/iparchitechs/chr:stable",
-      "kind": "mikrotik_ros",
+      "kind": "vr_ros",
       "description": "MikroTik RouterOS CHR - Stable Release",
       "vendor": "MikroTik",
       "category": "network_os_vm_based",
@@ -1602,7 +1603,7 @@
     {
       "name": "MikroTik RouterOS CHR (Long-term)",
       "image": "docker.io/iparchitechs/chr:long-term",
-      "kind": "mikrotik_ros",
+      "kind": "vr_ros",
       "description": "MikroTik RouterOS CHR - Long-term Support",
       "vendor": "MikroTik",
       "category": "network_os_vm_based",
@@ -1654,7 +1655,7 @@
     {
       "name": "VyOS Rolling",
       "image": "vyos/vyos:1.4-rolling",
-      "kind": "vyos",
+      "kind": "vyosnetworks_vyos",
       "description": "VyOS Router - Rolling Release",
       "vendor": "VyOS",
       "category": "open_source_network",
@@ -1672,7 +1673,7 @@
     {
       "name": "VyOS 1.4 LTS",
       "image": "vyos/vyos:1.4-lts",
-      "kind": "vyos",
+      "kind": "vyosnetworks_vyos",
       "description": "VyOS Router - Long Term Support",
       "vendor": "VyOS",
       "category": "open_source_network",
@@ -1681,26 +1682,6 @@
       ],
       "access": "public",
       "registry": "docker.io/vyos"
-    },
-    {
-      "name": "SONiC Virtual Switch",
-      "image": "docker-sonic-vs:latest",
-      "kind": "sonic-vs",
-      "description": "Microsoft SONiC - Virtual Switch Container",
-      "vendor": "Microsoft/SONiC",
-      "category": "open_source_network",
-      "architecture": [
-        "amd64",
-        "arm64"
-      ],
-      "access": "build_required",
-      "registry": "Build from Azure Pipeline",
-      "requirements": "Download from sonic-build.azurewebsites.net",
-      "features": [
-        "Cloud-scale networking",
-        "Redis-based state",
-        "Modular containers"
-      ]
     },
     {
       "name": "OpenWrt Latest",
@@ -1758,7 +1739,7 @@
     {
       "name": "Palo Alto PAN-OS (Latest)",
       "image": "vrnetlab/vr-pan:latest",
-      "kind": "paloalto_panos",
+      "kind": "vr_pan",
       "description": "Palo Alto PAN-OS Firewall - VM-based",
       "vendor": "Palo Alto Networks",
       "category": "security_firewalls",
@@ -1777,7 +1758,7 @@
     {
       "name": "Palo Alto PAN-OS 10.2.6",
       "image": "vrnetlab/vr-pan:10.2.6",
-      "kind": "paloalto_panos",
+      "kind": "vr_pan",
       "description": "Palo Alto PAN-OS 10.2.6 - Stable Release",
       "vendor": "Palo Alto Networks",
       "category": "security_firewalls",

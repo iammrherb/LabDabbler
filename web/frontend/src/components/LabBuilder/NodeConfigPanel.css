@@ -129,6 +129,53 @@
   margin-top: 0.5rem;
 }
 
+.template-info {
+  margin-top: 12px;
+  padding: 8px 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.template-docs {
+  margin-bottom: 8px;
+}
+
+.docs-link {
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.docs-link:hover {
+  text-decoration: underline;
+}
+
+.default-credentials {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 3px;
+}
+
+.default-credentials small {
+  color: #856404;
+  font-family: monospace;
+}
+
+.required-fields {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 3px;
+}
+
+.required-fields small {
+  color: #721c24;
+  font-weight: 500;
+}
+
 .kind-info p {
   margin: 0;
   font-size: 0.85rem;

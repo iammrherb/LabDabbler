@@ -7,8 +7,11 @@ function TopologyControls({
   onClear, 
   onSave, 
   onLoad, 
+  onLoadTemplate,
+  onBrowseLabs,
   onExport, 
   onValidate, 
+  onEnvironmentSettings,
   validationErrors 
 }) {
   const [showSaveDialog, setShowSaveDialog] = useState(false)
@@ -188,9 +191,25 @@ function TopologyControls({
         >
           📁 Load
         </button>
+        
+        <button 
+          className="control-btn secondary"
+          onClick={onBrowseLabs}
+          title="Browse all available labs"
+        >
+          📚 Browse Labs
+        </button>
       </div>
 
       <div className="control-group">
+        <button 
+          className="control-btn secondary"
+          onClick={onEnvironmentSettings}
+          title="Configure environment settings"
+        >
+          🌍 Environment
+        </button>
+        
         <button 
           className="control-btn secondary"
           onClick={onExport}

@@ -5,6 +5,10 @@ import TopologyCanvas from './LabBuilder/TopologyCanvas'
 import NodeConfigPanel from './LabBuilder/NodeConfigPanel'
 import TopologyControls from './LabBuilder/TopologyControls'
 import TopologyExporter from './LabBuilder/TopologyExporter'
+import LinkConfigPanel from './LabBuilder/LinkConfigPanel'
+import LabTemplates from './LabBuilder/LabTemplates'
+import EnvironmentSettingsPanel from './LabBuilder/EnvironmentSettingsPanel'
+import LabBrowser from './LabBuilder/LabBrowser'
 import GitHubIntegration from './GitHubIntegration'
 import { getApiBase, api } from '../utils/api'
 
@@ -14,6 +18,22 @@ function LabBuilder() {
     name: 'custom-lab',
     nodes: {},
     links: []
+  })
+  
+  // Environment configuration state
+  const [environmentConfig, setEnvironmentConfig] = useState({
+    mgmt: {
+      network: 'mgmt',
+      ipv4_subnet: '172.20.20.0/24',
+      bridge: 'br-mgmt',
+      mtu: 1500,
+      external_access: true
+    },
+    deployment: {
+      runtime: 'docker',
+      auto_remove: true,
+      debug: false
+    }
   })
   
   // Canvas and interaction state
@@ -26,8 +46,12 @@ function LabBuilder() {
   
   // UI state
   const [showNodeConfig, setShowNodeConfig] = useState(false)
+  const [showLinkConfig, setShowLinkConfig] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const [showExporter, setShowExporter] = useState(false)
   const [showGitHubExport, setShowGitHubExport] = useState(false)
+  const [showEnvironmentSettings, setShowEnvironmentSettings] = useState(false)
+  const [showLabBrowser, setShowLabBrowser] = useState(false)
   const [containers, setContainers] = useState([])
   const [loading, setLoading] = useState(true)
   const [validationErrors, setValidationErrors] = useState([])
@@ -42,8 +66,24 @@ function LabBuilder() {
   const loadContainers = async () => {
     try {
       setLoading(true)
-      const data = await api.getWithParams('/api/containers/search', { limit: 1000 })
-      setContainers(data.results || [])
+      // Load both regular containers and containerlab kinds
+      const [containersData, clabKindsData] = await Promise.all([
+        api.getWithParams('/api/containers/search', { limit: 1000 }).catch(() => ({ results: [] })),
+        api.get('/api/containerlab/kinds').catch(() => ({ kinds: [] }))
+      ])
+      
+      // Combine both data sources
+      const regularContainers = containersData.results || []
+      const clabContainers = clabKindsData.kinds || []
+      
+      // Mark containerlab kinds with a special flag
+      const enhancedClabContainers = clabContainers.map(container => ({
+        ...container,
+        image: container.default_image,
+        isContainerlabKind: true
+      }))
+      
+      setContainers([...regularContainers, ...enhancedClabContainers])
     } catch (error) {
       console.error('Error loading containers:', error)
     } finally {
@@ -128,7 +168,45 @@ function LabBuilder() {
     const linkId = `link-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     const newLink = {
       id: linkId,
-      endpoints: [endpoint1, endpoint2]
+      name: `${endpoint1.node}-${endpoint2.node}`,
+      type: 'ethernet',
+      endpoints: [
+        { 
+          node: endpoint1.node, 
+          interface: endpoint1.interface || 'eth0',
+          ip: '',
+          vlan: '',
+          mode: 'access'
+        },
+        { 
+          node: endpoint2.node, 
+          interface: endpoint2.interface || 'eth0',
+          ip: '',
+          vlan: '',
+          mode: 'access'
+        }
+      ],
+      properties: {
+        bandwidth: '',
+        mtu: '1500',
+        delay: '0ms',
+        jitter: '0ms',
+        loss: '0%',
+        duplex: 'full',
+        auto_negotiate: true
+      },
+      vlan_config: {
+        enabled: false,
+        native_vlan: '1',
+        allowed_vlans: '',
+        encapsulation: '802.1q'
+      },
+      advanced: {
+        mac_learning: true,
+        stp_enabled: false,
+        storm_control: false,
+        flow_control: false
+      }
     }
     
     setTopology(prev => ({
@@ -147,8 +225,18 @@ function LabBuilder() {
     
     if (selectedLink === linkId) {
       setSelectedLink(null)
+      setShowLinkConfig(false)
     }
   }, [selectedLink])
+
+  const updateLink = useCallback((linkId, updates) => {
+    setTopology(prev => ({
+      ...prev,
+      links: prev.links.map(link => 
+        link.id === linkId ? { ...link, ...updates } : link
+      )
+    }))
+  }, [])
 
   const validateTopology = useCallback(() => {
     const errors = []
@@ -231,6 +319,17 @@ function LabBuilder() {
     }
   }
 
+  const loadTemplate = useCallback((topology, templateMeta) => {
+    setTopology(topology)
+    setSelectedNode(null)
+    setSelectedLink(null)
+    setLinking(null)
+    setShowNodeConfig(false)
+    setShowLinkConfig(false)
+    setShowTemplates(false)
+    console.log(`Loaded lab template: ${templateMeta.name}`)
+  }, [])
+
   if (loading) {
     return (
       <div className="lab-builder-loading">
@@ -251,7 +350,10 @@ function LabBuilder() {
           onClear={clearTopology}
           onSave={saveTopology}
           onLoad={loadTopology}
+          onLoadTemplate={() => setShowTemplates(true)}
+          onBrowseLabs={() => setShowLabBrowser(true)}
           onExport={() => setShowExporter(true)}
+          onEnvironmentSettings={() => setShowEnvironmentSettings(true)}
           onValidate={validateTopology}
           validationErrors={validationErrors}
         />
@@ -273,7 +375,10 @@ function LabBuilder() {
               setSelectedNode(nodeId)
               setShowNodeConfig(true)
             }}
-            onLinkSelect={setSelectedLink}
+            onLinkSelect={(linkId) => {
+              setSelectedLink(linkId)
+              setShowLinkConfig(true)
+            }}
             onNodeMove={(nodeId, position) => updateNode(nodeId, { position })}
             onNodeDelete={removeNode}
             onLinkDelete={removeLink}
@@ -309,6 +414,26 @@ function LabBuilder() {
             onClose={() => setShowNodeConfig(false)}
           />
         )}
+        
+        {showLinkConfig && selectedLink && (
+          <LinkConfigPanel
+            link={topology.links.find(l => l.id === selectedLink)}
+            nodes={topology.nodes}
+            onUpdate={(updates) => updateLink(selectedLink, updates)}
+            onClose={() => setShowLinkConfig(false)}
+            onDelete={() => {
+              removeLink(selectedLink)
+              setShowLinkConfig(false)
+            }}
+          />
+        )}
+        
+        {showTemplates && (
+          <LabTemplates
+            onLoadTemplate={loadTemplate}
+            onClose={() => setShowTemplates(false)}
+          />
+        )}
       </div>
       
       {showExporter && (
@@ -327,6 +452,25 @@ function LabBuilder() {
         <GitHubIntegration
           topology={topology}
           onClose={() => setShowGitHubExport(false)}
+        />
+      )}
+      
+      {showEnvironmentSettings && (
+        <EnvironmentSettingsPanel
+          environmentConfig={environmentConfig}
+          onUpdate={setEnvironmentConfig}
+          onClose={() => setShowEnvironmentSettings(false)}
+        />
+      )}
+      
+      {showLabBrowser && (
+        <LabBrowser
+          onLoadLab={loadTopology}
+          onEditLab={(lab) => {
+            loadTopology(lab.topology_data || lab)
+            setShowLabBrowser(false)
+          }}
+          onClose={() => setShowLabBrowser(false)}
         />
       )}
     </div>
