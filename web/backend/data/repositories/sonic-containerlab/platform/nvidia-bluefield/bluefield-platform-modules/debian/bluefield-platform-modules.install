@@ -1,0 +1,4 @@
+cfg/bluefield-modules.conf etc/modules-load.d/
+udev/* etc/udev/rules.d/
+bin/* usr/bin/
+systemd/system/* lib/systemd/system/

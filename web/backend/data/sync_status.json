@@ -1,32 +1,52 @@
 {
   "containerlab-official": {
-    "last_sync": "2025-09-12T03:46:00.636135",
+    "last_sync": "2025-09-12T21:26:08.624209",
     "success": true,
-    "sync_count": 3
+    "sync_count": 6
   },
   "hellt-clabs": {
-    "last_sync": "2025-09-12T03:46:01.555578",
+    "last_sync": "2025-09-12T21:26:09.393993",
     "success": true,
-    "sync_count": 3
+    "sync_count": 6
   },
   "packetanglers-topos": {
-    "last_sync": "2025-09-12T03:46:02.141122",
+    "last_sync": "2025-09-12T21:26:10.317460",
     "success": true,
-    "sync_count": 3
+    "sync_count": 6
   },
   "learn-srlinux": {
-    "last_sync": "2025-09-12T03:46:04.092415",
+    "last_sync": "2025-09-12T21:26:09.830163",
     "success": true,
-    "sync_count": 3
+    "sync_count": 6
   },
   "clab-config-demo": {
-    "last_sync": "2025-09-11T00:15:55.509617",
+    "last_sync": "2025-09-12T21:26:41.745880",
     "success": true,
-    "sync_count": 1
+    "sync_count": 3
   },
   "instruqt-clab-topologies": {
     "last_sync": "2025-09-11T00:15:55.909805",
     "success": true,
     "sync_count": 1
+  },
+  "networkop-topos": {
+    "last_sync": "2025-09-12T21:26:10.720439",
+    "success": false,
+    "sync_count": 3
+  },
+  "srl-baselab": {
+    "last_sync": "2025-09-12T21:26:41.261253",
+    "success": false,
+    "sync_count": 2
+  },
+  "network-automation-examples": {
+    "last_sync": "2025-09-12T21:27:12.274282",
+    "success": false,
+    "sync_count": 2
+  },
+  "juniper-clab-examples": {
+    "last_sync": "2025-09-12T21:27:42.834012",
+    "success": false,
+    "sync_count": 2
   }
 }

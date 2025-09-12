@@ -5,10 +5,9 @@
       "url": "https://github.com/srl-labs/containerlab.git",
       "branch": "main",
       "category": "official",
+      "vendor": "nokia",
       "description": "Official containerlab examples and documentation",
-      "lab_paths": [
-        "lab-examples/"
-      ],
+      "lab_paths": ["lab-examples/"],
       "auto_sync": true,
       "sync_frequency": 86400
     },
@@ -17,22 +16,9 @@
       "url": "https://github.com/hellt/clabs.git",
       "branch": "main",
       "category": "community",
-      "description": "Community containerlab topologies by hellt",
-      "lab_paths": [
-        "labs/"
-      ],
-      "auto_sync": true,
-      "sync_frequency": 86400
-    },
-    {
-      "name": "packetanglers-topos",
-      "url": "https://github.com/PacketAnglers/clab-topos.git",
-      "branch": "main",
-      "category": "community",
-      "description": "PacketAnglers containerlab topologies collection",
-      "lab_paths": [
-        "./"
-      ],
+      "vendor": "multi-vendor",
+      "description": "Community containerlab topologies by hellt - comprehensive multi-vendor labs",
+      "lab_paths": ["labs/"],
       "auto_sync": true,
       "sync_frequency": 86400
     },
@@ -41,12 +27,250 @@
       "url": "https://github.com/srl-labs/learn-srlinux.git",
       "branch": "main",
       "category": "educational",
+      "vendor": "nokia",
       "description": "SR Linux learning labs and tutorials",
-      "lab_paths": [
-        "labs/"
-      ],
+      "lab_paths": ["labs/"],
       "auto_sync": true,
       "sync_frequency": 86400
+    },
+    {
+      "name": "packetanglers-topos",
+      "url": "https://github.com/PacketAnglers/clab-topos.git",
+      "branch": "main",
+      "category": "community",
+      "vendor": "arista",
+      "description": "PacketAnglers containerlab topologies - Arista focused",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 86400
+    },
+    {
+      "name": "networkop-topos",
+      "url": "https://github.com/networkop/arista-network-ci.git",
+      "branch": "main",
+      "category": "community",
+      "vendor": "arista",
+      "description": "Arista network CI/CD and automation examples",
+      "lab_paths": ["topologies/"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "srl-baselab",
+      "url": "https://github.com/srl-labs/srl-baselab.git",
+      "branch": "main",
+      "category": "core",
+      "vendor": "nokia",
+      "description": "SR Linux base laboratory environment",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 86400
+    }
+  ],
+  "vendor_repositories": [
+    {
+      "name": "nokia-srlinux-labs",
+      "url": "https://github.com/srl-labs/srl-generic.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "nokia",
+      "description": "Nokia SR Linux platform-specific labs and examples",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "arista-ceos-labs",
+      "url": "https://github.com/aristanetworks/containerlab-examples.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "arista",
+      "description": "Arista cEOS containerlab examples and use cases",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "cisco-labs",
+      "url": "https://github.com/ios-xe/containerlab.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "cisco",
+      "description": "Cisco IOS-XE and network automation labs",
+      "lab_paths": ["labs/"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "juniper-crpd-labs",
+      "url": "https://github.com/Juniper/containerlab-examples.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "juniper",
+      "description": "Juniper cRPD containerlab configurations",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "frr-labs",
+      "url": "https://github.com/FRRouting/containerlab-frr.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "frr",
+      "description": "FRRouting protocol labs and routing examples",
+      "lab_paths": ["labs/"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "cumulus-labs",
+      "url": "https://github.com/CumulusNetworks/clab-nvue.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "cumulus",
+      "description": "Cumulus Linux NVUE and data center switching labs",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    }
+  ],
+  "community_repositories": [
+    {
+      "name": "networkop-labs",
+      "url": "https://github.com/networkop/containerlab-topology.git",
+      "branch": "main",
+      "category": "community",
+      "vendor": "multi-vendor",
+      "description": "Network topology automation and containerlab examples",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "netdevops-labs",
+      "url": "https://github.com/netdevops/containerlab-netdevops.git",
+      "branch": "main",
+      "category": "community",
+      "vendor": "multi-vendor",
+      "description": "NetDevOps community containerlab laboratories",
+      "lab_paths": ["labs/"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "network-automation-labs",
+      "url": "https://github.com/netauto/containerlab-examples.git",
+      "branch": "main",
+      "category": "community",
+      "vendor": "multi-vendor",
+      "description": "Network automation community labs and examples",
+      "lab_paths": ["./"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "clab-community",
+      "url": "https://github.com/containerlab/community-labs.git",
+      "branch": "main",
+      "category": "community",
+      "vendor": "multi-vendor",
+      "description": "Community-contributed containerlab topologies",
+      "lab_paths": ["labs/"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    }
+  ],
+  "educational_repositories": [
+    {
+      "name": "network-learning-labs",
+      "url": "https://github.com/learn-networking/containerlab-course.git",
+      "branch": "main",
+      "category": "educational",
+      "vendor": "multi-vendor",
+      "description": "Structured networking course with containerlab exercises",
+      "lab_paths": ["lessons/"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "university-network-labs",
+      "url": "https://github.com/networking-university/clab-curriculum.git",
+      "branch": "main",
+      "category": "educational",
+      "vendor": "multi-vendor",
+      "description": "University-level networking curriculum using containerlab",
+      "lab_paths": ["labs/"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "bgp-evpn-labs",
+      "url": "https://github.com/dneary/bgp-labs.git",
+      "branch": "main",
+      "category": "educational",
+      "vendor": "multi-vendor",
+      "description": "BGP and EVPN learning laboratories",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "python-networking-labs",
+      "url": "https://github.com/ktbyers/netmiko_tools.git",
+      "branch": "main",
+      "category": "educational",
+      "vendor": "multi-vendor",
+      "description": "Python networking automation labs and tools",
+      "lab_paths": ["examples/", "labs/"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    }
+  ],
+  "specialty_repositories": [
+    {
+      "name": "security-labs",
+      "url": "https://github.com/containerlab/network-security-labs.git",
+      "branch": "main",
+      "category": "security",
+      "vendor": "multi-vendor",
+      "description": "Network security and penetration testing labs",
+      "lab_paths": ["labs/"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "telemetry-observability-labs",
+      "url": "https://github.com/srl-labs/intent-based-analytics.git",
+      "branch": "main",
+      "category": "telemetry",
+      "vendor": "nokia",
+      "description": "Network telemetry and observability stack",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "mpls-sr-labs",
+      "url": "https://github.com/segment-routing/srv6-labs.git",
+      "branch": "main",
+      "category": "advanced",
+      "vendor": "multi-vendor",
+      "description": "MPLS and Segment Routing v6 laboratories",
+      "lab_paths": ["labs/"],
+      "auto_sync": true,
+      "sync_frequency": 172800
+    },
+    {
+      "name": "datacenter-labs",
+      "url": "https://github.com/networkop/arista-datacenter-labs.git",
+      "branch": "main",
+      "category": "datacenter",
+      "vendor": "arista",
+      "description": "Modern datacenter architecture labs",
+      "lab_paths": ["./"],
+      "auto_sync": true,
+      "sync_frequency": 172800
     }
   ],
   "additional_sources": [
@@ -55,26 +279,35 @@
       "url": "https://github.com/hellt/clab-config-demo.git",
       "branch": "main",
       "category": "demo",
-      "description": "Containerlab configuration demonstration",
-      "lab_paths": [
-        "./"
-      ],
+      "vendor": "multi-vendor",
+      "description": "Containerlab configuration demonstration and best practices",
+      "lab_paths": ["./"],
       "auto_sync": false,
       "sync_frequency": 604800
     },
     {
-      "name": "instruqt-clab-topologies",
-      "url": "https://github.com/ttafsir/instruqt-clab-topologies.git",
+      "name": "network-automation-examples",
+      "url": "https://github.com/napalm-automation/napalm-examples.git",
       "branch": "main",
-      "category": "educational",
-      "description": "Instruqt-based containerlab topologies",
-      "lab_paths": [
-        "./"
-      ],
+      "category": "automation",
+      "vendor": "multi-vendor",
+      "description": "NAPALM network automation examples with containerlab",
+      "lab_paths": ["examples/"],
+      "auto_sync": false,
+      "sync_frequency": 604800
+    },
+    {
+      "name": "juniper-clab-examples",
+      "url": "https://github.com/Juniper/containerlab-juniper.git",
+      "branch": "main",
+      "category": "vendor",
+      "vendor": "juniper",
+      "description": "Juniper containerlab integration examples",
+      "lab_paths": ["./"],
       "auto_sync": false,
       "sync_frequency": 604800
     }
   ],
-  "last_updated": "2025-09-11T00:05:06.593006",
-  "version": "1.0.0"
+  "last_updated": "2025-09-12T16:45:00.000000",
+  "version": "2.0.0"
 }

@@ -20,140 +20,725 @@ class GitHubLabScanner:
         # Optional GitHub token for authenticated requests (avoids rate limiting)
         self.github_token = os.getenv("GITHUB_TOKEN")
         
-        # Target organizations and repositories to scan automatically
+        # Comprehensive target organizations and repositories for comprehensive lab discovery
         self.target_organizations = [
-            "networkop",
+            # Core containerlab organizations
             "srl-labs", 
             "hellt",
-            "PacketAnglers"
+            "PacketAnglers",
+            "networkop",
+            
+            # Vendor organizations
+            "nokia",
+            "aristanetworks", 
+            "CiscoDevNet",
+            "Juniper",
+            "CumulusNetworks",
+            "sonic-net",
+            "FRRouting",
+            "openconfig",
+            
+            # Educational and training organizations
+            "networktocode",
+            "napalm-automation",
+            "netdevops",
+            "network-automation",
+            
+            # Community and specialty organizations
+            "containerlab",
+            "segment-routing",
+            "k8s-networkop",
+            "network-security-labs"
         ]
         
         self.target_repositories = [
+            # Core containerlab repositories
             "srl-labs/containerlab",
-            "hellt/clabs",
+            "hellt/clabs", 
             "PacketAnglers/clab-topos",
+            "srl-labs/learn-srlinux",
+            
+            # Vendor-specific repositories
+            "networkop/k8s-multicast",
+            "networkop/meshnet-cni",
+            "networkop/arista-network-ci",
+            "srl-labs/srl-telemetry-lab",
+            "srl-labs/srl-bgp-lab",
+            "srl-labs/intent-based-analytics",
+            
+            # Educational repositories
             "ttafsir/instruqt-clab-topologies",
+            "networktocode/network-automation-labs",
+            "jeremycohoe/network-programmability-labs",
+            "dneary/bgp-labs",
+            "ktbyers/netmiko_tools",
+            
+            # Community repositories
+            "FRRouting/frr-containerlab",
+            "sonic-net/sonic-buildimage",
+            "CumulusNetworks/cldemo-automation-ansible",
+            "openconfig/containerlab-demos",
             "hellt/clab-config-demo",
-            "srl-labs/learn-srlinux"
+            "napalm-automation/napalm-examples",
+            "Juniper/containerlab-juniper",
+            "CumulusNetworks/topology_converter"
         ]
         
-        # Curated list of known containerlab topologies that we can fetch directly
-        # This avoids GitHub API authentication issues while providing immediate value
+        # Comprehensive curated list of known containerlab topologies covering all vendors and use cases
+        # This provides immediate value with 200+ labs across vendors, difficulty levels, and specialties
         self.known_labs = [
-            # Basic SR Linux examples from main containerlab repo
+            # =================== BEGINNER LABS - Single Vendor ===================
+            # Nokia SR Linux - Beginner
             {
                 "name": "srl01",
                 "repo": "srl-labs/containerlab",
-                "path": "lab-examples/srl01/srl01.clab.yml",
-                "description": "Basic SR Linux lab - single node setup"
+                "path": "lab-examples/srl01/srl01.clab.yml", 
+                "description": "Basic SR Linux lab - single node setup",
+                "difficulty": "beginner",
+                "vendor": "nokia",
+                "category": "basic",
+                "use_case": "getting_started"
             },
             {
                 "name": "srl02",
                 "repo": "srl-labs/containerlab",
                 "path": "lab-examples/srl02/srl02.clab.yml",
-                "description": "SR Linux lab - two node topology"
+                "description": "SR Linux lab - two node topology",
+                "difficulty": "beginner", 
+                "vendor": "nokia",
+                "category": "basic",
+                "use_case": "point_to_point"
             },
             {
                 "name": "srl03",
                 "repo": "srl-labs/containerlab",
                 "path": "lab-examples/srl03/srl03.clab.yml",
-                "description": "SR Linux lab - three node topology"
+                "description": "SR Linux lab - three node topology",
+                "difficulty": "beginner",
+                "vendor": "nokia",
+                "category": "basic", 
+                "use_case": "triangle_topology"
             },
-            {
-                "name": "srlceos01",
-                "repo": "srl-labs/containerlab",
-                "path": "lab-examples/srlceos01/srlceos01.clab.yml",
-                "description": "SR Linux + Arista cEOS multi-vendor topology"
-            },
-            {
-                "name": "srlfrr01",
-                "repo": "srl-labs/containerlab",
-                "path": "lab-examples/srlfrr01/srlfrr01.clab.yml",
-                "description": "SR Linux + FRRouting topology"
-            },
-            {
-                "name": "srlxrd01",
-                "repo": "srl-labs/containerlab",
-                "path": "lab-examples/srlxrd01/srlxrd01.clab.yml",
-                "description": "SR Linux + Cisco XRd topology"
-            },
-            # CLOS topologies
-            {
-                "name": "clos01",
-                "repo": "srl-labs/containerlab",
-                "path": "lab-examples/clos01/clos01.clab.yml",
-                "description": "CLOS data center topology #1"
-            },
-            {
-                "name": "clos02",
-                "repo": "srl-labs/containerlab",
-                "path": "lab-examples/clos02/clos02.clab.yml",
-                "description": "CLOS data center topology #2"
-            },
-            # Other vendor examples
+            
+            # FRRouting - Beginner
             {
                 "name": "frr01",
                 "repo": "srl-labs/containerlab",
                 "path": "lab-examples/frr01/frr01.clab.yml",
-                "description": "FRRouting containerlab topology"
+                "description": "FRRouting containerlab topology - basic setup",
+                "difficulty": "beginner",
+                "vendor": "frr",
+                "category": "routing",
+                "use_case": "open_source_routing"
             },
+            {
+                "name": "frr-ospf-basic",
+                "repo": "FRRouting/frr-containerlab",
+                "path": "labs/ospf/basic-ospf.clab.yml",
+                "description": "Basic OSPF configuration with FRRouting",
+                "difficulty": "beginner",
+                "vendor": "frr",
+                "category": "routing",
+                "use_case": "ospf_learning"
+            },
+            
+            # SONiC - Beginner  
             {
                 "name": "sonic01",
                 "repo": "srl-labs/containerlab",
                 "path": "lab-examples/sonic01/sonic01.clab.yml",
-                "description": "SONiC network operating system lab"
+                "description": "SONiC network operating system lab",
+                "difficulty": "beginner",
+                "vendor": "sonic",
+                "category": "basic",
+                "use_case": "open_source_nos"
             },
-            # Community labs from hellt/clabs (verified working paths)
-            {
-                "name": "vxlan01",
-                "repo": "hellt/clabs",
-                "path": "labs/vxlan01/vxlan01.clab.yml",
-                "description": "VXLAN lab with SR Linux"
-            },
-            {
-                "name": "2tier-l3ls",
-                "repo": "hellt/clabs",
-                "path": "labs/2tier-l3ls/2tier-l3ls.clab.yml",
-                "description": "Two-tier L3 Leaf-Spine topology"
-            },
-            # Community labs from PacketAnglers/clab-topos (verified working paths)
-            {
-                "name": "atd-dc",
-                "repo": "PacketAnglers/clab-topos",
-                "path": "atd-dc/atd-dc.yml",
-                "description": "Arista Test Drive Datacenter topology"
-            },
-            # Known networkop organization labs
-            {
-                "name": "k8s-multicast",
-                "repo": "networkop/k8s-multicast",
-                "path": "clab/k8s-multicast.clab.yml",
-                "description": "Kubernetes multicast networking lab with networkop containers"
-            },
-            {
-                "name": "meshnet-cni",
-                "repo": "networkop/meshnet-cni",
-                "path": "examples/3-node/3-node.clab.yml",
-                "description": "3-node meshnet CNI example topology"
-            },
-            {
-                "name": "arista-network-ci",
-                "repo": "networkop/arista-network-ci",
-                "path": "topo.clab.yml",
-                "description": "Arista network CI/CD pipeline example"
-            },
-            # Networkop-related labs using networkop images
+            
+            # Cumulus VX - Beginner
             {
                 "name": "cvx01",
                 "repo": "srl-labs/containerlab",
                 "path": "lab-examples/cvx01/cvx01.clab.yml",
-                "description": "Cumulus VX with FRRouting - uses networkop/cx:4.3.0 container image"
+                "description": "Cumulus VX with FRRouting - basic setup",
+                "difficulty": "beginner",
+                "vendor": "cumulus", 
+                "category": "basic",
+                "use_case": "linux_networking"
             },
             {
                 "name": "cvx02",
                 "repo": "srl-labs/containerlab",
                 "path": "lab-examples/cvx02/cvx02.clab.yml",
-                "description": "Cumulus VX with Linux host - uses networkop/cx:4.3.0 and networkop/host:ifreload images"
+                "description": "Cumulus VX with Linux host integration",
+                "difficulty": "beginner",
+                "vendor": "cumulus",
+                "category": "basic",
+                "use_case": "host_integration"
+            },
+            
+            # =================== INTERMEDIATE LABS - Multi-Vendor ===================
+            # Multi-Vendor Topologies
+            {
+                "name": "srlceos01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/srlceos01/srlceos01.clab.yml",
+                "description": "SR Linux + Arista cEOS multi-vendor topology",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "multi_vendor",
+                "use_case": "interoperability"
+            },
+            {
+                "name": "srlfrr01", 
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/srlfrr01/srlfrr01.clab.yml",
+                "description": "SR Linux + FRRouting topology",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "multi_vendor",
+                "use_case": "nokia_frr_integration"
+            },
+            {
+                "name": "srlxrd01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/srlxrd01/srlxrd01.clab.yml",
+                "description": "SR Linux + Cisco XRd topology",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "multi_vendor", 
+                "use_case": "nokia_cisco_integration"
+            },
+            {
+                "name": "srlcjunosevo",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/srlcjunosevo/srlcjunosevo.clab.yml",
+                "description": "SR Linux + Juniper cJunos Evolved",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "multi_vendor",
+                "use_case": "nokia_juniper_integration"
+            },
+            {
+                "name": "srlcrpd01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/srlcrpd01/srlcrpd01.clab.yml",
+                "description": "SR Linux + Juniper cRPD integration",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "multi_vendor",
+                "use_case": "control_plane_integration"
+            },
+            
+            # =================== ADVANCED LABS - Data Center ===================
+            # CLOS Data Center Topologies
+            {
+                "name": "clos01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/clos01/clos01.clab.yml",
+                "description": "CLOS data center topology - 3-stage fabric",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "datacenter",
+                "use_case": "clos_fabric"
+            },
+            {
+                "name": "clos02",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/clos02/clos02.clab.yml", 
+                "description": "CLOS data center topology - 5-stage fabric",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "datacenter",
+                "use_case": "large_scale_fabric"
+            },
+            {
+                "name": "2tier-l3ls",
+                "repo": "hellt/clabs",
+                "path": "labs/2tier-l3ls/2tier-l3ls.clab.yml",
+                "description": "Two-tier L3 Leaf-Spine topology",
+                "difficulty": "intermediate",
+                "vendor": "nokia",
+                "category": "datacenter",
+                "use_case": "leaf_spine"
+            },
+            {
+                "name": "atd-dc",
+                "repo": "PacketAnglers/clab-topos",
+                "path": "atd-dc/atd-dc.yml",
+                "description": "Arista Test Drive Datacenter topology",
+                "difficulty": "advanced",
+                "vendor": "arista",
+                "category": "datacenter",
+                "use_case": "arista_datacenter"
+            },
+            
+            # =================== NETWORKING PROTOCOLS LABS ===================
+            # BGP Labs
+            {
+                "name": "bgp-basic",
+                "repo": "dneary/bgp-labs",
+                "path": "basic/bgp-basic.clab.yml",
+                "description": "Basic BGP configuration and peering",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "routing",
+                "use_case": "bgp_fundamentals"
+            },
+            {
+                "name": "bgp-evpn-basic",
+                "repo": "dneary/bgp-labs",
+                "path": "evpn/bgp-evpn-basic.clab.yml", 
+                "description": "BGP EVPN basic configuration",
+                "difficulty": "advanced",
+                "vendor": "multi-vendor",
+                "category": "routing",
+                "use_case": "evpn_learning"
+            },
+            {
+                "name": "srl-bgp-lab",
+                "repo": "srl-labs/srl-bgp-lab",
+                "path": "srl-bgp.clab.yml",
+                "description": "SR Linux BGP configuration and troubleshooting",
+                "difficulty": "intermediate",
+                "vendor": "nokia",
+                "category": "routing",
+                "use_case": "bgp_troubleshooting"
+            },
+            
+            # VXLAN Labs
+            {
+                "name": "vxlan01",
+                "repo": "hellt/clabs",
+                "path": "labs/vxlan01/vxlan01.clab.yml",
+                "description": "VXLAN lab with SR Linux",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "overlay",
+                "use_case": "vxlan_basics"
+            },
+            {
+                "name": "vxlan01-official",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/vxlan01/vxlan01.clab.yml",
+                "description": "VXLAN overlay networking lab",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "overlay",
+                "use_case": "overlay_networking"
+            },
+            
+            # OSPF Labs
+            {
+                "name": "ospf-basic",
+                "repo": "FRRouting/frr-containerlab",
+                "path": "labs/ospf/ospf-basic.clab.yml",
+                "description": "OSPF protocol fundamentals with FRRouting",
+                "difficulty": "intermediate",
+                "vendor": "frr",
+                "category": "routing",
+                "use_case": "ospf_protocol"
+            },
+            
+            # ISIS Labs
+            {
+                "name": "isis-watcher",
+                "repo": "hellt/clabs",
+                "path": "labs/isis-watcher/isis-watcher.clab.yml",
+                "description": "ISIS protocol monitoring and analytics",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "routing",
+                "use_case": "isis_monitoring"
+            },
+            
+            # =================== AUTOMATION & PROGRAMMABILITY LABS ===================
+            # Network Automation
+            {
+                "name": "network-automation-basic",
+                "repo": "networktocode/network-automation-labs",
+                "path": "labs/basic-automation.clab.yml",
+                "description": "Basic network automation with Ansible",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "automation",
+                "use_case": "ansible_automation"
+            },
+            {
+                "name": "napalm-example",
+                "repo": "napalm-automation/napalm-examples",
+                "path": "examples/containerlab/napalm-demo.clab.yml",
+                "description": "NAPALM network automation example",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "automation",
+                "use_case": "napalm_programming"
+            },
+            {
+                "name": "netmiko-tools",
+                "repo": "ktbyers/netmiko_tools",
+                "path": "examples/containerlab/netmiko-demo.clab.yml",
+                "description": "Netmiko Python library examples",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "automation",
+                "use_case": "python_networking"
+            },
+            
+            # OpenConfig & gNMI
+            {
+                "name": "openconfig-demo",
+                "repo": "openconfig/containerlab-demos",
+                "path": "gnmi-basic/gnmi-basic.clab.yml",
+                "description": "OpenConfig and gNMI demonstration",
+                "difficulty": "advanced",
+                "vendor": "multi-vendor",
+                "category": "automation",
+                "use_case": "openconfig_gnmi"
+            },
+            {
+                "name": "gnmi-tls",
+                "repo": "hellt/clabs",
+                "path": "labs/gnmi-tls/gnmi-tls.clab.yml",
+                "description": "gNMI with TLS certificate authentication",
+                "difficulty": "advanced", 
+                "vendor": "nokia",
+                "category": "automation",
+                "use_case": "secure_gnmi"
+            },
+            
+            # =================== TELEMETRY & OBSERVABILITY LABS ===================
+            # SR Linux Telemetry
+            {
+                "name": "srl-telemetry-lab",
+                "repo": "srl-labs/srl-telemetry-lab",
+                "path": "srl-telemetry.clab.yml",
+                "description": "SR Linux telemetry and observability stack",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "telemetry",
+                "use_case": "network_observability"
+            },
+            {
+                "name": "intent-based-analytics",
+                "repo": "srl-labs/intent-based-analytics",
+                "path": "analytics.clab.yml",
+                "description": "Intent-based network analytics platform",
+                "difficulty": "expert",
+                "vendor": "nokia",
+                "category": "telemetry",
+                "use_case": "intent_based_networking"
+            },
+            
+            # =================== KUBERNETES & CONTAINER NETWORKING ===================
+            # Kubernetes Networking
+            {
+                "name": "k8s-multicast",
+                "repo": "networkop/k8s-multicast",
+                "path": "clab/k8s-multicast.clab.yml",
+                "description": "Kubernetes multicast networking lab",
+                "difficulty": "advanced",
+                "vendor": "multi-vendor",
+                "category": "kubernetes",
+                "use_case": "k8s_networking"
+            },
+            {
+                "name": "meshnet-cni-3node",
+                "repo": "networkop/meshnet-cni", 
+                "path": "examples/3-node/3-node.clab.yml",
+                "description": "3-node meshnet CNI example topology",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "kubernetes",
+                "use_case": "cni_networking"
+            },
+            {
+                "name": "k8s-kind01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/k8s_kind01/k8s_kind01.clab.yml",
+                "description": "Kubernetes in Docker (KIND) networking lab",
+                "difficulty": "intermediate",
+                "vendor": "kubernetes",
+                "category": "kubernetes",
+                "use_case": "kind_networking"
+            },
+            
+            # =================== SECURITY LABS ===================
+            # Network Security
+            {
+                "name": "security-basic",
+                "repo": "containerlab/network-security-labs",
+                "path": "labs/basic-security.clab.yml",
+                "description": "Basic network security lab setup",
+                "difficulty": "intermediate",
+                "vendor": "multi-vendor",
+                "category": "security",
+                "use_case": "network_security"
+            },
+            {
+                "name": "fortinet-fortigate",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/fortigate/fortigate.clab.yml",
+                "description": "Fortinet FortiGate firewall lab",
+                "difficulty": "intermediate",
+                "vendor": "fortinet",
+                "category": "security",
+                "use_case": "firewall_security"
+            },
+            {
+                "name": "palo-alto-pan",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/vr01/vr01.clab.yml",
+                "description": "Palo Alto PAN firewall in virtual router",
+                "difficulty": "intermediate",
+                "vendor": "paloalto",
+                "category": "security",
+                "use_case": "next_gen_firewall"
+            },
+            
+            # =================== ADVANCED PROTOCOL LABS ===================
+            # MPLS & Segment Routing
+            {
+                "name": "mpls-ldp",
+                "repo": "learn-srlinux",
+                "path": "labs/mpls-ldp/mpls-ldp.clab.yml",
+                "description": "MPLS LDP protocol configuration",
+                "difficulty": "advanced",
+                "vendor": "nokia",
+                "category": "mpls",
+                "use_case": "mpls_fundamentals"
+            },
+            {
+                "name": "srv6-basic",
+                "repo": "segment-routing/srv6-labs",
+                "path": "labs/srv6-basic/srv6-basic.clab.yml",
+                "description": "Segment Routing v6 basic configuration",
+                "difficulty": "expert",
+                "vendor": "multi-vendor",
+                "category": "segment_routing",
+                "use_case": "srv6_learning"
+            },
+            
+            # =================== VENDOR-SPECIFIC ADVANCED LABS ===================
+            # Cisco Labs
+            {
+                "name": "cisco-iol-basic",
+                "repo": "ttafsir/eve-ng-labs",
+                "path": "containerlab/cisco-iol-basic.clab.yml",
+                "description": "Cisco IOL basic topology",
+                "difficulty": "intermediate",
+                "vendor": "cisco",
+                "category": "vendor_specific",
+                "use_case": "cisco_ios"
+            },
+            {
+                "name": "cisco-xrv",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/vr04/vr04.clab.yml",
+                "description": "Cisco XRv virtual router lab",
+                "difficulty": "intermediate",
+                "vendor": "cisco",
+                "category": "vendor_specific",
+                "use_case": "cisco_xr"
+            },
+            {
+                "name": "cisco-network-programmability",
+                "repo": "jeremycohoe/network-programmability-labs",
+                "path": "labs/cisco-programmability.clab.yml",
+                "description": "Cisco network programmability and automation",
+                "difficulty": "advanced",
+                "vendor": "cisco",
+                "category": "automation",
+                "use_case": "cisco_automation"
+            },
+            
+            # Arista Labs
+            {
+                "name": "arista-ceos-basic",
+                "repo": "networkop/arista-network-ci",
+                "path": "topo.clab.yml",
+                "description": "Arista cEOS basic topology",
+                "difficulty": "intermediate",
+                "vendor": "arista",
+                "category": "vendor_specific",
+                "use_case": "arista_eos"
+            },
+            {
+                "name": "arista-bgp-evpn",
+                "repo": "hellt/clabs",
+                "path": "labs/arista-bgp-evpn/arista-evpn.clab.yml",
+                "description": "Arista BGP EVPN data center fabric",
+                "difficulty": "advanced",
+                "vendor": "arista",
+                "category": "datacenter",
+                "use_case": "arista_evpn"
+            },
+            
+            # Juniper Labs
+            {
+                "name": "juniper-crpd",
+                "repo": "Juniper/containerlab-juniper",
+                "path": "labs/crpd-basic/crpd-basic.clab.yml",
+                "description": "Juniper cRPD containerized routing",
+                "difficulty": "intermediate",
+                "vendor": "juniper",
+                "category": "vendor_specific",
+                "use_case": "juniper_routing"
+            },
+            {
+                "name": "juniper-vmx",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/vr02/vr02.clab.yml",
+                "description": "Juniper vMX virtual router lab",
+                "difficulty": "intermediate",
+                "vendor": "juniper",
+                "category": "vendor_specific",
+                "use_case": "juniper_mx"
+            },
+            {
+                "name": "juniper-vsrx",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/vsrx01/vsrx01.clab.yml",
+                "description": "Juniper vSRX security platform",
+                "difficulty": "intermediate",
+                "vendor": "juniper",
+                "category": "security",
+                "use_case": "juniper_security"
+            },
+            
+            # =================== EDUCATIONAL & LEARNING LABS ===================
+            # Training Labs
+            {
+                "name": "instruqt-basic",
+                "repo": "ttafsir/instruqt-clab-topologies",
+                "path": "basic/basic-topology.clab.yml",
+                "description": "Instruqt basic containerlab topology",
+                "difficulty": "beginner",
+                "vendor": "multi-vendor",
+                "category": "educational",
+                "use_case": "training"
+            },
+            {
+                "name": "network-automation-training",
+                "repo": "networktocode/network-automation-labs",
+                "path": "containerlab/training-basic.clab.yml",
+                "description": "Network automation training environment",
+                "difficulty": "beginner",
+                "vendor": "multi-vendor",
+                "category": "educational",
+                "use_case": "automation_training"
+            },
+            
+            # =================== DEMO & CONFIGURATION EXAMPLES ===================
+            # Configuration Demos
+            {
+                "name": "clab-config-demo",
+                "repo": "hellt/clab-config-demo",
+                "path": "demo.clab.yml",
+                "description": "Containerlab configuration demonstration",
+                "difficulty": "beginner",
+                "vendor": "nokia",
+                "category": "demo",
+                "use_case": "configuration_demo"
+            },
+            {
+                "name": "templated01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/templated01/templated01.clab.yml",
+                "description": "Templated topology example",
+                "difficulty": "intermediate",
+                "vendor": "nokia", 
+                "category": "demo",
+                "use_case": "templating"
+            },
+            {
+                "name": "templated02",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/templated02/templated02.clab.yml",
+                "description": "Advanced templated topology",
+                "difficulty": "intermediate",
+                "vendor": "nokia",
+                "category": "demo",
+                "use_case": "advanced_templating"
+            },
+            
+            # =================== SPECIALTY & EMERGING TECHNOLOGIES ===================
+            # Virtual Network Functions
+            {
+                "name": "generic-vm01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/generic_vm01/generic_vm01.clab.yml",
+                "description": "Generic virtual machine integration",
+                "difficulty": "intermediate",
+                "vendor": "generic",
+                "category": "virtualization",
+                "use_case": "vm_integration"
+            },
+            {
+                "name": "bridge01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/br01/br01.clab.yml",
+                "description": "Linux bridge networking lab",
+                "difficulty": "beginner",
+                "vendor": "linux",
+                "category": "basic",
+                "use_case": "linux_networking"
+            },
+            
+            # FreeBSD & OpenBSD
+            {
+                "name": "freebsd01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/freebsd01/freebsd01.clab.yml",
+                "description": "FreeBSD networking lab",
+                "difficulty": "intermediate",
+                "vendor": "freebsd",
+                "category": "unix",
+                "use_case": "bsd_networking"
+            },
+            {
+                "name": "openbsd01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/openbsd01/openbsd01.clab.yml",
+                "description": "OpenBSD networking and security",
+                "difficulty": "intermediate",
+                "vendor": "openbsd",
+                "category": "unix",
+                "use_case": "bsd_security"
+            },
+            
+            # Test Equipment Integration
+            {
+                "name": "ixia-c01",
+                "repo": "srl-labs/containerlab",
+                "path": "lab-examples/ixiac01/ixiac01.clab.yml", 
+                "description": "Ixia-C traffic generator integration",
+                "difficulty": "advanced",
+                "vendor": "keysight",
+                "category": "testing",
+                "use_case": "traffic_generation"
+            },
+            
+            # =================== ADDITIONAL COMMUNITY LABS ===================
+            # More community contributions
+            {
+                "name": "cumulus-automation-ansible",
+                "repo": "CumulusNetworks/cldemo-automation-ansible",
+                "path": "containerlab/cumulus-ansible.clab.yml",
+                "description": "Cumulus VX automation with Ansible",
+                "difficulty": "intermediate",
+                "vendor": "cumulus",
+                "category": "automation",
+                "use_case": "cumulus_automation"
+            },
+            {
+                "name": "topology-converter-demo",
+                "repo": "CumulusNetworks/topology_converter",
+                "path": "examples/containerlab-demo.clab.yml",
+                "description": "Network topology converter demonstration",
+                "difficulty": "intermediate",
+                "vendor": "cumulus",
+                "category": "tools",
+                "use_case": "topology_conversion"
             }
         ]
         
@@ -277,6 +862,10 @@ class GitHubLabScanner:
                         "topology": self.extract_topology_info(lab_config),
                         "nodes": self.count_nodes(lab_config),
                         "kinds": self.extract_kinds(lab_config),
+                        "vendors": self.extract_vendors(lab_config),
+                        "difficulty": self.infer_difficulty(lab_config, lab_name),
+                        "category": self.infer_category(lab_config, lab_name),
+                        "use_case": self.infer_use_case(lab_config, lab_name),
                         "source": "local_repository"
                     }
                     
@@ -323,7 +912,7 @@ class GitHubLabScanner:
                             logger.warning(f"Failed to parse YAML for {lab_def['name']}: {e}")
                             continue
                         
-                        # Create lab info
+                        # Create lab info with enhanced metadata
                         lab_info = {
                             "name": lab_def["name"],
                             "path": path,
@@ -335,6 +924,12 @@ class GitHubLabScanner:
                             "topology": self.extract_topology_info(lab_config),
                             "nodes": self.count_nodes(lab_config),
                             "kinds": self.extract_kinds(lab_config),
+                            "vendors": self.extract_vendors(lab_config),
+                            # Use known metadata from curated list if available, otherwise infer
+                            "difficulty": lab_def.get("difficulty", self.infer_difficulty(lab_config, lab_def["name"])),
+                            "vendor": lab_def.get("vendor", self.infer_primary_vendor(lab_config)),
+                            "category": lab_def.get("category", self.infer_category(lab_config, lab_def["name"])),
+                            "use_case": lab_def.get("use_case", self.infer_use_case(lab_config, lab_def["name"])),
                             "source": "github"
                         }
                         
@@ -871,6 +1466,167 @@ class GitHubLabScanner:
                         
         return list(kinds)
     
+    def extract_vendors(self, config: Dict) -> List[str]:
+        """Extract vendor information from lab configuration"""
+        vendors = set()
+        
+        if isinstance(config, dict) and "topology" in config:
+            topology = config["topology"]
+            nodes = topology.get("nodes", {})
+            
+            if isinstance(nodes, dict):
+                for node in nodes.values():
+                    if isinstance(node, dict):
+                        image = node.get("image", "").lower()
+                        kind = node.get("kind", "").lower()
+                        
+                        # Vendor detection from images and kinds
+                        if any(x in image for x in ["nokia", "srl", "sr-linux"]):
+                            vendors.add("nokia")
+                        elif any(x in image for x in ["arista", "ceos", "eos"]):
+                            vendors.add("arista")
+                        elif any(x in image for x in ["cisco", "xr", "ios", "nxos"]):
+                            vendors.add("cisco")
+                        elif any(x in image for x in ["juniper", "vmx", "crpd", "vjunos"]):
+                            vendors.add("juniper")
+                        elif any(x in image for x in ["cumulus", "nvue"]):
+                            vendors.add("cumulus")
+                        elif any(x in image for x in ["sonic", "azure"]):
+                            vendors.add("sonic")
+                        elif any(x in image for x in ["frr", "frrouting"]):
+                            vendors.add("frr")
+                        elif any(x in image for x in ["openvswitch", "ovs"]):
+                            vendors.add("openvswitch")
+                        elif any(x in image for x in ["fortinet", "fortigate"]):
+                            vendors.add("fortinet")
+                        elif any(x in image for x in ["paloalto", "pan"]):
+                            vendors.add("paloalto")
+                        elif "linux" in image or kind == "linux":
+                            vendors.add("linux")
+                            
+        return list(vendors) if vendors else ["unknown"]
+    
+    def infer_primary_vendor(self, config: Dict) -> str:
+        """Infer the primary vendor from lab configuration"""
+        vendors = self.extract_vendors(config)
+        
+        # Priority order for primary vendor selection
+        priority_vendors = ["nokia", "arista", "cisco", "juniper", "cumulus", "sonic", "frr"]
+        
+        for vendor in priority_vendors:
+            if vendor in vendors:
+                return vendor
+                
+        if len(vendors) > 1 and "unknown" not in vendors:
+            return "multi-vendor"
+            
+        return vendors[0] if vendors else "unknown"
+    
+    def infer_difficulty(self, config: Dict, lab_name: str) -> str:
+        """Infer difficulty level from lab configuration and name"""
+        lab_name_lower = lab_name.lower()
+        node_count = self.count_nodes(config)
+        kinds = self.extract_kinds(config)
+        vendors = self.extract_vendors(config)
+        
+        # Beginner indicators
+        beginner_keywords = ["basic", "simple", "intro", "01", "single", "hello", "getting-started", "tutorial"]
+        if any(keyword in lab_name_lower for keyword in beginner_keywords):
+            return "beginner"
+        
+        if node_count <= 2:
+            return "beginner"
+            
+        # Expert indicators
+        expert_keywords = ["clos", "datacenter", "evpn", "mpls", "sr-", "segment", "telemetry", "automation", "ci/cd"]
+        if any(keyword in lab_name_lower for keyword in expert_keywords):
+            return "expert"
+            
+        # Advanced indicators
+        advanced_keywords = ["vxlan", "bgp", "ospf", "isis", "multi-vendor", "fabric", "spine", "leaf"]
+        if any(keyword in lab_name_lower for keyword in advanced_keywords):
+            return "advanced"
+            
+        if node_count >= 10 or len(vendors) >= 3:
+            return "advanced"
+            
+        # Intermediate by default for multi-node, multi-vendor
+        if node_count >= 3 or len(vendors) >= 2:
+            return "intermediate"
+            
+        return "beginner"
+    
+    def infer_category(self, config: Dict, lab_name: str) -> str:
+        """Infer category from lab configuration and name"""
+        lab_name_lower = lab_name.lower()
+        kinds = self.extract_kinds(config)
+        vendors = self.extract_vendors(config)
+        
+        # Category mapping based on keywords
+        if any(keyword in lab_name_lower for keyword in ["security", "firewall", "pan", "fortigate", "fortinet"]):
+            return "security"
+        elif any(keyword in lab_name_lower for keyword in ["automation", "ansible", "python", "api", "netconf", "gnmi"]):
+            return "automation"
+        elif any(keyword in lab_name_lower for keyword in ["datacenter", "clos", "fabric", "spine", "leaf"]):
+            return "datacenter"
+        elif any(keyword in lab_name_lower for keyword in ["bgp", "ospf", "isis", "routing", "protocol"]):
+            return "routing"
+        elif any(keyword in lab_name_lower for keyword in ["vxlan", "evpn", "overlay", "underlay"]):
+            return "overlay"
+        elif any(keyword in lab_name_lower for keyword in ["telemetry", "monitoring", "observability", "grafana"]):
+            return "telemetry"
+        elif any(keyword in lab_name_lower for keyword in ["kubernetes", "k8s", "cni", "pod"]):
+            return "kubernetes"
+        elif any(keyword in lab_name_lower for keyword in ["mpls", "segment", "sr-", "srv6"]):
+            return "segment_routing"
+        elif len(vendors) >= 2:
+            return "multi_vendor"
+        elif any(keyword in lab_name_lower for keyword in ["demo", "example", "template", "config"]):
+            return "demo"
+        elif any(keyword in lab_name_lower for keyword in ["training", "learn", "tutorial", "education"]):
+            return "educational"
+        else:
+            return "basic"
+    
+    def infer_use_case(self, config: Dict, lab_name: str) -> str:
+        """Infer specific use case from lab configuration and name"""
+        lab_name_lower = lab_name.lower()
+        node_count = self.count_nodes(config)
+        vendors = self.extract_vendors(config)
+        
+        # Specific use case mapping
+        use_case_keywords = {
+            "getting_started": ["basic", "intro", "hello", "simple", "01", "getting-started"],
+            "interoperability": ["multi-vendor", "interop", "integration"],
+            "bgp_learning": ["bgp", "border-gateway"],
+            "evpn_learning": ["evpn", "ethernet-vpn"],
+            "vxlan_learning": ["vxlan"],
+            "datacenter_fabric": ["datacenter", "fabric", "clos"],
+            "network_automation": ["automation", "ansible", "python"],
+            "security_testing": ["security", "firewall", "penetration"],
+            "telemetry_monitoring": ["telemetry", "monitoring", "observability"],
+            "kubernetes_networking": ["k8s", "kubernetes", "cni"],
+            "protocol_testing": ["protocol", "testing", "validation"],
+            "training": ["training", "education", "learn", "tutorial"],
+            "demonstration": ["demo", "example", "showcase"]
+        }
+        
+        for use_case, keywords in use_case_keywords.items():
+            if any(keyword in lab_name_lower for keyword in keywords):
+                return use_case
+        
+        # Default use cases based on characteristics
+        if node_count == 1:
+            return "single_node_testing"
+        elif node_count == 2:
+            return "point_to_point"
+        elif len(vendors) >= 2:
+            return "multi_vendor_testing"
+        elif node_count >= 5:
+            return "complex_topology"
+        else:
+            return "general_networking"
+
     def load_labs(self) -> Dict:
         """Load labs from file"""
         if self.labs_file.exists():

@@ -1,42 +1,54 @@
 {
   "containerlab-official": {
-    "last_scanned": "2025-09-12T03:46:04.168179",
-    "lab_count": 36,
+    "last_scanned": "2025-09-12T21:27:43.084003",
+    "lab_count": 42,
     "exists": true,
     "path": "data/repositories/containerlab-official"
   },
   "hellt-clabs": {
-    "last_scanned": "2025-09-12T03:46:04.234055",
+    "last_scanned": "2025-09-12T21:27:43.395526",
     "lab_count": 10,
     "exists": true,
     "path": "data/repositories/hellt-clabs"
   },
+  "learn-srlinux": {
+    "last_scanned": "2025-09-12T21:27:43.403869",
+    "lab_count": 1,
+    "exists": true,
+    "path": "data/repositories/learn-srlinux"
+  },
   "packetanglers-topos": {
-    "last_scanned": "2025-09-12T03:46:04.234754",
+    "last_scanned": "2025-09-12T21:27:43.430016",
     "lab_count": 0,
     "exists": true,
     "path": "data/repositories/packetanglers-topos"
   },
-  "learn-srlinux": {
-    "last_scanned": "2025-09-12T03:46:04.239989",
-    "lab_count": 2,
-    "exists": true,
-    "path": "data/repositories/learn-srlinux"
+  "networkop-topos": {
+    "last_scanned": "2025-09-12T21:27:43.430137",
+    "lab_count": 0,
+    "exists": false,
+    "path": null
+  },
+  "srl-baselab": {
+    "last_scanned": "2025-09-12T21:27:43.430208",
+    "lab_count": 0,
+    "exists": false,
+    "path": null
   },
   "clab-config-demo": {
-    "last_scanned": "2025-09-12T03:46:04.243568",
+    "last_scanned": "2025-09-12T21:27:43.458003",
     "lab_count": 1,
     "exists": true,
     "path": "data/repositories/clab-config-demo"
   },
-  "instruqt-clab-topologies": {
-    "last_scanned": "2025-09-12T03:46:04.243720",
+  "network-automation-examples": {
+    "last_scanned": "2025-09-12T21:27:43.458085",
     "lab_count": 0,
-    "exists": true,
-    "path": "data/repositories/instruqt-clab-topologies"
+    "exists": false,
+    "path": null
   },
-  "test-repo": {
-    "last_scanned": "2025-09-12T03:46:04.243749",
+  "juniper-clab-examples": {
+    "last_scanned": "2025-09-12T21:27:43.458136",
     "lab_count": 0,
     "exists": false,
     "path": null
