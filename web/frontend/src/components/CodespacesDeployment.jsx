@@ -5,30 +5,56 @@ import { getApiBase, api } from '../utils/api'
 function CodespacesDeployment({ labData }) {
   const [deploymentStatus, setDeploymentStatus] = useState('')
   const [isDeploying, setIsDeploying] = useState(false)
-
+  const [deploymentProgress, setDeploymentProgress] = useState('')
+  const [resultUrls, setResultUrls] = useState({})
 
   const deployToCodespaces = async () => {
     setIsDeploying(true)
-    setDeploymentStatus('Preparing deployment to GitHub Codespaces...')
+    setDeploymentStatus('')
+    setResultUrls({})
+    setDeploymentProgress('🔄 Preparing lab for GitHub Codespaces deployment...')
     
     try {
+      // Validate lab data
+      if (!labData || !labData.name) {
+        throw new Error('Lab data is missing or invalid')
+      }
+
+      setDeploymentProgress('🔧 Creating GitHub repository...')
+      
       const result = await api.post('/api/github/deploy-codespaces', {
-        lab_data: labData,
+        lab_config: labData,
         deployment_type: 'codespaces'
       })
       
       if (result.success) {
-        setDeploymentStatus('✅ Deployment successful! Opening GitHub Codespaces...')
-        // Open the Codespaces URL
-        if (result.codespaces_url) {
-          window.open(result.codespaces_url, '_blank')
-        }
+        setDeploymentProgress('📦 Configuring containerlab devcontainer...')
+        
+        // Store the URLs for later use
+        setResultUrls({
+          github: result.github_url,
+          codespaces: result.codespaces_url
+        })
+        
+        setDeploymentStatus(`✅ Lab deployed successfully! Repository: ${result.github_url?.split('/').pop()}`)
+        setDeploymentProgress('🚀 Ready to launch in Codespaces!')
+        
+        // Optionally auto-open Codespaces
+        setTimeout(() => {
+          if (result.codespaces_url) {
+            setDeploymentProgress('🌟 Opening GitHub Codespaces...')
+            window.open(result.codespaces_url, '_blank')
+          }
+        }, 1500)
+        
       } else {
-        setDeploymentStatus(`❌ Deployment failed: ${result.message}`)
+        setDeploymentStatus(`❌ Deployment failed: ${result.error || result.message}`)
+        setDeploymentProgress('')
       }
     } catch (error) {
       console.error('Codespaces deployment error:', error)
-      setDeploymentStatus('❌ Deployment failed: Unable to connect to deployment service')
+      setDeploymentStatus(`❌ Deployment failed: ${error.message || 'Unable to connect to deployment service'}`)
+      setDeploymentProgress('')
     } finally {
       setIsDeploying(false)
     }
@@ -36,26 +62,50 @@ function CodespacesDeployment({ labData }) {
 
   const exportToGitHub = async () => {
     setIsDeploying(true)
-    setDeploymentStatus('Creating GitHub repository...')
+    setDeploymentStatus('')
+    setResultUrls({})
+    setDeploymentProgress('🔄 Preparing lab export to GitHub...')
     
     try {
+      // Validate lab data
+      if (!labData || !labData.name) {
+        throw new Error('Lab data is missing or invalid')
+      }
+
+      setDeploymentProgress('🔧 Creating GitHub repository...')
+      
       const result = await api.post('/api/github/export-repo', {
-        lab_data: labData,
+        lab_config: labData,
         export_type: 'repository'
       })
       
       if (result.success) {
-        setDeploymentStatus('✅ Repository created successfully!')
-        // Open the GitHub repository
-        if (result.github_url) {
-          window.open(result.github_url, '_blank')
-        }
+        setDeploymentProgress('📄 Generating lab documentation...')
+        
+        // Store the URLs for later use
+        setResultUrls({
+          github: result.github_url,
+          codespaces: result.codespaces_url
+        })
+        
+        setDeploymentStatus(`✅ Repository created successfully! ${result.github_url?.split('/').pop()}`)
+        setDeploymentProgress('📂 Ready to view on GitHub!')
+        
+        // Auto-open GitHub repository
+        setTimeout(() => {
+          if (result.github_url) {
+            window.open(result.github_url, '_blank')
+          }
+        }, 1500)
+        
       } else {
-        setDeploymentStatus(`❌ Export failed: ${result.message}`)
+        setDeploymentStatus(`❌ Export failed: ${result.error || result.message}`)
+        setDeploymentProgress('')
       }
     } catch (error) {
       console.error('GitHub export error:', error)
-      setDeploymentStatus('❌ Export failed: Unable to connect to GitHub service')
+      setDeploymentStatus(`❌ Export failed: ${error.message || 'Unable to connect to GitHub service'}`)
+      setDeploymentProgress('')
     } finally {
       setIsDeploying(false)
     }
@@ -133,9 +183,51 @@ function CodespacesDeployment({ labData }) {
         </div>
       </div>
 
+      {deploymentProgress && (
+        <div className="deployment-progress">
+          <div className="progress-text">{deploymentProgress}</div>
+          {isDeploying && (
+            <div className="progress-bar">
+              <div className="progress-bar-inner"></div>
+            </div>
+          )}
+        </div>
+      )}
+
       {deploymentStatus && (
         <div className={`deployment-status ${deploymentStatus.startsWith('✅') ? 'success' : deploymentStatus.startsWith('❌') ? 'error' : 'info'}`}>
           {deploymentStatus}
+        </div>
+      )}
+
+      {resultUrls.github && (
+        <div className="deployment-results">
+          <h4>🎉 Deployment Complete!</h4>
+          <div className="result-buttons">
+            <button 
+              className="result-button github-button"
+              onClick={() => window.open(resultUrls.github, '_blank')}
+            >
+              📂 View Repository
+            </button>
+            {resultUrls.codespaces && (
+              <button 
+                className="result-button codespaces-button"
+                onClick={() => window.open(resultUrls.codespaces, '_blank')}
+              >
+                🚀 Launch Codespaces
+              </button>
+            )}
+          </div>
+          <div className="quick-start-info">
+            <p>Your lab has been exported with:</p>
+            <ul>
+              <li>✅ Official containerlab devcontainer</li>
+              <li>✅ Pre-configured VS Code workspace</li>
+              <li>✅ Network automation extensions</li>
+              <li>✅ Lab topology and documentation</li>
+            </ul>
+          </div>
         </div>
       )}
 

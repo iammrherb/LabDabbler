@@ -226,6 +226,136 @@
   line-height: 1.4;
 }
 
+/* Progress indicator styles */
+.deployment-progress {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #e1e8ff;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.progress-text {
+  color: #4f46e5;
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed, #4f46e5);
+  border-radius: 3px;
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Deployment results styles */
+.deployment-results {
+  background: #f0fdf4;
+  padding: 25px;
+  border-radius: 12px;
+  border: 2px solid #22c55e;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.deployment-results h4 {
+  color: #15803d;
+  margin: 0 0 20px 0;
+  font-size: 1.3em;
+}
+
+.result-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.result-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.github-button {
+  background: #24292f;
+  color: white;
+}
+
+.github-button:hover {
+  background: #1c2128;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(36, 41, 47, 0.3);
+}
+
+.codespaces-button {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+}
+
+.codespaces-button:hover {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.quick-start-info {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.quick-start-info p {
+  color: #15803d;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.quick-start-info ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #166534;
+}
+
+.quick-start-info li {
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
 /* Animation for loading states */
 @keyframes pulse {
   0%, 100% {
@@ -238,4 +368,22 @@
 
 .deploy-button:disabled {
   animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .result-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .result-button {
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .quick-start-info {
+    margin: 0;
+    max-width: none;
+  }
 }

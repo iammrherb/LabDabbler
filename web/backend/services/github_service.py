@@ -175,76 +175,98 @@ class GitHubService:
     async def create_codespaces_config(self, lab_config: Dict[str, Any]) -> Dict[str, Any]:
         """Generate devcontainer configuration for GitHub Codespaces"""
         
-        # Base devcontainer configuration optimized for containerlab
+        # Get lab requirements to determine machine size
+        nodes = lab_config.get("topology", {}).get("nodes", {})
+        node_count = len(nodes)
+        
+        # Determine required machine type based on lab complexity
+        if node_count > 10:
+            # Large labs need more resources
+            host_requirements = {
+                "cpus": 8,
+                "memory": "16gb", 
+                "storage": "32gb"
+            }
+        elif node_count > 5:
+            # Medium labs
+            host_requirements = {
+                "cpus": 4,
+                "memory": "8gb",
+                "storage": "32gb"
+            }
+        else:
+            # Small labs - default to 4 core for nested virtualization support
+            host_requirements = {
+                "cpus": 4,
+                "memory": "8gb",
+                "storage": "32gb"
+            }
+        
+        # Official containerlab devcontainer configuration
+        # Based on https://containerlab.dev/manual/codespaces/
         devcontainer_config = {
-            "name": f"Containerlab Environment - {lab_config.get('name', 'Lab')}",
-            "image": "ghcr.io/srl-labs/clab-devcontainer:latest",
-            "features": {
-                "docker-in-docker": "latest",
-                "python": "3.11",
-                "node": "20"
-            },
+            "name": f"Containerlab Lab - {lab_config.get('name', 'Lab')}",
+            "image": "ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.68.0",
+            "hostRequirements": host_requirements,
             "customizations": {
                 "vscode": {
                     "extensions": [
-                        "ms-vscode-remote.remote-containers",
-                        "ms-python.python",
-                        "ms-python.flake8",
-                        "ms-python.pylint",
+                        # Containerlab specific extensions
                         "redhat.vscode-yaml",
                         "ms-vscode.vscode-json",
+                        # Network automation and development
+                        "ms-python.python",
+                        "ms-python.pylint",
+                        "ms-python.flake8",
+                        # Git and collaboration
                         "eamodio.gitlens",
                         "GitHub.copilot",
                         "GitHub.copilot-chat",
-                        "ms-vscode.azure-repos",
-                        "christian-kohler.path-intellisense",
-                        "formulahendry.auto-rename-tag",
-                        "bradlc.vscode-tailwindcss",
-                        "esbenp.prettier-vscode"
+                        # Terminal and shell
+                        "ms-vscode.vscode-terminal",
+                        # Docker support
+                        "ms-azuretools.vscode-docker",
+                        # File management
+                        "christian-kohler.path-intellisense"
                     ],
                     "settings": {
                         "terminal.integrated.defaultProfile.linux": "bash",
-                        "python.defaultInterpreterPath": "/usr/local/bin/python",
-                        "python.linting.enabled": True,
-                        "python.linting.pylintEnabled": True,
+                        "terminal.integrated.shell.linux": "/bin/bash",
+                        "python.defaultInterpreterPath": "/usr/bin/python3",
+                        "yaml.schemas": {
+                            "https://raw.githubusercontent.com/srl-labs/containerlab/main/schemas/clab.schema.json": "*.clab.yml"
+                        },
+                        "files.associations": {
+                            "*.clab.yml": "yaml",
+                            "*.clab.yaml": "yaml"
+                        },
                         "editor.formatOnSave": True,
-                        "editor.codeActionsOnSave": {
-                            "source.organizeImports": True
-                        }
+                        "editor.defaultFormatter": "redhat.vscode-yaml"
                     }
                 }
             },
-            "postCreateCommand": [
-                "bash",
-                "-c", 
-                "pip install netlab streamlit jinja2 && " +
-                "netlab install containerlab && " +
-                "git clone https://github.com/vrnetlab/vrnetlab.git /vrnetlab && " +
-                "chmod +x /vrnetlab/*/Makefile && " +
-                "echo 'Containerlab environment setup complete!'"
-            ],
-            "forwardPorts": [5000, 8000, 8080],
+            "forwardPorts": [5000, 8000, 8080, 8443],
             "portsAttributes": {
                 "5000": {
-                    "label": "LabDabbler Frontend",
+                    "label": "Lab Web Interface",
                     "onAutoForward": "openPreview"
                 },
                 "8000": {
-                    "label": "LabDabbler Backend API",
+                    "label": "Lab API",
                     "onAutoForward": "ignore"
                 },
                 "8080": {
-                    "label": "Lab Web Interface",
-                    "onAutoForward": "openPreview"
+                    "label": "Alternative Web Interface",
+                    "onAutoForward": "ignore"
+                },
+                "8443": {
+                    "label": "HTTPS Web Interface",
+                    "onAutoForward": "ignore"
                 }
             },
             "remoteEnv": {
-                "CONTAINERLAB_VERSION": "latest",
-                "NETLAB_VERSION": "latest"
-            },
-            "mounts": [
-                "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-            ]
+                "CONTAINERLAB_VERSION": "0.68.0"
+            }
         }
         
         return devcontainer_config
@@ -428,13 +450,29 @@ cd web/backend && python app.py &
                 "message": "Failed to create lab package"
             }
     
+    async def get_repository_default_branch(self, repo_owner: str, repo_name: str) -> str:
+        """Get the default branch for a repository"""
+        try:
+            headers = await self.get_authenticated_headers()
+            
+            async with aiohttp.ClientSession() as session:
+                repo_url = f"{self.github_api_base}/repos/{repo_owner}/{repo_name}"
+                async with session.get(repo_url, headers=headers) as response:
+                    if response.status == 200:
+                        repo_info = await response.json()
+                        return repo_info.get("default_branch", "main")
+                    return "main"  # Fallback to main
+        except Exception as e:
+            logger.error(f"Failed to get default branch for {repo_owner}/{repo_name}: {e}")
+            return "main"  # Fallback to main
+    
     async def push_lab_to_github(self, repo_owner: str, repo_name: str, lab_package: Dict[str, Any]) -> Dict[str, Any]:
         """Push a lab package to a GitHub repository"""
         try:
             headers = await self.get_authenticated_headers()
             
             async with aiohttp.ClientSession() as session:
-                # Get repository information
+                # Get repository information and default branch
                 repo_url = f"{self.github_api_base}/repos/{repo_owner}/{repo_name}"
                 async with session.get(repo_url, headers=headers) as response:
                     if response.status != 200:
@@ -442,9 +480,23 @@ cd web/backend && python app.py &
                             "success": False,
                             "error": f"Repository {repo_owner}/{repo_name} not found or inaccessible"
                         }
+                    
+                    repo_info = await response.json()
+                    default_branch = repo_info.get("default_branch", "main")
                 
                 # Create/update files in the repository
                 files_created = []
+                files_failed = []
+                critical_files = [".devcontainer/devcontainer.json"]
+                
+                # Add lab.clab.yml to critical files if it exists in the package
+                for category, files in lab_package["package"].items():
+                    if category == "lab_files":
+                        for file_path in files.keys():
+                            if file_path.endswith(".clab.yml"):
+                                critical_files.append(file_path)
+                                break
+                
                 for category, files in lab_package["package"].items():
                     if category == "metadata":
                         continue
@@ -460,27 +512,75 @@ cd web/backend && python app.py &
                                 existing_file = await response.json()
                                 file_data["sha"] = existing_file["sha"]
                         
-                        # Create/update the file
+                        # Create/update the file with correct branch
                         import base64
                         file_data.update({
                             "message": f"Update {file_path} via LabDabbler",
                             "content": base64.b64encode(content.encode()).decode(),
-                            "branch": "main"
+                            "branch": default_branch
                         })
                         
                         async with session.put(file_url, headers=headers, json=file_data) as response:
                             if response.status in [200, 201]:
                                 files_created.append(file_path)
                             else:
-                                logger.error(f"Failed to create/update {file_path}: {response.status}")
+                                error_msg = f"Failed to create/update {file_path}: {response.status}"
+                                logger.error(error_msg)
+                                files_failed.append({
+                                    "file_path": file_path,
+                                    "status_code": response.status,
+                                    "error": error_msg
+                                })
                 
-                return {
-                    "success": True,
+                # Check for critical file failures - return success=False if any critical files failed
+                critical_failures = [f for f in files_failed if f["file_path"] in critical_files]
+                has_critical_failures = len(critical_failures) > 0
+                
+                # Post-push verification: confirm critical files exist
+                verified_files = []
+                if not has_critical_failures:
+                    for critical_file in critical_files:
+                        if critical_file in files_created:
+                            # Verify the file actually exists after creation
+                            verify_url = f"{self.github_api_base}/repos/{repo_owner}/{repo_name}/contents/{critical_file}"
+                            async with session.get(verify_url, headers=headers, params={"ref": default_branch}) as response:
+                                if response.status == 200:
+                                    verified_files.append(critical_file)
+                                else:
+                                    has_critical_failures = True
+                                    files_failed.append({
+                                        "file_path": critical_file,
+                                        "status_code": response.status,
+                                        "error": f"Post-push verification failed: file not found after creation"
+                                    })
+                
+                # Create proper URLs with encoding
+                import urllib.parse
+                encoded_repo = urllib.parse.quote(f"{repo_owner}/{repo_name}")
+                github_url = f"https://github.com/{repo_owner}/{repo_name}"
+                
+                # Determine success status
+                deployment_success = not has_critical_failures and len(verified_files) == len(critical_files)
+                
+                result = {
+                    "success": deployment_success,
                     "files_created": files_created,
-                    "repository_url": f"https://github.com/{repo_owner}/{repo_name}",
-                    "codespaces_url": f"https://github.com/codespaces/new?repo={repo_owner}/{repo_name}",
-                    "message": f"Lab deployed to {repo_owner}/{repo_name}"
+                    "files_failed": files_failed,
+                    "critical_files": critical_files,
+                    "verified_files": verified_files,
+                    "default_branch": default_branch,
+                    "github_url": github_url,  # Frontend expects this field
+                    "repository_url": github_url,  # Backward compatibility
+                    "codespaces_url": f"https://github.com/codespaces/new?repo={encoded_repo}&ref={default_branch}&quickstart=1&hide_repo_select=true"
                 }
+                
+                if deployment_success:
+                    result["message"] = f"Lab successfully deployed to {repo_owner}/{repo_name} (verified)"
+                else:
+                    result["message"] = f"Lab deployment to {repo_owner}/{repo_name} failed - missing critical files"
+                    result["error"] = f"Critical files failed: {[f['file_path'] for f in critical_failures]}"
+                
+                return result
                 
         except Exception as e:
             logger.error(f"Failed to push lab to GitHub: {e}")
@@ -517,31 +617,172 @@ cd web/backend && python app.py &
                 "error": str(e)
             }
     
+    async def create_repository(self, repo_name: str, description: str = "", private: bool = False) -> Dict[str, Any]:
+        """Create a new GitHub repository"""
+        try:
+            headers = await self.get_authenticated_headers()
+            
+            # Get authenticated user information
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{self.github_api_base}/user", headers=headers) as response:
+                    if response.status != 200:
+                        return {
+                            "success": False,
+                            "error": "Failed to get user information"
+                        }
+                    user_info = await response.json()
+                    username = user_info.get("login")
+                
+                # Create repository
+                repo_data = {
+                    "name": repo_name,
+                    "description": description or f"Containerlab network lab: {repo_name}",
+                    "private": private,
+                    "auto_init": True,
+                    "has_issues": True,
+                    "has_projects": False,
+                    "has_wiki": False
+                }
+                
+                async with session.post(f"{self.github_api_base}/user/repos", headers=headers, json=repo_data) as response:
+                    if response.status == 201:
+                        repo_info = await response.json()
+                        return {
+                            "success": True,
+                            "repository": repo_info,
+                            "owner": username,
+                            "name": repo_name,
+                            "full_name": f"{username}/{repo_name}",
+                            "html_url": repo_info.get("html_url"),
+                            "clone_url": repo_info.get("clone_url")
+                        }
+                    elif response.status == 422:
+                        # Repository already exists
+                        return {
+                            "success": False,
+                            "error": f"Repository '{repo_name}' already exists",
+                            "exists": True,
+                            "owner": username,
+                            "name": repo_name,
+                            "full_name": f"{username}/{repo_name}"
+                        }
+                    else:
+                        error_data = await response.json() if response.content_type == 'application/json' else {}
+                        return {
+                            "success": False,
+                            "error": error_data.get("message", f"Failed to create repository: {response.status}")
+                        }
+                        
+        except Exception as e:
+            logger.error(f"Failed to create repository: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    async def generate_lab_topology_files(self, lab_config: Dict[str, Any]) -> Dict[str, str]:
+        """Generate lab topology files from lab configuration"""
+        try:
+            lab_files = {}
+            lab_name = lab_config.get("name", "containerlab-lab")
+            
+            # Generate main .clab.yml file
+            clab_filename = f"{lab_name}.clab.yml"
+            
+            # Create the containerlab topology structure
+            topology_config = {
+                "name": lab_name,
+                "topology": lab_config.get("topology", {})
+            }
+            
+            # Add management configuration if not present
+            if "mgmt" not in topology_config:
+                topology_config["mgmt"] = {
+                    "network": f"{lab_name}-mgmt",
+                    "ipv4_subnet": "172.80.80.0/24"
+                }
+            
+            # Add any additional lab metadata
+            if lab_config.get("description"):
+                topology_config["description"] = lab_config["description"]
+            
+            # Convert to YAML format
+            lab_files[clab_filename] = yaml.dump(topology_config, default_flow_style=False, sort_keys=False)
+            
+            # Generate any additional configuration files mentioned in the lab
+            nodes = lab_config.get("topology", {}).get("nodes", {})
+            for node_name, node_config in nodes.items():
+                # If node has startup-config or other config files, include them
+                if "startup-config" in node_config:
+                    config_file = node_config["startup-config"]
+                    if not config_file.startswith("/") and "." in config_file:
+                        # This looks like a relative config file path, we should include it
+                        # For now, create a placeholder - in real scenario we'd need actual config content
+                        lab_files[config_file] = f"# Configuration for {node_name}\n# Generated by LabDabbler\n"
+            
+            return lab_files
+            
+        except Exception as e:
+            logger.error(f"Failed to generate lab topology files: {e}")
+            return {}
+    
     async def deploy_to_codespaces(self, lab_data: Dict[str, Any]) -> Dict[str, Any]:
         """Deploy lab data to GitHub Codespaces"""
         try:
-            # Extract topology information
-            topology = lab_data.get("topology", {})
-            repo_owner = lab_data.get("repo_owner", "")
-            repo_name = lab_data.get("repo_name", "")
+            # Extract lab configuration
+            lab_config = lab_data.get("lab_config", lab_data)
+            lab_name = lab_config.get("name", "containerlab-lab")
             
-            if not repo_owner or not repo_name:
-                return {
-                    "success": False,
-                    "error": "Repository owner and name are required"
+            # Sanitize repo name
+            repo_name = f"clab-{lab_name}".lower().replace(" ", "-").replace("_", "-")
+            repo_name = "".join(c for c in repo_name if c.isalnum() or c in ["-", "."])
+            
+            # Create repository
+            repo_result = await self.create_repository(
+                repo_name=repo_name,
+                description=f"Containerlab network lab: {lab_name}",
+                private=False
+            )
+            
+            if not repo_result["success"] and not repo_result.get("exists"):
+                return repo_result
+            
+            # Use existing or new repository info
+            repo_owner = repo_result["owner"] 
+            actual_repo_name = repo_result["name"]
+            
+            # Generate lab topology files - CRITICAL FIX
+            lab_files = await self.generate_lab_topology_files(lab_config)
+            if not lab_files:
+                logger.warning("No lab topology files generated, creating minimal structure")
+                # Fallback: create minimal topology file
+                lab_files = {
+                    f"{lab_name}.clab.yml": yaml.dump({
+                        "name": lab_name,
+                        "topology": lab_config.get("topology", {
+                            "nodes": {},
+                            "links": []
+                        }),
+                        "mgmt": {
+                            "network": f"{lab_name}-mgmt",
+                            "ipv4_subnet": "172.80.80.0/24"
+                        }
+                    }, default_flow_style=False)
                 }
             
-            # Create lab package with Codespaces configuration
-            lab_package = await self.create_lab_package(topology, {})
+            # Create lab package with Codespaces configuration and actual lab files
+            lab_package = await self.create_lab_package(lab_config, lab_files)
             if not lab_package["success"]:
                 return lab_package
                 
             # Push to GitHub repository
-            result = await self.push_lab_to_github(repo_owner, repo_name, lab_package)
+            result = await self.push_lab_to_github(repo_owner, actual_repo_name, lab_package)
             
             if result["success"]:
-                result["codespaces_url"] = f"https://github.com/codespaces/new?repo={repo_owner}/{repo_name}"
-                result["message"] = f"Lab deployed to GitHub Codespaces: {repo_owner}/{repo_name}"
+                # The URLs are already properly set in push_lab_to_github, but ensure consistency
+                if "github_url" not in result:
+                    result["github_url"] = result.get("repository_url")
+                result["message"] = f"Lab deployed to GitHub Codespaces: {repo_owner}/{actual_repo_name}"
             
             return result
             
@@ -556,27 +797,60 @@ cd web/backend && python app.py &
     async def export_to_github_repo(self, lab_data: Dict[str, Any]) -> Dict[str, Any]:
         """Export lab data to a GitHub repository"""
         try:
-            # Extract topology information
-            topology = lab_data.get("topology", {})
-            repo_owner = lab_data.get("repo_owner", "")
-            repo_name = lab_data.get("repo_name", "")
+            # Extract lab configuration
+            lab_config = lab_data.get("lab_config", lab_data)
+            lab_name = lab_config.get("name", "containerlab-lab")
             
-            if not repo_owner or not repo_name:
-                return {
-                    "success": False,
-                    "error": "Repository owner and name are required"
+            # Sanitize repo name
+            repo_name = f"clab-{lab_name}".lower().replace(" ", "-").replace("_", "-")
+            repo_name = "".join(c for c in repo_name if c.isalnum() or c in ["-", "."])
+            
+            # Create repository
+            repo_result = await self.create_repository(
+                repo_name=repo_name,
+                description=f"Containerlab network lab: {lab_name}",
+                private=False
+            )
+            
+            if not repo_result["success"] and not repo_result.get("exists"):
+                return repo_result
+            
+            # Use existing or new repository info
+            repo_owner = repo_result["owner"] 
+            actual_repo_name = repo_result["name"]
+            
+            # Generate lab topology files - CRITICAL FIX FOR EXPORT
+            lab_files = await self.generate_lab_topology_files(lab_config)
+            if not lab_files:
+                logger.warning("No lab topology files generated for export, creating minimal structure")
+                # Fallback: create minimal topology file
+                lab_files = {
+                    f"{lab_name}.clab.yml": yaml.dump({
+                        "name": lab_name,
+                        "topology": lab_config.get("topology", {
+                            "nodes": {},
+                            "links": []
+                        }),
+                        "mgmt": {
+                            "network": f"{lab_name}-mgmt",
+                            "ipv4_subnet": "172.80.80.0/24"
+                        }
+                    }, default_flow_style=False)
                 }
             
-            # Create lab package
-            lab_package = await self.create_lab_package(topology, {})
+            # Create lab package with proper topology files
+            lab_package = await self.create_lab_package(lab_config, lab_files)
             if not lab_package["success"]:
                 return lab_package
                 
             # Push to GitHub repository
-            result = await self.push_lab_to_github(repo_owner, repo_name, lab_package)
+            result = await self.push_lab_to_github(repo_owner, actual_repo_name, lab_package)
             
             if result["success"]:
-                result["message"] = f"Lab exported to GitHub repository: {repo_owner}/{repo_name}"
+                # URLs are already properly set in push_lab_to_github, don't override them
+                if "github_url" not in result:
+                    result["github_url"] = result.get("repository_url")
+                result["message"] = f"Lab exported to GitHub repository: {repo_owner}/{actual_repo_name}"
             
             return result
             
