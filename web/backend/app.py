@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from typing import Optional
 import os
 import yaml
 import json
@@ -13,12 +14,14 @@ from services.github_lab_scanner import GitHubLabScanner
 from services.lab_launcher import LabLauncherService
 from services.vrnetlab_service import VRNetLabService
 from services.repository_management import RepositoryManagementService
+from services.runtime import RuntimeProviderFactory
 
 logger = logging.getLogger(__name__)
 
 # Initialize services at module level
 container_service = ContainerDiscoveryService(Path("./data"))
 lab_scanner = GitHubLabScanner(Path("./data"))
+runtime_factory = RuntimeProviderFactory(Path("./data"))
 lab_launcher = LabLauncherService(Path("./data"))
 vrnetlab_service = VRNetLabService(Path("./data"))
 repository_service = RepositoryManagementService(Path("./data"))
@@ -72,6 +75,7 @@ else:
 # Update service data directories to use PROJECT_ROOT/data
 container_service.data_dir = DATA_DIR
 lab_scanner.data_dir = DATA_DIR
+runtime_factory.data_dir = DATA_DIR
 lab_launcher.data_dir = DATA_DIR
 vrnetlab_service.data_dir = DATA_DIR
 repository_service.data_dir = DATA_DIR
@@ -867,6 +871,120 @@ async def export_topology(topology_id: str, format: str = "clab"):
         raise
     except Exception as e:
         logger.error(f"Error exporting topology: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Runtime Provider Management Endpoints
+@app.get("/api/runtime/health")
+async def check_runtime_health(provider_name: Optional[str] = None):
+    """Check health of runtime providers"""
+    try:
+        if provider_name:
+            # Check specific provider
+            provider = runtime_factory.get_provider(provider_name)
+            if not provider:
+                raise HTTPException(status_code=404, detail=f"Runtime provider '{provider_name}' not found")
+            
+            health = await provider.check_health()
+            return health
+        else:
+            # Check all providers
+            health_results = await runtime_factory.check_all_providers_health()
+            return {
+                "providers": health_results,
+                "default_provider": runtime_factory.default_provider_name
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error checking runtime health: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/runtime/providers")
+async def list_runtime_providers():
+    """List all configured runtime providers"""
+    try:
+        providers = runtime_factory.list_providers()
+        return {
+            "providers": providers,
+            "default_provider": runtime_factory.default_provider_name
+        }
+    except Exception as e:
+        logger.error(f"Error listing runtime providers: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/runtime/providers")
+async def add_runtime_provider(config: dict):
+    """Add a new runtime provider"""
+    try:
+        success = runtime_factory.add_provider(config)
+        if success:
+            return {"message": f"Runtime provider '{config.get('name')}' added successfully"}
+        else:
+            raise HTTPException(status_code=400, detail="Failed to add runtime provider")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding runtime provider: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/runtime/providers/{provider_name}")
+async def remove_runtime_provider(provider_name: str):
+    """Remove a runtime provider"""
+    try:
+        success = runtime_factory.remove_provider(provider_name)
+        if success:
+            return {"message": f"Runtime provider '{provider_name}' removed successfully"}
+        else:
+            raise HTTPException(status_code=404, detail=f"Runtime provider '{provider_name}' not found or cannot be removed")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error removing runtime provider: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/runtime/providers/{provider_name}/default")
+async def set_default_runtime_provider(provider_name: str):
+    """Set the default runtime provider"""
+    try:
+        success = runtime_factory.set_default_provider(provider_name)
+        if success:
+            return {"message": f"Default runtime provider set to '{provider_name}'"}
+        else:
+            raise HTTPException(status_code=404, detail=f"Runtime provider '{provider_name}' not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error setting default runtime provider: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/runtime/test")
+async def test_runtime_provider(config: dict):
+    """Test a runtime provider configuration without saving it"""
+    try:
+        from services.runtime.local import LocalRuntimeProvider
+        from services.runtime.ssh import SSHRuntimeProvider
+        
+        provider_type = config.get("type")
+        if provider_type == "local":
+            test_provider = LocalRuntimeProvider(config)
+        elif provider_type == "ssh":
+            test_provider = SSHRuntimeProvider(config)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown provider type: {provider_type}")
+        
+        health = await test_provider.check_health()
+        
+        # Clean up SSH connections if applicable  
+        await test_provider.close_connection()
+        
+        return {
+            "message": "Runtime provider test completed",
+            "health": health
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error testing runtime provider: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

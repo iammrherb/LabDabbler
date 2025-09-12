@@ -1,0 +1,11 @@
+{
+  "default_provider": "local",
+  "providers": {
+    "local": {
+      "name": "local",
+      "type": "local",
+      "description": "Local containerlab runtime",
+      "enabled": true
+    }
+  }
+}

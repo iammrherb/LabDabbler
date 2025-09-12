@@ -4,7 +4,7 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["cargo", "jq", "libiconv", "libxcrypt", "libyaml", "openssl", "pkg-config", "rustc"]
+packages = ["cargo", "jq", "libiconv", "libsodium", "libxcrypt", "libyaml", "nettle", "openssh", "openssl", "pkg-config", "rustc"]
 
 [workflows]
 runButton = "Project"
@@ -55,7 +55,7 @@ localPort = 8000
 externalPort = 8000
 
 [[ports]]
-localPort = 36589
+localPort = 45563
 externalPort = 3000
 
 [deployment]

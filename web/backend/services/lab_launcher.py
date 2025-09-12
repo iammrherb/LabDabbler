@@ -4,24 +4,36 @@ import yaml
 import subprocess
 import aiohttp
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 from pathlib import Path
 import logging
 import uuid
 import shutil
 import tempfile
 
+from .runtime import RuntimeProviderFactory, RuntimeProvider
+
 logger = logging.getLogger(__name__)
 
 class LabLauncherService:
     """Service to launch and manage containerlab topologies"""
     
-    def __init__(self, data_dir: Path = Path("./data")):
+    def __init__(self, data_dir: Path = Path("./data"), runtime_provider: Optional[RuntimeProvider] = None):
         self.data_dir = data_dir
         self.data_dir.mkdir(exist_ok=True)
         self.active_labs_file = self.data_dir / "active_labs.json"
         self.lab_configs_dir = self.data_dir / "lab_configs"
         self.lab_configs_dir.mkdir(exist_ok=True)
+        
+        # Initialize runtime provider
+        if runtime_provider:
+            self.runtime_provider: RuntimeProvider = runtime_provider
+        else:
+            self.runtime_factory = RuntimeProviderFactory(data_dir)
+            provider = self.runtime_factory.get_default_provider()
+            if not provider:
+                raise RuntimeError("No runtime provider available")
+            self.runtime_provider: RuntimeProvider = provider
         
     async def launch_lab(self, lab_file_path: str) -> Dict:
         """Launch a containerlab topology from an existing .clab.yml file or URL"""
@@ -81,15 +93,30 @@ class LabLauncherService:
             logger.info(f"Launching lab: {lab_name} (ID: {lab_id}) from {lab_file}")
             
             # Check if containerlab is available
-            if not await self.check_containerlab():
+            assert self.runtime_provider is not None, "Runtime provider should be initialized"
+            if not await self.runtime_provider.check_containerlab():
                 return {
                     "success": False,
                     "error": "containerlab is not installed or not available",
-                    "message": "Please install containerlab to launch labs"
+                    "message": "Please install containerlab on the runtime provider"
                 }
             
-            # Launch the lab using the original file
-            result = await self.execute_containerlab_deploy(lab_name, lab_file)
+            # Upload lab file to runtime if needed (for remote providers)
+            remote_lab_file = str(lab_file)
+            assert self.runtime_provider is not None, "Runtime provider should be initialized"
+            if self.runtime_provider.type != "local":
+                # For remote providers, upload the file
+                remote_lab_file = f"/tmp/{lab_file.name}"
+                upload_success = await self.runtime_provider.upload_file(lab_file, remote_lab_file)
+                if not upload_success:
+                    return {
+                        "success": False,
+                        "error": "Failed to upload lab file to runtime provider",
+                        "message": f"Could not upload {lab_file} to remote host"
+                    }
+            
+            # Launch the lab using the runtime provider
+            result = await self.execute_containerlab_deploy(lab_name, remote_lab_file)
             
             if result["success"]:
                 # Store lab information
@@ -200,7 +227,16 @@ class LabLauncherService:
                     "message": f"Cannot stop lab {lab_name} - original topology file is missing"
                 }
             
-            result = await self.execute_containerlab_destroy(lab_name, lab_file)
+            # For remote providers, we may need to re-upload the file or use the cached path
+            remote_lab_file = str(lab_file)
+            assert self.runtime_provider is not None, "Runtime provider should be initialized"
+            if self.runtime_provider.type != "local":
+                remote_lab_file = f"/tmp/{lab_file.name}"
+                # Try to upload the file for destroy (if it exists locally)
+                if lab_file.exists():
+                    await self.runtime_provider.upload_file(lab_file, remote_lab_file)
+                
+            result = await self.execute_containerlab_destroy(lab_name, remote_lab_file)
             
             # Always clean up from our tracking, even if destroy had issues
             del active_labs[lab_id]
@@ -287,46 +323,30 @@ class LabLauncherService:
             logger.error(f"Error listing active labs: {e}")
             return []
     
-    async def check_containerlab(self) -> bool:
-        """Check if containerlab is available"""
-        try:
-            result = await asyncio.create_subprocess_exec(
-                "containerlab", "version",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await result.communicate()
-            return result.returncode == 0
-        except FileNotFoundError:
-            return False
-        except Exception:
-            return False
+    # Removed check_containerlab method - now delegated to runtime provider
     
-    async def execute_containerlab_deploy(self, lab_name: str, lab_file: Path) -> Dict:
-        """Execute containerlab deploy command"""
+    async def execute_containerlab_deploy(self, lab_name: str, lab_file: str) -> Dict:
+        """Execute containerlab deploy command using runtime provider"""
         try:
-            cmd = ["containerlab", "deploy", "-t", str(lab_file)]
+            cmd = ["containerlab", "deploy", "-t", lab_file]
             
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=lab_file.parent
-            )
+            # Get working directory (parent of lab file)
+            assert self.runtime_provider is not None, "Runtime provider should be initialized"
+            cwd = str(Path(lab_file).parent) if self.runtime_provider.type == "local" else "/tmp"
             
-            stdout, stderr = await process.communicate()
+            return_code, stdout, stderr = await self.runtime_provider.execute_command(cmd, cwd)
             
-            if process.returncode == 0:
+            if return_code == 0:
                 return {
                     "success": True,
-                    "stdout": stdout.decode(),
-                    "stderr": stderr.decode()
+                    "stdout": stdout,
+                    "stderr": stderr
                 }
             else:
                 return {
                     "success": False,
-                    "error": stderr.decode(),
-                    "stdout": stdout.decode()
+                    "error": stderr or f"Deploy failed with return code {return_code}",
+                    "stdout": stdout
                 }
                 
         except Exception as e:
@@ -335,32 +355,29 @@ class LabLauncherService:
                 "error": str(e)
             }
     
-    async def execute_containerlab_destroy(self, lab_name: str, lab_file: Path) -> Dict:
-        """Execute containerlab destroy command with proper error handling"""
+    async def execute_containerlab_destroy(self, lab_name: str, lab_file: str) -> Dict:
+        """Execute containerlab destroy command using runtime provider"""
         try:
-            cmd = ["containerlab", "destroy", "-t", str(lab_file)]
+            cmd = ["containerlab", "destroy", "-t", lab_file]
             
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=lab_file.parent
-            )
+            # Get working directory (parent of lab file)
+            assert self.runtime_provider is not None, "Runtime provider should be initialized"
+            cwd = str(Path(lab_file).parent) if self.runtime_provider.type == "local" else "/tmp"
             
-            stdout, stderr = await process.communicate()
+            return_code, stdout, stderr = await self.runtime_provider.execute_command(cmd, cwd)
             
             # Check return code for destroy operation
-            if process.returncode == 0:
+            if return_code == 0:
                 return {
                     "success": True,
-                    "stdout": stdout.decode(),
-                    "stderr": stderr.decode()
+                    "stdout": stdout,
+                    "stderr": stderr
                 }
             else:
                 return {
                     "success": False,
-                    "error": stderr.decode() or f"Destroy failed with return code {process.returncode}",
-                    "stdout": stdout.decode()
+                    "error": stderr or f"Destroy failed with return code {return_code}",
+                    "stdout": stdout
                 }
                 
         except Exception as e:
@@ -375,15 +392,10 @@ class LabLauncherService:
             # Use containerlab inspect to check status with the actual lab name
             cmd = ["containerlab", "inspect", "--name", lab_name]
             
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
+            assert self.runtime_provider is not None, "Runtime provider should be initialized"
+            return_code, stdout, stderr = await self.runtime_provider.execute_command(cmd)
             
-            stdout, stderr = await process.communicate()
-            
-            if process.returncode == 0:
+            if return_code == 0:
                 return "running"
             else:
                 return "stopped"
