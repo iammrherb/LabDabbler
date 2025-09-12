@@ -21,7 +21,7 @@ function App() {
   const fetchData = async () => {
     try {
       // Use backend API - in Replit, use the same domain but different port mapping
-      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
       const apiBase = window.location.hostname.includes('replit.dev') 
         ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
         : `${window.location.protocol}//${window.location.hostname}:8000`
@@ -48,7 +48,7 @@ function App() {
   const refreshContainers = async () => {
     setLoading(true)
     try {
-      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
       const apiBase = window.location.hostname.includes('replit.dev') 
         ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
         : `${window.location.protocol}//${window.location.hostname}:8000`
@@ -67,7 +67,7 @@ function App() {
   const scanGitHubLabs = async () => {
     setLoading(true)
     try {
-      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
       const apiBase = window.location.hostname.includes('replit.dev') 
         ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
         : `${window.location.protocol}//${window.location.hostname}:8000`
@@ -97,7 +97,7 @@ function App() {
         return
       }
       
-      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
       const apiBase = window.location.hostname.includes('replit.dev') 
         ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
         : `${window.location.protocol}//${window.location.hostname}:8000`
@@ -131,7 +131,7 @@ function App() {
   const stopLab = async (labId) => {
     setLoading(true)
     try {
-      const domain = process.env.REPLIT_DOMAINS || window.location.hostname
+      const domain = import.meta.env.VITE_REPLIT_DOMAINS || window.location.hostname
       const apiBase = window.location.hostname.includes('replit.dev') 
         ? `${window.location.protocol}//${domain.replace('-00-', '-8000-')}`
         : `${window.location.protocol}//${window.location.hostname}:8000`
