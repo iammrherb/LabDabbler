@@ -8,10 +8,11 @@
  * @returns {string} The API base URL
  */
 export const getApiBase = () => {
-  // In Replit environment, use internal network IP for reliable communication
-  // This is the same approach that works in App.jsx
+  // In Replit environment, construct proper backend URL
   if (window.location.hostname.includes('replit.dev')) {
-    return 'http://172.31.93.98:8000'
+    // Build backend URL using current hostname but port 8000
+    const currentUrl = new URL(window.location.href)
+    return `${currentUrl.protocol}//${currentUrl.hostname}:8000`
   }
   
   // For local development

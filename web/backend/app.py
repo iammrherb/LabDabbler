@@ -65,9 +65,9 @@ app = FastAPI(title="LabDabbler - Master Lab Repository", version="1.0.0", lifes
 # Configure CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5000", "https://*.replit.dev"],
+    allow_origins=["http://localhost:5000", "https://*.replit.dev", "http://*.replit.dev"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
