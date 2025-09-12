@@ -55,11 +55,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data storage - paths relative to project root
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-LABS_DIR = PROJECT_ROOT / "labs"
-CONFIGS_DIR = PROJECT_ROOT / "configs"
-DATA_DIR = PROJECT_ROOT / "data"
+# Data storage - paths relative to project root or container environment
+if os.getenv("ENVIRONMENT") == "production":
+    # In Docker container, use paths relative to /app
+    PROJECT_ROOT = Path("/app")
+    LABS_DIR = PROJECT_ROOT / "labs"
+    CONFIGS_DIR = PROJECT_ROOT / "configs"
+    DATA_DIR = PROJECT_ROOT / "data"
+else:
+    # In development, use paths relative to project root
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    LABS_DIR = PROJECT_ROOT / "labs"
+    CONFIGS_DIR = PROJECT_ROOT / "configs"
+    DATA_DIR = PROJECT_ROOT / "data"
 
 # Update service data directories to use PROJECT_ROOT/data
 container_service.data_dir = DATA_DIR

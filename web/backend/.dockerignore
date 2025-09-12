@@ -1,0 +1,29 @@
+# Ignore large data directories to reduce build context
+data/vrnetlab_repo/
+data/repositories/
+data/container_registry/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Ignore logs
+*.log
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db

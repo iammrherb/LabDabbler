@@ -19,7 +19,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy requirements
-COPY ../../pyproject.toml ../../uv.lock ./
+COPY pyproject.toml uv.lock ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
@@ -77,5 +77,5 @@ ENV PYTHONUNBUFFERED=1
 ENV ENVIRONMENT=production
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Start the application (ensure we're in the correct directory)
-CMD ["sh", "-c", "cd /app && python -m uvicorn app:app --host 0.0.0.0 --port 8000 --workers 4 --access-log --log-level info"]
+# Start the application
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--access-log", "--log-level", "info"]
